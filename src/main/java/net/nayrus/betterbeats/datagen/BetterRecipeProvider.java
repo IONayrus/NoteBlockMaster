@@ -2,13 +2,12 @@ package net.nayrus.betterbeats.datagen;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import net.nayrus.betterbeats.block.BlockRegistry;
+import net.nayrus.betterbeats.datagen.recipes.WakerRecipeBuilder;
 import net.nayrus.betterbeats.item.ItemRegistry;
+import net.nayrus.betterbeats.util.BetterTags;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
@@ -22,7 +21,7 @@ public class BetterRecipeProvider extends RecipeProvider implements IConditionBu
 
     @Override
     protected void buildRecipes(RecipeOutput recipeOutput) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ItemRegistry.BEATWAKER.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ItemRegistry.BEAT_WAKER.get())
                 .pattern("  N")
                 .pattern("NN ")
                 .pattern("I  ")
@@ -32,7 +31,13 @@ public class BetterRecipeProvider extends RecipeProvider implements IConditionBu
                 .pattern(" N ")
                 .pattern("NBN")
                 .pattern(" W ")
-                .define('N', Tags.Items.NUGGETS_GOLD).define('B', Items.NOTE_BLOCK).define('W', ItemRegistry.BEATWAKER.get())
-                .unlockedBy("has_iron", has(ItemRegistry.BEATWAKER)).save(recipeOutput);
+                .define('N', Tags.Items.NUGGETS_GOLD).define('B', Items.NOTE_BLOCK).define('W', BetterTags.Items.BEATWAKERS)
+                .unlockedBy("has_waker", has(ItemRegistry.BEAT_WAKER)).save(recipeOutput);
+
+        WakerRecipeBuilder.shaped(RecipeCategory.MISC, ItemRegistry.NOTE_WAKER.get())
+                .pattern("PG")
+                .pattern("WP")
+                .define('W', ItemRegistry.BEAT_WAKER).define('P', Items.PURPLE_DYE).define('G', Items.GHAST_TEAR)
+                .unlockedBy("has_waker", has(ItemRegistry.BEAT_WAKER)).save(recipeOutput);
     }
 }

@@ -1,10 +1,8 @@
 package net.nayrus.betterbeats.datagen;
 
 
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.nayrus.betterbeats.BetterBeats;
 import net.nayrus.betterbeats.item.ItemRegistry;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
@@ -19,7 +17,8 @@ public class BetterItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        handheldItem(ItemRegistry.BEATWAKER);
+        handheldItem(ItemRegistry.BEAT_WAKER);
+        handheldItem(ItemRegistry.NOTE_WAKER);
     }
 
     private ItemModelBuilder handheldItem(DeferredItem<?> item) {

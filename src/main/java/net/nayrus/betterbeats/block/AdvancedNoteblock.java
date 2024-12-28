@@ -48,7 +48,7 @@ public class AdvancedNoteblock extends NoteBlock
     @Override
     protected ItemInteractionResult useItemOn(
             ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(!stack.is(ItemRegistry.BEATWAKER.asItem())) return super.useItemOn(stack,state,level,pos,player,hand,hitResult);
+        if(!stack.is(ItemRegistry.BEAT_WAKER.asItem())) return super.useItemOn(stack,state,level,pos,player,hand,hitResult);
 
         if(!level.isClientSide){
             int val = state.getValue(SUBTICK);
@@ -60,7 +60,7 @@ public class AdvancedNoteblock extends NoteBlock
     @Override
     protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
         if (!level.isClientSide) {
-            if(!player.getWeaponItem().is(ItemRegistry.BEATWAKER))
+            if(!player.getWeaponItem().is(ItemRegistry.BEAT_WAKER))
                 super.attack(state, level, pos, player);
             else{
                 int state_val = state.getValue(SUBTICK);
