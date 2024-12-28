@@ -20,8 +20,7 @@ public class BetterItemTagProvider extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(BetterTags.Items.BETTER_BEATS)
-                .add(ItemRegistry.BEATWAKER.get())
-                .add(BlockRegistry.ADVANCED_NOTEBLOCK.asItem());
+        tag(BetterTags.Items.BEATWAKERS)
+                .add(ItemRegistry.BEATWAKER.get());
     }
 }

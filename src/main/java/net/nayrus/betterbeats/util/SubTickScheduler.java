@@ -1,10 +1,8 @@
 package net.nayrus.betterbeats.util;
 
 
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NoteBlock;
@@ -12,7 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.nayrus.betterbeats.block.AdvancedNoteblock;
 
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class SubTickScheduler {
 
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    public static final long SUBTICK_LENGTH = 5L;
 
     public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos, int id, int param){
         executor.schedule(()-> {
@@ -34,10 +32,8 @@ public class SubTickScheduler {
             } else {
                 f = 1.0F;
             }
-            if(level.isClientSide())
-                Optional.ofNullable(level.getNearestPlayer(pos.getX(), pos.getY(), pos.getZ(), 100D, true))
-                    .ifPresent(player -> player.sendSystemMessage(Component.literal(Util.getMillis()+": Event: "+level.isClientSide())));
-            level.playSeededSound(
+
+            level.playSound(
                     null,
                     (double)pos.getX() + 0.5,
                     (double)pos.getY() + 0.5,
@@ -45,10 +41,9 @@ public class SubTickScheduler {
                     noteblockinstrument.getSoundEvent(),
                     SoundSource.RECORDS,
                     3.0F,
-                    f,
-                    level.random.nextLong()
+                    f
             );
-        },state.getValue(AdvancedNoteblock.SUBTICK)*5L, TimeUnit.MILLISECONDS);
+        },state.getValue(AdvancedNoteblock.SUBTICK) * SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
     }
 
     public static void shutdown(){executor.shutdown();}

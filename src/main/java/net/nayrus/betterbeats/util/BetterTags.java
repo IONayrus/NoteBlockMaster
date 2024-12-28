@@ -19,7 +19,7 @@ public class BetterTags {
     }
 
     public static class Items {
-        public static final TagKey<Item> BETTER_BEATS = createTag("betterbeats_item");
+        public static final TagKey<Item> BEATWAKERS = createTag("beatwakers");
 
         private static TagKey<Item> createTag(String name) {
             return ItemTags.create(ResourceLocation.fromNamespaceAndPath(BetterBeats.MOD_ID, name));
