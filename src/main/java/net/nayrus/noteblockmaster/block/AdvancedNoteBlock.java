@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.nayrus.noteblockmaster.Config;
 import net.nayrus.noteblockmaster.util.Registry;
 import net.nayrus.noteblockmaster.util.NBMTags;
 import net.nayrus.noteblockmaster.util.SubTickScheduler;
@@ -34,9 +35,9 @@ import javax.annotation.Nullable;
 public class AdvancedNoteBlock extends Block
 {
 
-    public static final int MAX_SUBTICKS = (int) (100 / SubTickScheduler.SUBTICK_LENGTH);
-    public static final IntegerProperty SUBTICK = IntegerProperty.create("subtick",0,MAX_SUBTICKS-1);
-    public static final IntegerProperty OCTAVE = IntegerProperty.create("octave",0,6);
+    public static int MAX_SUBTICKS;
+    public static IntegerProperty SUBTICK;
+    public static IntegerProperty OCTAVE;
     public static final IntegerProperty KEY = IntegerProperty.create("key",0,11);
     public static final String[] NOTE_STRING = {"C1", "C#1", "D1", "D#1", "E1", "F1", "F#1", "G1", "G#1", "A1", "A#1", "B1",
                                                 "C2", "C#2", "D2", "D#2", "E2", "F2", "F#2", "G2", "G#2", "A2", "A#2", "B2",
@@ -45,12 +46,12 @@ public class AdvancedNoteBlock extends Block
                                                 "C5", "C#5", "D5", "D#5", "E5", "F5", "F#5", "G5", "G#5", "A5", "A#5", "B5",
                                                 "C6", "C#6", "D6", "D#6", "E6", "F6", "F#6", "G6", "G#6", "A6", "A#6", "B6",
                                                 "C7", "C#7", "D7", "D#7", "E7", "F7", "F#7", "G7", "G#7", "A7", "A#7", "B7"};
+    public static int minNoteVal;
+    public static int maxNoteVal;
 
     private final int defaultNoteValue;
-    private final int minNoteVal;
-    private final int maxNoteVal;
 
-    public AdvancedNoteBlock(Properties properties, int minNote, int maxNote) {
+    public AdvancedNoteBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition
@@ -62,12 +63,6 @@ public class AdvancedNoteBlock extends Block
                         .setValue(KEY, 6)
         );
         defaultNoteValue = getNoteValue(this.defaultBlockState());
-        this.minNoteVal = Math.max(minNote, 0);
-        this.maxNoteVal = Math.min(maxNote, NOTE_STRING.length - 2); //B7 is out of range, A#7 is out of tune but ok
-    }
-
-    public AdvancedNoteBlock(Properties properties){
-        this(properties, 0, NOTE_STRING.length );
     }
 
     private BlockState setInstrument(LevelAccessor level, BlockPos pos, BlockState state) {
@@ -180,25 +175,31 @@ public class AdvancedNoteBlock extends Block
 
     @Override
     protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
-        SubTickScheduler.delayedNoteBlockEvent(state, level, pos, id, param);
+        net.neoforged.neoforge.event.level.NoteBlockEvent.Play e = new net.neoforged.neoforge.event.level.NoteBlockEvent.Play(level, pos, state, getNoteValue(state), state.getValue(NoteBlock.INSTRUMENT));
+        if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
+        SubTickScheduler.delayedNoteBlockEvent(state, level, pos);
         return true;
     }
 
     public static int noteStringAsInt(String note){
-        if(note.length() > 3 || note.length() < 2) throw new IllegalArgumentException();
-        int val = note.length() == 3 ? 1 : 0;
-        switch(note.charAt(0)){
-            case 'B': val ++;
-            case 'A': val += 2;
-            case 'G': val += 2;
-            case 'F': val ++;
-            case 'E': val += 2;
-            case 'D': val += 2;
-            case 'C': break;
+        try{
+            return Integer.parseInt(note);
+        } catch (NumberFormatException e) {
+            if(note.length() > 3 || note.length() < 2) throw new IllegalArgumentException();
+            int val = note.length() == 3 ? 1 : 0;
+            switch(note.charAt(0)){
+                case 'B': val ++;
+                case 'A': val += 2;
+                case 'G': val += 2;
+                case 'F': val ++;
+                case 'E': val += 2;
+                case 'D': val += 2;
+                case 'C': break;
+            }
+            val += ((Character.getNumericValue(note.charAt(note.length()-1)) - 1) * 12);
+            if(val < 0 || val >= NOTE_STRING.length) throw new IllegalArgumentException();
+            return val;
         }
-        val += ((Character.getNumericValue(note.charAt(note.length()-1)) - 1) * 12);
-        if(val < 0 || val >= NOTE_STRING.length) throw new IllegalArgumentException();
-        return val;
     }
 
     public static int getNoteValue(BlockState state){
@@ -216,8 +217,8 @@ public class AdvancedNoteBlock extends Block
 
     public int changeNoteValueBy(int note, int value){
         int _new = (note + value);
-        if(_new >= note) return (_new <= maxNoteVal) ? _new : ((_new % maxNoteVal) + minNoteVal);
-        else return (_new >= minNoteVal) ? _new : (maxNoteVal - (minNoteVal % _new));
+        if(_new >= note) return (_new <= maxNoteVal) ? _new : ((_new % maxNoteVal) - 1 + minNoteVal);
+        else return (_new >= minNoteVal) ? _new : (maxNoteVal - (minNoteVal % _new) + 1);
     }
 
 }

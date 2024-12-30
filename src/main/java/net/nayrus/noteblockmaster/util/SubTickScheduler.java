@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 public class SubTickScheduler {
 
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    public static final long SUBTICK_LENGTH = 5L;
+    public static long SUBTICK_LENGTH;
 
-    public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos, int id, int param){
+    public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos){
         executor.schedule(()-> {
             NoteBlockInstrument noteblockinstrument = state.getValue(NoteBlock.INSTRUMENT);
             float f;

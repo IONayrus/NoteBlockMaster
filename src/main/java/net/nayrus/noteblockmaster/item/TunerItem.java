@@ -17,8 +17,8 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.nayrus.noteblockmaster.block.AdvancedNoteBlock.NOTE_STRING;
 
-public class Tuner extends Item {
-    public Tuner(Properties properties) {
+public class TunerItem extends Item {
+    public TunerItem(Properties properties) {
         super(properties);
     }
 

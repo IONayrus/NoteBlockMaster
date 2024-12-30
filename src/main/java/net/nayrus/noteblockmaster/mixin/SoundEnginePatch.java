@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SoundEngine.class)
-public abstract class SoundLimitBreaker {
+public abstract class SoundEnginePatch {
     @Inject(method = "calculatePitch", at = @At("HEAD"), cancellable = true)
     private void breakSoundLimit(SoundInstance sound, CallbackInfoReturnable<Float> cir) {
         float limit = sound.getSource() == SoundSource.RECORDS ? 8 : 1;

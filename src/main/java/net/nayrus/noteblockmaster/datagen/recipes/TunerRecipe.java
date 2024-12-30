@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
-import net.nayrus.noteblockmaster.item.Tuner;
+import net.nayrus.noteblockmaster.item.TunerItem;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -26,7 +26,7 @@ public class TunerRecipe extends ShapedRecipe {
         for (int i = 0; i < remainingItems.size(); i++) {
             ItemStack stack = input.getItem(i);
 
-            if (stack.getItem() instanceof Tuner) {
+            if (stack.getItem() instanceof TunerItem) {
                 // Consume this specific item
                 remainingItems.set(i, ItemStack.EMPTY);
             } else if (!stack.isEmpty() && stack.hasCraftingRemainingItem()) {

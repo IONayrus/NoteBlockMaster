@@ -1,12 +1,20 @@
 package net.nayrus.noteblockmaster;
 
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
 import net.nayrus.noteblockmaster.util.Registry;
 import net.nayrus.noteblockmaster.util.SubTickScheduler;
+import net.neoforged.fml.config.ConfigTracker;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.fml.javafmlmod.FMLModContainer;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
+import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
@@ -42,8 +50,9 @@ public class NoteBlockMaster
 
     public NoteBlockMaster(IEventBus modEventBus, ModContainer modContainer)
     {
+        modContainer.registerConfig(ModConfig.Type.STARTUP, Config.SPEC);
 
-        modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::beforeModRegistry);
 
         Registry.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
@@ -51,13 +60,16 @@ public class NoteBlockMaster
         NeoForge.EVENT_BUS.register(this);
 
         modEventBus.addListener(this::addCreative);
-
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
+    private void beforeModRegistry (final NewRegistryEvent event)
     {
-
+        SubTickScheduler.SUBTICK_LENGTH = Config.SUBTICK_LENGTH.get();
+        AdvancedNoteBlock.MAX_SUBTICKS = (int) (100 / SubTickScheduler.SUBTICK_LENGTH);
+        AdvancedNoteBlock.SUBTICK = IntegerProperty.create("subtick",0,AdvancedNoteBlock.MAX_SUBTICKS-1);
+        AdvancedNoteBlock.OCTAVE = IntegerProperty.create("octave",2 - Config.ADDITIONAL_OCTAVES.get(),4 + Config.ADDITIONAL_OCTAVES.get());
+        AdvancedNoteBlock.minNoteVal = AdvancedNoteBlock.noteStringAsInt(Config.LOWER_NOTE_LIMIT.get());
+        AdvancedNoteBlock.maxNoteVal = AdvancedNoteBlock.noteStringAsInt(Config.HIGHER_NOTE_LIMIT.get());
     }
 
     // Add the example block item to the building blocks tab
