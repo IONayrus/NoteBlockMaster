@@ -12,10 +12,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.util.Registry;
-import net.nayrus.noteblockmaster.util.SubTickScheduler;
 import org.jetbrains.annotations.NotNull;
 
-import static net.nayrus.noteblockmaster.block.AdvancedNoteBlock.NOTE_STRING;
+import static net.nayrus.noteblockmaster.util.Util.NOTE_STRING;
 
 public class TunerItem extends Item {
     public TunerItem(Properties properties) {
@@ -45,7 +44,7 @@ public class TunerItem extends Item {
 
             if (stack.is(Registry.TEMPOTUNER)) {
                 int val = state.getValue(AdvancedNoteBlock.SUBTICK);
-                player.displayClientMessage(Component.literal(val / 10f + " ticks (" + val * SubTickScheduler.SUBTICK_LENGTH + " ms)").withColor(0xB0B0B0), true);
+                player.displayClientMessage(Component.literal(val / 10f + " ticks (" + val * AdvancedNoteBlock.SUBTICK_LENGTH + " ms)").withColor(0xB0B0B0), true);
                 return InteractionResult.SUCCESS;
             }
             if (stack.is(Registry.NOTETUNER)) {

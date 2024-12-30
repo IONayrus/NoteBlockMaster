@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 public class SubTickScheduler {
 
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    public static long SUBTICK_LENGTH;
 
     public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos){
         executor.schedule(()-> {
@@ -33,7 +32,7 @@ public class SubTickScheduler {
             } else {
                 f = 1.0F;
             }
-            if(!level.isClientSide()) NoteBlockMaster.LOGGER.info(Float.toString(f));
+
             level.playSound(
                     null,
                     (double)pos.getX() + 0.5,
@@ -44,7 +43,7 @@ public class SubTickScheduler {
                     3.0F,
                     f
             );
-        },state.getValue(AdvancedNoteBlock.SUBTICK) * SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
+        },state.getValue(AdvancedNoteBlock.SUBTICK) * AdvancedNoteBlock.SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
     }
 
     public static void shutdown(){executor.shutdown();}
