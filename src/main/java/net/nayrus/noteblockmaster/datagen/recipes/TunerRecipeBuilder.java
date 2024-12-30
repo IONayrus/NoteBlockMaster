@@ -1,4 +1,4 @@
-package net.nayrus.betterbeats.datagen.recipes;
+package net.nayrus.noteblockmaster.datagen.recipes;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class WakerRecipeBuilder implements RecipeBuilder {
+public class TunerRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category;
     private final Item result;
     private final int count;
@@ -36,38 +36,38 @@ public class WakerRecipeBuilder implements RecipeBuilder {
     private String group;
     private boolean showNotification = true;
 
-    public WakerRecipeBuilder(RecipeCategory category, ItemLike result, int count) {
+    public TunerRecipeBuilder(RecipeCategory category, ItemLike result, int count) {
         this(category, new ItemStack(result, count));
     }
 
-    public WakerRecipeBuilder(RecipeCategory p_249996_, ItemStack result) {
+    public TunerRecipeBuilder(RecipeCategory p_249996_, ItemStack result) {
         this.category = p_249996_;
         this.result = result.getItem();
         this.count = result.getCount();
         this.resultStack = result;
     }
 
-    public static WakerRecipeBuilder shaped(RecipeCategory category, ItemLike result) {
+    public static TunerRecipeBuilder shaped(RecipeCategory category, ItemLike result) {
         return shaped(category, result, 1);
     }
 
-    public static WakerRecipeBuilder shaped(RecipeCategory category, ItemLike result, int count) {
-        return new WakerRecipeBuilder(category, result, count);
+    public static TunerRecipeBuilder shaped(RecipeCategory category, ItemLike result, int count) {
+        return new TunerRecipeBuilder(category, result, count);
     }
 
-    public static WakerRecipeBuilder shaped(RecipeCategory p_251325_, ItemStack result) {
-        return new WakerRecipeBuilder(p_251325_, result);
+    public static TunerRecipeBuilder shaped(RecipeCategory p_251325_, ItemStack result) {
+        return new TunerRecipeBuilder(p_251325_, result);
     }
 
-    public WakerRecipeBuilder define(Character symbol, TagKey<Item> tag) {
+    public TunerRecipeBuilder define(Character symbol, TagKey<Item> tag) {
         return this.define(symbol, Ingredient.of(tag));
     }
 
-    public WakerRecipeBuilder define(Character symbol, ItemLike item) {
+    public TunerRecipeBuilder define(Character symbol, ItemLike item) {
         return this.define(symbol, Ingredient.of(item));
     }
 
-    public WakerRecipeBuilder define(Character symbol, Ingredient ingredient) {
+    public TunerRecipeBuilder define(Character symbol, Ingredient ingredient) {
         if (this.key.containsKey(symbol)) {
             throw new IllegalArgumentException("Symbol '" + symbol + "' is already defined!");
         } else if (symbol == ' ') {
@@ -78,7 +78,7 @@ public class WakerRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    public WakerRecipeBuilder pattern(String pattern) {
+    public TunerRecipeBuilder pattern(String pattern) {
         if (!this.rows.isEmpty() && pattern.length() != this.rows.get(0).length()) {
             throw new IllegalArgumentException("Pattern must be the same width on every line!");
         } else {
@@ -87,17 +87,17 @@ public class WakerRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    public WakerRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
+    public TunerRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
         this.criteria.put(name, criterion);
         return this;
     }
 
-    public WakerRecipeBuilder group(@Nullable String groupName) {
+    public TunerRecipeBuilder group(@Nullable String groupName) {
         this.group = groupName;
         return this;
     }
 
-    public WakerRecipeBuilder showNotification(boolean showNotification) {
+    public TunerRecipeBuilder showNotification(boolean showNotification) {
         this.showNotification = showNotification;
         return this;
     }
@@ -115,7 +115,7 @@ public class WakerRecipeBuilder implements RecipeBuilder {
                 .rewards(AdvancementRewards.Builder.recipe(id))
                 .requirements(AdvancementRequirements.Strategy.OR);
         this.criteria.forEach(advancement$builder::addCriterion);
-        WakerRecipe shapedrecipe = new WakerRecipe(
+        TunerRecipe shapedrecipe = new TunerRecipe(
                 Objects.requireNonNullElse(this.group, ""),
                 RecipeBuilder.determineBookCategory(this.category),
                 shapedrecipepattern,

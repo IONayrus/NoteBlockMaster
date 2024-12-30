@@ -1,11 +1,11 @@
-package net.nayrus.betterbeats.datagen;
+package net.nayrus.noteblockmaster.datagen;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.nayrus.betterbeats.BetterBeats;
+import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(modid = BetterBeats.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = NoteBlockMaster.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class DataGenerators {
 
     @SubscribeEvent
@@ -27,14 +27,14 @@ public class DataGenerators {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
         gen.addProvider(event.includeServer(), new LootTableProvider(output, Collections.emptySet(),
-                List.of(new LootTableProvider.SubProviderEntry(BetterBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
-        gen.addProvider(event.includeServer(), new BetterRecipeProvider(output, lookupProvider));
+                List.of(new LootTableProvider.SubProviderEntry(NBMBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
+        gen.addProvider(event.includeServer(), new NBMRecipeProvider(output, lookupProvider));
 
-        BlockTagsProvider blockTagsProvider = new BetterBlockTagProvider(output, lookupProvider, helper);
+        BlockTagsProvider blockTagsProvider = new NBMBlockTagProvider(output, lookupProvider, helper);
         gen.addProvider(event.includeServer(), blockTagsProvider);
-        gen.addProvider(event.includeServer(), new BetterItemTagProvider(output, lookupProvider, blockTagsProvider.contentsGetter(), helper));
+        gen.addProvider(event.includeServer(), new NBMItemTagProvider(output, lookupProvider, blockTagsProvider.contentsGetter(), helper));
 
-        gen.addProvider(event.includeClient(), new BetterItemModelProvider(output, helper));
-        gen.addProvider(event.includeClient(), new BetterBlockStateProvider(output, helper));
+        gen.addProvider(event.includeClient(), new NBMItemModelProvider(output, helper));
+        gen.addProvider(event.includeClient(), new NBMBlockStateProvider(output, helper));
     }
 }

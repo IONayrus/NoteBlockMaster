@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SpongePowered/Mixin/master/schema/mixin-config.schema.json",
+  "required": true,
+  "package": "net.nayrus.noteblockmaster.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "SoundLimitBreaker"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

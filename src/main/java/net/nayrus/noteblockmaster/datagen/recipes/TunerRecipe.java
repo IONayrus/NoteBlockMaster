@@ -1,4 +1,4 @@
-package net.nayrus.betterbeats.datagen.recipes;
+package net.nayrus.noteblockmaster.datagen.recipes;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -6,16 +6,16 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import net.nayrus.betterbeats.BetterBeats;
-import net.nayrus.betterbeats.item.BeatWaker;
+import net.nayrus.noteblockmaster.NoteBlockMaster;
+import net.nayrus.noteblockmaster.item.Tuner;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 
-public class WakerRecipe extends ShapedRecipe {
+public class TunerRecipe extends ShapedRecipe {
 
-    public WakerRecipe(String group, CraftingBookCategory category, ShapedRecipePattern pattern, ItemStack result, boolean showNotification) {
+    public TunerRecipe(String group, CraftingBookCategory category, ShapedRecipePattern pattern, ItemStack result, boolean showNotification) {
         super(group, category, pattern, result, showNotification);
     }
 
@@ -26,7 +26,7 @@ public class WakerRecipe extends ShapedRecipe {
         for (int i = 0; i < remainingItems.size(); i++) {
             ItemStack stack = input.getItem(i);
 
-            if (stack.getItem() instanceof BeatWaker) {
+            if (stack.getItem() instanceof Tuner) {
                 // Consume this specific item
                 remainingItems.set(i, ItemStack.EMPTY);
             } else if (!stack.isEmpty() && stack.hasCraftingRemainingItem()) {
@@ -39,7 +39,7 @@ public class WakerRecipe extends ShapedRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return BetterBeats.WAKER_RECIPE_SERIALIZER.get();
+        return NoteBlockMaster.TUNER_RECIPE_SERIALIZER.get();
     }
 
     public HolderLookup.Provider getDummyProvider(){

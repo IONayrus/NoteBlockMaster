@@ -1,29 +1,29 @@
-package net.nayrus.betterbeats.datagen;
+package net.nayrus.noteblockmaster.datagen;
 
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.nayrus.betterbeats.BetterBeats;
-import net.nayrus.betterbeats.item.ItemRegistry;
+import net.nayrus.noteblockmaster.NoteBlockMaster;
+import net.nayrus.noteblockmaster.util.Registry;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-public class BetterItemModelProvider extends ItemModelProvider {
-    public BetterItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
-        super(output, BetterBeats.MOD_ID, existingFileHelper);
+public class NBMItemModelProvider extends ItemModelProvider {
+    public NBMItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
+        super(output, NoteBlockMaster.MOD_ID, existingFileHelper);
     }
 
     @Override
     protected void registerModels() {
-        handheldItem(ItemRegistry.BEAT_WAKER);
-        handheldItem(ItemRegistry.NOTE_WAKER);
+        handheldItem(Registry.TEMPOTUNER);
+        handheldItem(Registry.NOTETUNER);
     }
 
     private ItemModelBuilder handheldItem(DeferredItem<?> item) {
         return withExistingParent(item.getId().getPath(),
                 ResourceLocation.parse("item/handheld")).texture("layer0",
-                ResourceLocation.fromNamespaceAndPath(BetterBeats.MOD_ID,"item/" + item.getId().getPath()));
+                ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID,"item/" + item.getId().getPath()));
     }
 }

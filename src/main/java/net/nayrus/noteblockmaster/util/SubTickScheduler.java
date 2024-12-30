@@ -1,4 +1,4 @@
-package net.nayrus.betterbeats.util;
+package net.nayrus.noteblockmaster.util;
 
 
 import net.minecraft.core.BlockPos;
@@ -8,7 +8,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.nayrus.betterbeats.block.AdvancedNoteblock;
+import net.nayrus.noteblockmaster.NoteBlockMaster;
+import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,15 +25,15 @@ public class SubTickScheduler {
             NoteBlockInstrument noteblockinstrument = state.getValue(NoteBlock.INSTRUMENT);
             float f;
             if (noteblockinstrument.isTunable()) {
-                int i = state.getValue(NoteBlock.NOTE);
-                f = NoteBlock.getPitchFromNote(i);
+                int i = AdvancedNoteBlock.getNoteValue(state);
+                f = AdvancedNoteBlock.getPitchFromNote(i);
                 level.addParticle(
                         ParticleTypes.NOTE, (double)pos.getX() + 0.5, (double)pos.getY() + 1.2, (double)pos.getZ() + 0.5, (double)i / 24.0, 0.0, 0.0
                 );
             } else {
                 f = 1.0F;
             }
-
+            if(!level.isClientSide()) NoteBlockMaster.LOGGER.info(Float.toString(f));
             level.playSound(
                     null,
                     (double)pos.getX() + 0.5,
@@ -43,7 +44,7 @@ public class SubTickScheduler {
                     3.0F,
                     f
             );
-        },state.getValue(AdvancedNoteblock.SUBTICK) * SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
+        },state.getValue(AdvancedNoteBlock.SUBTICK) * SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
     }
 
     public static void shutdown(){executor.shutdown();}

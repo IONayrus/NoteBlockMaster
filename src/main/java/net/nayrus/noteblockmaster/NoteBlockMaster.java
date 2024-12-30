@@ -1,10 +1,9 @@
-package net.nayrus.betterbeats;
+package net.nayrus.noteblockmaster;
 
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.nayrus.betterbeats.block.BlockRegistry;
-import net.nayrus.betterbeats.datagen.recipes.WakerRecipeSerializer;
-import net.nayrus.betterbeats.item.ItemRegistry;
-import net.nayrus.betterbeats.util.SubTickScheduler;
+import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
+import net.nayrus.noteblockmaster.util.Registry;
+import net.nayrus.noteblockmaster.util.SubTickScheduler;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -28,26 +27,25 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
-@Mod(BetterBeats.MOD_ID)
-public class BetterBeats
+@Mod(NoteBlockMaster.MOD_ID)
+public class NoteBlockMaster
 {
 
-    public static final String MOD_ID = "betterbeats";
+    public static final String MOD_ID = "noteblockmaster";
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, MOD_ID);
-    public static final DeferredHolder<RecipeSerializer<?>, WakerRecipeSerializer> WAKER_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("wakerrecipe", () -> WakerRecipeSerializer.INSTANCE);
+    public static final DeferredHolder<RecipeSerializer<?>, TunerRecipeSerializer> TUNER_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("tunerrecipe", () -> TunerRecipeSerializer.INSTANCE);
 
 
-    public BetterBeats(IEventBus modEventBus, ModContainer modContainer)
+    public NoteBlockMaster(IEventBus modEventBus, ModContainer modContainer)
     {
 
         modEventBus.addListener(this::commonSetup);
 
-        BlockRegistry.register(modEventBus);
-        ItemRegistry.register(modEventBus);
+        Registry.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         RECIPE_SERIALIZERS.register(modEventBus);
         NeoForge.EVENT_BUS.register(this);
@@ -66,11 +64,11 @@ public class BetterBeats
     private void addCreative(BuildCreativeModeTabContentsEvent event)
     {
         if(event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES){
-            event.accept(ItemRegistry.BEAT_WAKER);
-            event.accept(ItemRegistry.NOTE_WAKER);
+            event.accept(Registry.TEMPOTUNER);
+            event.accept(Registry.NOTETUNER);
         }
         if(event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS){
-            event.accept(BlockRegistry.ADVANCED_NOTEBLOCK);
+            event.accept(Registry.ADVANCED_NOTEBLOCK);
         }
     }
 
