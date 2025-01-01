@@ -11,6 +11,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.utils.Registry;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +45,8 @@ public class TunerItem extends Item {
 
             if (stack.is(Registry.TEMPOTUNER)) {
                 int val = state.getValue(AdvancedNoteBlock.SUBTICK);
-                player.displayClientMessage(Component.literal(val / 10f + " ticks (" + val * AdvancedNoteBlock.SUBTICK_LENGTH + " ms)").withColor(0xB0B0B0), true);
+                player.displayClientMessage(Component.literal(val / 10f + " ticks (" + val * AdvancedNoteBlock.SUBTICK_LENGTH + " ms)")
+                        .withColor(AdvancedNoteBlock.getColor(state, ANBInfoRender.PROPERTY.TEMPO).getRGB()), true);
                 return InteractionResult.SUCCESS;
             }
             if (stack.is(Registry.NOTETUNER)) {
@@ -57,7 +59,8 @@ public class TunerItem extends Item {
                 level.setBlock(pos, state, 3);
                 block.playNote(player, state, level, pos);
                 player.awardStat(Stats.TUNE_NOTEBLOCK);
-                player.displayClientMessage(Component.literal(NOTE_STRING[_new]).withColor(0xB030B0), true);
+                player.displayClientMessage(Component.literal(NOTE_STRING[_new])
+                        .withColor(AdvancedNoteBlock.getColor(state, ANBInfoRender.PROPERTY.NOTE).getRGB()), true);
                 return InteractionResult.SUCCESS;
             }
         }

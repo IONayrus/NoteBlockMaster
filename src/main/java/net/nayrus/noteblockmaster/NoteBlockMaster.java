@@ -1,16 +1,25 @@
 package net.nayrus.noteblockmaster;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.command.BPMInfoCommand;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
 import net.nayrus.noteblockmaster.event.RenderLevelStage;
 import net.nayrus.noteblockmaster.utils.Registry;
 import net.nayrus.noteblockmaster.utils.SubTickScheduler;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
+import net.neoforged.neoforge.server.command.ConfigCommand;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
@@ -28,6 +37,8 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(NoteBlockMaster.MOD_ID)
@@ -76,6 +87,13 @@ public class NoteBlockMaster
     public void onServerStopped(ServerStoppedEvent event)
     {
         SubTickScheduler.shutdown();
+    }
+
+    @SubscribeEvent
+    public void onCommandRegister(RegisterCommandsEvent event){
+        new BPMInfoCommand(event.getDispatcher());
+
+        ConfigCommand.register(event.getDispatcher());
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent

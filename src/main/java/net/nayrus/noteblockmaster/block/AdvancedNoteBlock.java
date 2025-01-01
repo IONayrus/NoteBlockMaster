@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.Config;
+import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.utils.Registry;
 import net.nayrus.noteblockmaster.utils.NBMTags;
 import net.nayrus.noteblockmaster.utils.SubTickScheduler;
@@ -33,12 +35,13 @@ import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 
 public class AdvancedNoteBlock extends Block
 {
 
     public static int MAX_SUBTICKS;
-    public static long SUBTICK_LENGTH;
+    public static int SUBTICK_LENGTH;
     public static IntegerProperty SUBTICK;
     public static IntegerProperty NOTE;
     public static int MIN_NOTE_VAL;
@@ -130,6 +133,18 @@ public class AdvancedNoteBlock extends Block
         }
     }
 
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+        boolean flag = level.hasNeighborSignal(pos);
+        if (flag != state.getValue(NoteBlock.POWERED)) {
+            if (flag) {
+                this.playNote(null, state, level, pos);
+            }
+
+            level.setBlock(pos, state.setValue(NoteBlock.POWERED, Boolean.valueOf(flag)), 3);
+        }
+    }
+
     public void playNote(@Nullable Entity entity, BlockState state, Level level, BlockPos pos) {
         if (state.getValue(NoteBlock.INSTRUMENT).worksAboveNoteBlock() || level.getBlockState(pos.above()).isAir()) {
             level.blockEvent(pos, this, 0, 0);
@@ -152,10 +167,12 @@ public class AdvancedNoteBlock extends Block
 
                     level.setBlock(pos, state.setValue(SUBTICK, new_val), Block.UPDATE_ALL);
 
-                    player.displayClientMessage(Component.literal(new_val/10f + " ticks ("+new_val * SUBTICK_LENGTH+" ms)").withColor(0xB0B0B0), true);
+                    player.displayClientMessage(Component.literal(new_val/10f + " ticks ("+new_val * SUBTICK_LENGTH+" ms)")
+                            .withColor(AdvancedNoteBlock.getColor(state, ANBInfoRender.PROPERTY.TEMPO).getRGB()), true);
                 } else
                 if(item.is(Registry.NOTETUNER)){
-                    player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)]).withColor(0xB030B0), true);
+                    player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)])
+                            .withColor(AdvancedNoteBlock.getColor(state, ANBInfoRender.PROPERTY.NOTE).getRGB()), true);
                     this.playNote(player, state, level, pos);
                     player.awardStat(Stats.PLAY_NOTEBLOCK);
                 }
@@ -221,6 +238,17 @@ public class AdvancedNoteBlock extends Block
 
     public static float getPitchFromNote(int note) {
         return (float)Math.pow(2.0, (double)(note - 42) / 12.0);
+    }
+
+    public static Color getColor(BlockState state, ANBInfoRender.PROPERTY info){
+        float rgbVal = switch (info){
+            case NOTE -> (AdvancedNoteBlock.getNoteValue(state) - 2) / 29.0F ;
+            case TEMPO -> state.getValue(AdvancedNoteBlock.SUBTICK) / (AdvancedNoteBlock.MAX_SUBTICKS - 1.0F);
+        };
+        float rCol = Math.max(0.0F, Mth.sin((rgbVal + 0.0F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
+        float gCol = Math.max(0.0F, Mth.sin((rgbVal + 0.33333334F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
+        float bCol = Math.max(0.0F, Mth.sin((rgbVal + 0.6666667F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
+        return new Color(rCol, gCol, bCol);
     }
 
     public int changeNoteValueBy(int note, int value){
