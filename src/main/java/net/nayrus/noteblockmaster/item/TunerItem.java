@@ -11,10 +11,10 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
-import net.nayrus.noteblockmaster.util.Registry;
+import net.nayrus.noteblockmaster.utils.Registry;
 import org.jetbrains.annotations.NotNull;
 
-import static net.nayrus.noteblockmaster.util.Utils.NOTE_STRING;
+import static net.nayrus.noteblockmaster.utils.Utils.NOTE_STRING;
 
 public class TunerItem extends Item {
     public TunerItem(Properties properties) {

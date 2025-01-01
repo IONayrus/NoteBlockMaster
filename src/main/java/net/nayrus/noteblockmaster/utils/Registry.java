@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.util;
+package net.nayrus.noteblockmaster.utils;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;

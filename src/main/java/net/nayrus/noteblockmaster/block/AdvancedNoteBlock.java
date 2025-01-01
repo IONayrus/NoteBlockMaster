@@ -26,10 +26,10 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.Config;
-import net.nayrus.noteblockmaster.util.Registry;
-import net.nayrus.noteblockmaster.util.NBMTags;
-import net.nayrus.noteblockmaster.util.SubTickScheduler;
-import net.nayrus.noteblockmaster.util.Utils;
+import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.utils.NBMTags;
+import net.nayrus.noteblockmaster.utils.SubTickScheduler;
+import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import javax.annotation.Nullable;
@@ -40,8 +40,7 @@ public class AdvancedNoteBlock extends Block
     public static int MAX_SUBTICKS;
     public static long SUBTICK_LENGTH;
     public static IntegerProperty SUBTICK;
-    public static IntegerProperty OCTAVE;
-    public static final IntegerProperty KEY = IntegerProperty.create("key",0,11);
+    public static IntegerProperty NOTE;
     public static int MIN_NOTE_VAL;
     public static int MAX_NOTE_VAL;
     public static int TOTAL_NOTES;
@@ -56,8 +55,7 @@ public class AdvancedNoteBlock extends Block
                         .setValue(NoteBlock.INSTRUMENT, NoteBlockInstrument.HARP)
                         .setValue(NoteBlock.POWERED,false)
                         .setValue(SUBTICK, 0)
-                        .setValue(OCTAVE, 2)
-                        .setValue(KEY, 6)
+                        .setValue(NOTE, noteStringAsInt("F#3"))
         );
         defaultNoteValue = getNoteValue(this.defaultBlockState());
     }
@@ -66,13 +64,9 @@ public class AdvancedNoteBlock extends Block
         SUBTICK_LENGTH = Config.SUBTICK_LENGTH.get();
         MAX_SUBTICKS = (int) (100 / SUBTICK_LENGTH);
         SUBTICK = IntegerProperty.create("subtick",0,MAX_SUBTICKS - 1);
-        MIN_NOTE_VAL = noteStringAsInt(Config.LOWER_NOTE_LIMIT.get());
-        MAX_NOTE_VAL = noteStringAsInt(Config.HIGHER_NOTE_LIMIT.get());
-        int lowerLimit = 2 - Config.ADDITIONAL_OCTAVES.get();
-        int upperLimit = 4 + Config.ADDITIONAL_OCTAVES.get();
-        OCTAVE = IntegerProperty.create("octave",lowerLimit, upperLimit);
-        if(getOctaveValue(MIN_NOTE_VAL) < lowerLimit) MIN_NOTE_VAL = lowerLimit * 12;
-        if(getOctaveValue(MAX_NOTE_VAL) > upperLimit) MAX_NOTE_VAL = (upperLimit + 1) * 12 - 1;
+        MIN_NOTE_VAL = Config.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.LOWER_NOTE_LIMIT.get()) : (int) Config.LOWER_NOTE_LIMIT.get();
+        MAX_NOTE_VAL = Config.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.HIGHER_NOTE_LIMIT.get()) : (int) Config.HIGHER_NOTE_LIMIT.get();
+        NOTE = IntegerProperty.create("note", MIN_NOTE_VAL, MAX_NOTE_VAL);
 
         TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
     }
@@ -182,7 +176,7 @@ public class AdvancedNoteBlock extends Block
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(NoteBlock.INSTRUMENT, NoteBlock.POWERED, SUBTICK, OCTAVE, KEY);
+        builder.add(NoteBlock.INSTRUMENT, NoteBlock.POWERED, SUBTICK, NOTE);
     }
 
     @Override
@@ -197,6 +191,7 @@ public class AdvancedNoteBlock extends Block
         try{
             return Integer.parseInt(note);
         } catch (NumberFormatException e) {
+            note = note.toUpperCase();
             if(note.length() > 3 || note.length() < 2) throw new IllegalArgumentException();
             int val = note.length() == 3 ? 1 : 0;
             switch(note.charAt(0)){
@@ -207,6 +202,7 @@ public class AdvancedNoteBlock extends Block
                 case 'E': val += 2;
                 case 'D': val += 2;
                 case 'C': break;
+                default: throw new IllegalArgumentException();
             }
             val += ((Character.getNumericValue(note.charAt(note.length()-1)) - 1) * 12);
             if(val < 0 || val >= Utils.NOTE_STRING.length) throw new IllegalArgumentException();
@@ -215,16 +211,12 @@ public class AdvancedNoteBlock extends Block
     }
 
     public static int getNoteValue(BlockState state){
-        return state.getValue(OCTAVE) * 12 + state.getValue(KEY);
+        return state.getValue(NOTE);
     }
 
     public BlockState setNoteValue(BlockState state, int value){
         value %= Utils.NOTE_STRING.length;
-        return state.setValue(OCTAVE, getOctaveValue(value)).setValue(KEY, value % 12);
-    }
-
-    private static int getOctaveValue(int note){
-        return note / 12;
+        return state.setValue(NOTE, value);
     }
 
     public static float getPitchFromNote(int note) {

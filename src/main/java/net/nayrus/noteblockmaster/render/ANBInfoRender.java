@@ -15,8 +15,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
-import net.nayrus.noteblockmaster.util.Registry;
-import net.nayrus.noteblockmaster.util.Utils;
+import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
@@ -51,13 +51,10 @@ public class ANBInfoRender {
         matrix.translate(-center.x(), -center.y(), -center.z());
 
         VertexConsumer builder;
-        //MyRenderType.updateRenders();
         builder = buffer.getBuffer(NBMRenderType.BlockOverlay);
 
         matrix.pushPose();
         matrix.translate(pos.getX(), pos.getY() + 0.75f, pos.getZ());
-        //matrix.translate(-0.005f, -0.005f, -0.005f);
-        //matrix.scale(1.01f, 1.01f, 1.01f);
         matrix.mulPose(Axis.YP.rotationDegrees(-90.0F));
 
         Matrix4f positionMatrix = matrix.last().pose();
@@ -68,7 +65,7 @@ public class ANBInfoRender {
 
         RenderSystem.disableDepthTest();
 
-        RenderUtils.direRender(positionMatrix, builder, pos, new Color(rCol, gCol, bCol), 0.25F);
+        RenderUtils.renderFlippedCone(positionMatrix, builder, new Color(rCol, gCol, bCol), 0.25F);
 
         matrix.popPose();
 

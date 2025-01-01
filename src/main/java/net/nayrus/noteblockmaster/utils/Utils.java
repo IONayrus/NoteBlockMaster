@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.util;
+package net.nayrus.noteblockmaster.utils;
 
 import net.minecraft.world.phys.Vec3;
 

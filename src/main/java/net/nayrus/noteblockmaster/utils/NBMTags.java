@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.util;
+package net.nayrus.noteblockmaster.utils;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;

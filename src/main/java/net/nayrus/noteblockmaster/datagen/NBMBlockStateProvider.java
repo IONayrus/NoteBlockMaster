@@ -2,7 +2,7 @@ package net.nayrus.noteblockmaster.datagen;
 
 import net.minecraft.data.PackOutput;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
-import net.nayrus.noteblockmaster.util.Registry;
+import net.nayrus.noteblockmaster.utils.Registry;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;

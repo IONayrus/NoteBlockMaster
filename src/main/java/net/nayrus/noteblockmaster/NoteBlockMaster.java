@@ -6,8 +6,8 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
 import net.nayrus.noteblockmaster.event.RenderLevelStage;
-import net.nayrus.noteblockmaster.util.Registry;
-import net.nayrus.noteblockmaster.util.SubTickScheduler;
+import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.utils.SubTickScheduler;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -45,7 +45,7 @@ public class NoteBlockMaster
 
     public NoteBlockMaster(IEventBus modEventBus, ModContainer modContainer)
     {
-        modContainer.registerConfig(ModConfig.Type.STARTUP, Config.SPEC);
+        modContainer.registerConfig(ModConfig.Type.STARTUP, Config.START_UP);
 
         modEventBus.addListener(AdvancedNoteBlock::loadPropertiesFromConfig);
         NeoForge.EVENT_BUS.register(this);
@@ -85,7 +85,7 @@ public class NoteBlockMaster
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-            ItemBlockRenderTypes.setRenderLayer(Registry.ADVANCED_NOTEBLOCK.get(), RenderType.cutout());
+
         }
     }
 
