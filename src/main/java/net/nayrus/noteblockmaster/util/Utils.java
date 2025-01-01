@@ -1,6 +1,8 @@
 package net.nayrus.noteblockmaster.util;
 
-public class Util {
+import net.minecraft.world.phys.Vec3;
+
+public class Utils {
 
     public static final String[] NOTE_STRING = {"C1", "C#1", "D1", "D#1", "E1", "F1", "F#1", "G1", "G#1", "A1", "A#1", "B1",
                                                 "C2", "C#2", "D2", "D#2", "E2", "F2", "F#2", "G2", "G#2", "A2", "A#2", "B2",
@@ -12,6 +14,10 @@ public class Util {
 
     public static boolean isIntInRange(int value, int min, int max) {
         return value >= min && value <= max;
+    }
+
+    public static Vec3 sphereVec(float radius){
+        return new Vec3(radius, radius, radius);
     }
 
 }

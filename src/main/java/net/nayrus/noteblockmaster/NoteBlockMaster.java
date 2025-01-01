@@ -1,8 +1,11 @@
 package net.nayrus.noteblockmaster;
 
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
+import net.nayrus.noteblockmaster.event.RenderLevelStage;
 import net.nayrus.noteblockmaster.util.Registry;
 import net.nayrus.noteblockmaster.util.SubTickScheduler;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -45,13 +48,15 @@ public class NoteBlockMaster
         modContainer.registerConfig(ModConfig.Type.STARTUP, Config.SPEC);
 
         modEventBus.addListener(AdvancedNoteBlock::loadPropertiesFromConfig);
+        NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(RenderLevelStage.class);
 
         Registry.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         RECIPE_SERIALIZERS.register(modEventBus);
-        NeoForge.EVENT_BUS.register(this);
 
         modEventBus.addListener(this::addCreative);
+
     }
 
     // Add the example block item to the building blocks tab
@@ -80,7 +85,7 @@ public class NoteBlockMaster
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-
+            ItemBlockRenderTypes.setRenderLayer(Registry.ADVANCED_NOTEBLOCK.get(), RenderType.cutout());
         }
     }
 

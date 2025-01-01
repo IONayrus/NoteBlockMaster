@@ -27,7 +27,7 @@ public class SubTickScheduler {
                 int i = AdvancedNoteBlock.getNoteValue(state);
                 f = AdvancedNoteBlock.getPitchFromNote(i);
                 level.addParticle(
-                        ParticleTypes.NOTE, (double)pos.getX() + 0.5, (double)pos.getY() + 1.2, (double)pos.getZ() + 0.5, (double)i / 24.0, 0.0, 0.0
+                        ParticleTypes.NOTE, (double)pos.getX() + 0.5, (double)pos.getY() + 1.2, (double)pos.getZ() + 0.5, (i - 2f) / 29, 0.0, 0.0
                 );
             } else {
                 f = 1.0F;

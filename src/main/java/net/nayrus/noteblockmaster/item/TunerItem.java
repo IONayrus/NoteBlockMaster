@@ -14,7 +14,7 @@ import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.util.Registry;
 import org.jetbrains.annotations.NotNull;
 
-import static net.nayrus.noteblockmaster.util.Util.NOTE_STRING;
+import static net.nayrus.noteblockmaster.util.Utils.NOTE_STRING;
 
 public class TunerItem extends Item {
     public TunerItem(Properties properties) {

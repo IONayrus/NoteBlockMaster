@@ -19,7 +19,7 @@ public class Registry
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(NoteBlockMaster.MOD_ID);
 
     public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock",
-            () -> new AdvancedNoteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK)));
+            () -> new AdvancedNoteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK).noOcclusion()));
     public static final DeferredItem<BlockItem> ADVANCED_NOTEBLOCK_ITEM = Registry.ITEMS.register("advanced_noteblock",
             ()-> new BlockItem(Registry.ADVANCED_NOTEBLOCK.get(), new Item.Properties()));
 

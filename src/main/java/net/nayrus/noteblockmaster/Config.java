@@ -1,7 +1,7 @@
 package net.nayrus.noteblockmaster;
 
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
-import net.nayrus.noteblockmaster.util.Util;
+import net.nayrus.noteblockmaster.util.Utils;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -29,7 +29,7 @@ public class Config
 
     public static boolean isNoteValue(Object str){
         if(!(str instanceof String configStr)){
-            if(str instanceof Integer val) return Util.isIntInRange(val, 0, 86);
+            if(str instanceof Integer val) return Utils.isIntInRange(val, 0, 86);
             else return false;
         }
         try{ AdvancedNoteBlock.noteStringAsInt(configStr); }

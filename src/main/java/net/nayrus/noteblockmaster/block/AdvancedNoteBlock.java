@@ -26,11 +26,10 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.Config;
-import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.util.Registry;
 import net.nayrus.noteblockmaster.util.NBMTags;
 import net.nayrus.noteblockmaster.util.SubTickScheduler;
-import net.nayrus.noteblockmaster.util.Util;
+import net.nayrus.noteblockmaster.util.Utils;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import javax.annotation.Nullable;
@@ -43,8 +42,9 @@ public class AdvancedNoteBlock extends Block
     public static IntegerProperty SUBTICK;
     public static IntegerProperty OCTAVE;
     public static final IntegerProperty KEY = IntegerProperty.create("key",0,11);
-    public static int minNoteVal;
-    public static int maxNoteVal;
+    public static int MIN_NOTE_VAL;
+    public static int MAX_NOTE_VAL;
+    public static int TOTAL_NOTES;
 
     private final int defaultNoteValue;
 
@@ -66,13 +66,15 @@ public class AdvancedNoteBlock extends Block
         SUBTICK_LENGTH = Config.SUBTICK_LENGTH.get();
         MAX_SUBTICKS = (int) (100 / SUBTICK_LENGTH);
         SUBTICK = IntegerProperty.create("subtick",0,MAX_SUBTICKS - 1);
-        minNoteVal = noteStringAsInt(Config.LOWER_NOTE_LIMIT.get());
-        maxNoteVal = noteStringAsInt(Config.HIGHER_NOTE_LIMIT.get());
+        MIN_NOTE_VAL = noteStringAsInt(Config.LOWER_NOTE_LIMIT.get());
+        MAX_NOTE_VAL = noteStringAsInt(Config.HIGHER_NOTE_LIMIT.get());
         int lowerLimit = 2 - Config.ADDITIONAL_OCTAVES.get();
         int upperLimit = 4 + Config.ADDITIONAL_OCTAVES.get();
         OCTAVE = IntegerProperty.create("octave",lowerLimit, upperLimit);
-        if(getOctaveValue(minNoteVal) < lowerLimit) minNoteVal = lowerLimit * 12;
-        if(getOctaveValue(maxNoteVal) > upperLimit) maxNoteVal = (upperLimit + 1) * 12 - 1;
+        if(getOctaveValue(MIN_NOTE_VAL) < lowerLimit) MIN_NOTE_VAL = lowerLimit * 12;
+        if(getOctaveValue(MAX_NOTE_VAL) > upperLimit) MAX_NOTE_VAL = (upperLimit + 1) * 12 - 1;
+
+        TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
     }
 
     private BlockState setInstrument(LevelAccessor level, BlockPos pos, BlockState state) {
@@ -159,7 +161,7 @@ public class AdvancedNoteBlock extends Block
                     player.displayClientMessage(Component.literal(new_val/10f + " ticks ("+new_val * SUBTICK_LENGTH+" ms)").withColor(0xB0B0B0), true);
                 } else
                 if(item.is(Registry.NOTETUNER)){
-                    player.displayClientMessage(Component.literal(Util.NOTE_STRING[getNoteValue(state)]).withColor(0xB030B0), true);
+                    player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)]).withColor(0xB030B0), true);
                     this.playNote(player, state, level, pos);
                     player.awardStat(Stats.PLAY_NOTEBLOCK);
                 }
@@ -207,7 +209,7 @@ public class AdvancedNoteBlock extends Block
                 case 'C': break;
             }
             val += ((Character.getNumericValue(note.charAt(note.length()-1)) - 1) * 12);
-            if(val < 0 || val >= Util.NOTE_STRING.length) throw new IllegalArgumentException();
+            if(val < 0 || val >= Utils.NOTE_STRING.length) throw new IllegalArgumentException();
             return val;
         }
     }
@@ -217,7 +219,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     public BlockState setNoteValue(BlockState state, int value){
-        value %= Util.NOTE_STRING.length;
+        value %= Utils.NOTE_STRING.length;
         return state.setValue(OCTAVE, getOctaveValue(value)).setValue(KEY, value % 12);
     }
 
@@ -231,8 +233,8 @@ public class AdvancedNoteBlock extends Block
 
     public int changeNoteValueBy(int note, int value){
         int _new = (note + value);
-        if(_new >= note) return (_new <= maxNoteVal) ? _new : ((_new % maxNoteVal) - 1 + minNoteVal);
-        else return (_new >= minNoteVal) ? _new : (maxNoteVal - (minNoteVal % _new) + 1);
+        if(_new >= note) return (_new <= MAX_NOTE_VAL) ? _new : ((_new % MAX_NOTE_VAL) - 1 + MIN_NOTE_VAL);
+        else return (_new >= MIN_NOTE_VAL) ? _new : (MAX_NOTE_VAL - (MIN_NOTE_VAL % _new) + 1);
     }
 
 }
