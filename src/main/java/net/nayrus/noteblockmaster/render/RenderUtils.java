@@ -31,6 +31,17 @@ public class RenderUtils {
         }
     }
 
+    public static Color shiftColor(Color base, Color target, float factor) {
+        factor = Math.min(1, Math.max(0, factor));
+        return new Color(
+                (int)(base.getRed()   + (target.getRed()   - base.getRed())   * factor),
+                (int)(base.getGreen() + (target.getGreen() - base.getGreen()) * factor),
+                (int)(base.getBlue()  + (target.getBlue()  - base.getBlue())  * factor)
+        );
+    }
 
-
+    public static Color applyAlpha(Color base, float alpha){
+        alpha = Math.min(1, Math.max(0, alpha));
+        return new Color(base.getRed() / 255.0F, base.getGreen() / 255.0F, base.getBlue() / 255.0F, alpha);
+    }
 }

@@ -19,9 +19,9 @@ public class RenderLevelStage {
         if(player == null) return;
         ItemStack item = getTunerItem(player);
         if(item.is(Registry.NOTETUNER))
-            ANBInfoRender.renderNoteInfo(e, player, ANBInfoRender.PROPERTY.NOTE);
+            ANBInfoRender.renderNoteBlockInfo(e, player, ANBInfoRender.PROPERTY.NOTE);
         if(item.is(Registry.TEMPOTUNER))
-            ANBInfoRender.renderNoteInfo(e, player, ANBInfoRender.PROPERTY.TEMPO);
+            ANBInfoRender.renderNoteBlockInfo(e, player, ANBInfoRender.PROPERTY.TEMPO);
     }
 
     public static ItemStack getTunerItem(Player player){
