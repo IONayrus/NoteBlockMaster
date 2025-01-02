@@ -19,6 +19,7 @@ import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.awt.*;
 
@@ -71,37 +72,38 @@ public class ANBInfoRender {
         matrix.mulPose(Axis.YP.rotationDegrees(-90.0F));
         Matrix4f positionMatrix = matrix.last().pose();
 
-        RenderUtils.renderFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.BlockOverlay), color, 0.2F);
+        RenderUtils.renderFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.SEE_THROUGH_TRIANGLES), color, 0.2F, 0.33F);
 
         matrix.popPose();
     }
 
     public static void renderInfoLabel(MultiBufferSource.BufferSource buffer, PoseStack matrix, String text, Color color, BlockPos pos, Vec3 camPos){
-        Vec3 camToPos = pos.getCenter().add(0,1.25,0).subtract(camPos);
         float scale = 0.025F;
 
         matrix.pushPose();
         matrix.translate(pos.getX() + 0.5, pos.getY() + 1.6F, pos.getZ() + 0.5);
 
-        renderInfoText(buffer, matrix, camToPos, text, color, scale, 0);
-        renderInfoText(buffer, matrix, camToPos, text, RenderUtils.applyAlpha(RenderUtils.shiftColor(color, Color.WHITE, 0.7F), 0.8F), scale, -0.005F);
+        renderInfoText(buffer, matrix, pos, camPos, text, RenderUtils.shiftColor(Color.LIGHT_GRAY, color, 0.8F), scale, new Vector3f(),0);
+        renderInfoText(buffer, matrix, pos, camPos, text, RenderUtils.applyAlpha(RenderUtils.shiftColor(color, Color.BLACK, 0.5F), 0.8F), scale, new Vector3f(-0.008F),0);
+        renderInfoText(buffer, matrix, pos, camPos, " ".repeat(text.length() + 2), Color.BLACK, scale - 0.003F, new Vector3f(0.0F,0F,-0.02F), RenderUtils.applyAlpha(RenderUtils.shiftColor(Color.WHITE, color, 0.33F), 0.33F).getRGB());
 
         matrix.popPose();
     }
 
-    public static void renderInfoText(MultiBufferSource.BufferSource buffer, PoseStack matrix, Vec3 viewVec, String text, Color color, float scale, float offset){
+    public static void renderInfoText(MultiBufferSource.BufferSource buffer, PoseStack matrix, BlockPos pos,  Vec3 camPos, String text, Color color, float scale, Vector3f offset, int background){
         Font textRender = Minecraft.getInstance().font;
+        Vec3 viewVec = new Vec3(pos.getX() + 0.5, pos.getY() + 1.6, pos.getZ() + 0.5).subtract(camPos);
 
         matrix.pushPose();
-        matrix.translate(offset, offset, offset);
+        matrix.translate(-offset.x(), offset.y(), offset.z()); //Bottom-Back-Right for neg val
         rotateTextToPlayer(matrix,textRender.width(text) * scale / 2.0F, viewVec, offset);
         matrix.scale(scale, scale, scale);
 
-        textRender.drawInBatch(text, 0.0F, 0.0F, color.getRGB(), false, matrix.last().pose(), buffer, Font.DisplayMode.SEE_THROUGH, 0, 15728880, false);
+        textRender.drawInBatch(text, 0.0F, 0.0F, color.getRGB(), false, matrix.last().pose(), buffer, Font.DisplayMode.SEE_THROUGH, background, 15728880, false);
         matrix.popPose();
     }
 
-    public static void rotateTextToPlayer(PoseStack matrix, float halfTextWidth, Vec3 viewVec, float offset){
+    public static void rotateTextToPlayer(PoseStack matrix, float halfTextWidth, Vec3 viewVec, Vector3f offset){
         double len = viewVec.length(), dY = viewVec.y();
         Vec3 viewXZ = viewVec.subtract(0, dY,0).normalize();
         double dotX = viewXZ.dot(new Vec3(1,0,0));
@@ -111,9 +113,9 @@ public class ANBInfoRender {
         Quaternionf tilt = Axis.XP.rotation((float) (Math.PI/2 * (dY / len)));
         Quaternionf rotation = Axis.YP.rotation((float) (Math.acos(dotX) * (dotZ < 0 ? -1 : 1) + Math.PI / 2));
         rotation.mul(tilt);
-        matrix.rotateAround(rotation, -offset, offset, offset);
+        matrix.rotateAround(rotation, offset.x(), offset.y(), offset.z());
 
-        matrix.translate(-halfTextWidth - offset * 2,0.0F,0.0F);
+        matrix.translate(-halfTextWidth, 0 , 0);
     }
 
 }

@@ -63,9 +63,9 @@ public class AdvancedNoteBlock extends Block
         defaultNoteValue = getNoteValue(this.defaultBlockState());
     }
 
-    public static void loadPropertiesFromConfig(final NewRegistryEvent event){
+    public static void loadPropertiesFromConfig(final NewRegistryEvent ignoredEvent){
         SUBTICK_LENGTH = Config.SUBTICK_LENGTH.get();
-        MAX_SUBTICKS = (int) (100 / SUBTICK_LENGTH);
+        MAX_SUBTICKS = (int) (100.0F / SUBTICK_LENGTH);
         SUBTICK = IntegerProperty.create("subtick",0,MAX_SUBTICKS - 1);
         MIN_NOTE_VAL = Config.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.LOWER_NOTE_LIMIT.get()) : (int) Config.LOWER_NOTE_LIMIT.get();
         MAX_NOTE_VAL = Config.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.HIGHER_NOTE_LIMIT.get()) : (int) Config.HIGHER_NOTE_LIMIT.get();
@@ -141,7 +141,7 @@ public class AdvancedNoteBlock extends Block
                 this.playNote(null, state, level, pos);
             }
 
-            level.setBlock(pos, state.setValue(NoteBlock.POWERED, Boolean.valueOf(flag)), 3);
+            level.setBlock(pos, state.setValue(NoteBlock.POWERED, flag), 3);
         }
     }
 

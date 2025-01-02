@@ -8,8 +8,8 @@ import java.awt.*;
 
 public class RenderUtils {
 
-    public static void renderFlippedCone(Matrix4f matrix, VertexConsumer builder, Color color, float scale) {
-        float red = color.getRed() / 255f, green = color.getGreen() / 255f, blue = color.getBlue() / 255f, alpha = .33f;
+    public static void renderFlippedCone(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float alpha) {
+        float red = color.getRed() / 255f, green = color.getGreen() / 255f, blue = color.getBlue() / 255f;
 
         float startX = 0 + (1 - scale) / 2, startY = 0 + (1 - scale) / 2, startZ = -1 + (1 - scale) / 2, endX = 1 - (1 - scale) / 2, endY = 1 - (1 - scale) / 2, endZ = 0 - (1 - scale) / 2;
         float midX = (startX + endX) / 2, midZ = (startZ + endZ) / 2;
@@ -32,11 +32,17 @@ public class RenderUtils {
     }
 
     public static Color shiftColor(Color base, Color target, float factor) {
-        factor = Math.min(1, Math.max(0, factor));
-        return new Color(
+        factor = Math.min(1, Math.max(-1, factor));
+        if(factor >= 0)
+            return new Color(
                 (int)(base.getRed()   + (target.getRed()   - base.getRed())   * factor),
                 (int)(base.getGreen() + (target.getGreen() - base.getGreen()) * factor),
                 (int)(base.getBlue()  + (target.getBlue()  - base.getBlue())  * factor)
+            );
+        return new Color(
+                (int)(base.getRed()   - (255 - target.getRed()   - base.getRed())   * factor),
+                (int)(base.getGreen() - (255 - target.getGreen() - base.getGreen()) * factor),
+                (int)(base.getBlue()  - (255 - target.getBlue()  - base.getBlue())  * factor)
         );
     }
 
@@ -44,4 +50,6 @@ public class RenderUtils {
         alpha = Math.min(1, Math.max(0, alpha));
         return new Color(base.getRed() / 255.0F, base.getGreen() / 255.0F, base.getBlue() / 255.0F, alpha);
     }
+
+
 }
