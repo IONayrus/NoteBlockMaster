@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
@@ -19,9 +20,9 @@ public class RenderLevelStage {
         if(player == null) return;
         ItemStack item = getTunerItem(player);
         if(item.is(Registry.NOTETUNER))
-            ANBInfoRender.renderNoteBlockInfo(e, player, ANBInfoRender.PROPERTY.NOTE);
+            ANBInfoRender.renderNoteBlockInfo(e, player, Utils.PROPERTY.NOTE);
         if(item.is(Registry.TEMPOTUNER))
-            ANBInfoRender.renderNoteBlockInfo(e, player, ANBInfoRender.PROPERTY.TEMPO);
+            ANBInfoRender.renderNoteBlockInfo(e, player, Utils.PROPERTY.TEMPO);
     }
 
     public static ItemStack getTunerItem(Player player){

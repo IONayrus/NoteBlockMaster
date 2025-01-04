@@ -2,20 +2,18 @@ package net.nayrus.noteblockmaster.item;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
-import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.utils.Utils;
 import org.jetbrains.annotations.NotNull;
-
-import static net.nayrus.noteblockmaster.utils.Utils.NOTE_STRING;
 
 public class TunerItem extends Item {
     public TunerItem(Properties properties) {
@@ -42,26 +40,18 @@ public class TunerItem extends Item {
         if(player==null) return InteractionResult.FAIL;
         if(!(state.getBlock() instanceof AdvancedNoteBlock block)) return InteractionResult.PASS;
         if(!level.isClientSide) {
-
             if (stack.is(Registry.TEMPOTUNER)) {
-                int val = state.getValue(AdvancedNoteBlock.SUBTICK);
-                player.displayClientMessage(Component.literal(val / 10f + " ticks (" + val * AdvancedNoteBlock.SUBTICK_LENGTH + " ms)")
-                        .withColor(AdvancedNoteBlock.getColor(state, ANBInfoRender.PROPERTY.TEMPO).getRGB()), true);
+                int state_val = state.getValue(AdvancedNoteBlock.SUBTICK);
+                int new_val = (player.isShiftKeyDown() ? state_val + 5 : state_val + 1) % AdvancedNoteBlock.MAX_SUBTICKS;
+
+                level.setBlock(pos, state.setValue(AdvancedNoteBlock.SUBTICK, new_val), Block.UPDATE_ALL);
+                player.displayClientMessage(Component.literal( "("+new_val * AdvancedNoteBlock.SUBTICK_LENGTH+" ms)")
+                        .withColor(block.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
                 return InteractionResult.SUCCESS;
             }
             if (stack.is(Registry.NOTETUNER)) {
-                int old_val = AdvancedNoteBlock.getNoteValue(state);
-                int new_val = player.isShiftKeyDown() ? block.changeNoteValueBy(old_val, 6) : block.changeNoteValueBy(old_val, 1);
-                int _new = net.neoforged.neoforge.common.CommonHooks.onNoteChange(level, pos, state, old_val, new_val);
-
-                if (_new == -1) return InteractionResult.FAIL;
-                state = block.setNoteValue(state, _new);
-                level.setBlock(pos, state, 3);
-                block.playNote(player, state, level, pos);
-                player.awardStat(Stats.TUNE_NOTEBLOCK);
-                player.displayClientMessage(Component.literal(NOTE_STRING[_new])
-                        .withColor(AdvancedNoteBlock.getColor(state, ANBInfoRender.PROPERTY.NOTE).getRGB()), true);
-                return InteractionResult.SUCCESS;
+                int new_val = player.isShiftKeyDown() ? block.changeNoteValueBy(state, 6) : block.changeNoteValueBy(state, 1);
+                return block.onNoteChange(level, player, state, pos, new_val);
             }
         }
         return InteractionResult.PASS;

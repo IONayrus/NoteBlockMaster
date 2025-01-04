@@ -2,7 +2,6 @@ package net.nayrus.noteblockmaster;
 
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.utils.Utils;
-
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class Config

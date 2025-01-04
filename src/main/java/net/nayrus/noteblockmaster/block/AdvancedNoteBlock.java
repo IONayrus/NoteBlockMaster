@@ -27,9 +27,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.Config;
-import net.nayrus.noteblockmaster.render.ANBInfoRender;
-import net.nayrus.noteblockmaster.utils.Registry;
 import net.nayrus.noteblockmaster.utils.NBMTags;
+import net.nayrus.noteblockmaster.utils.Registry;
 import net.nayrus.noteblockmaster.utils.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -122,14 +121,8 @@ public class AdvancedNoteBlock extends Block
             return InteractionResult.SUCCESS;
         } else {
             int val = getNoteValue(state);
-            int try_new = ((val+1) >= (defaultNoteValue + 25) || (val+1) < defaultNoteValue) ? defaultNoteValue : val+1;
-            int _new = net.neoforged.neoforge.common.CommonHooks.onNoteChange(level, pos, state, val, try_new);
-            if (_new == -1) return InteractionResult.FAIL;
-            state = setNoteValue(state, _new);
-            level.setBlock(pos, state, 3);
-            this.playNote(player, state, level, pos);
-            player.awardStat(Stats.TUNE_NOTEBLOCK);
-            return InteractionResult.CONSUME;
+            int _new = ((val+1) >= (defaultNoteValue + 25) || (val+1) < defaultNoteValue) ? defaultNoteValue : val+1;
+            return onNoteChange(level, player, state, pos, _new);
         }
     }
 
@@ -161,18 +154,9 @@ public class AdvancedNoteBlock extends Block
                 player.awardStat(Stats.PLAY_NOTEBLOCK);
             }
             else{
-                if(item.is(Registry.TEMPOTUNER)){
-                    int state_val = state.getValue(SUBTICK);
-                    int new_val = (player.isShiftKeyDown() ? state_val + 5 : state_val + 1) % MAX_SUBTICKS;
-
-                    level.setBlock(pos, state.setValue(SUBTICK, new_val), Block.UPDATE_ALL);
-
-                    player.displayClientMessage(Component.literal(new_val/10f + " ticks ("+new_val * SUBTICK_LENGTH+" ms)")
-                            .withColor(AdvancedNoteBlock.getColor(state, ANBInfoRender.PROPERTY.TEMPO).getRGB()), true);
-                } else
                 if(item.is(Registry.NOTETUNER)){
                     player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)])
-                            .withColor(AdvancedNoteBlock.getColor(state, ANBInfoRender.PROPERTY.NOTE).getRGB()), true);
+                            .withColor(this.getColor(state, Utils.PROPERTY.NOTE).getRGB()), true);
                     this.playNote(player, state, level, pos);
                     player.awardStat(Stats.PLAY_NOTEBLOCK);
                 }
@@ -200,7 +184,7 @@ public class AdvancedNoteBlock extends Block
     protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
         net.neoforged.neoforge.event.level.NoteBlockEvent.Play e = new net.neoforged.neoforge.event.level.NoteBlockEvent.Play(level, pos, state, getNoteValue(state), state.getValue(NoteBlock.INSTRUMENT));
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
-        SubTickScheduler.delayedNoteBlockEvent(state, level, pos);
+        SubTickScheduler.delayedNoteBlockEvent(state, level, pos, this);
         return true;
     }
 
@@ -227,9 +211,11 @@ public class AdvancedNoteBlock extends Block
         }
     }
 
-    public static int getNoteValue(BlockState state){
+    public int getNoteValue(BlockState state){
         return state.getValue(NOTE);
     }
+
+
 
     public BlockState setNoteValue(BlockState state, int value){
         value %= Utils.NOTE_STRING.length;
@@ -240,9 +226,9 @@ public class AdvancedNoteBlock extends Block
         return (float)Math.pow(2.0, (double)(note - 42) / 12.0);
     }
 
-    public static Color getColor(BlockState state, ANBInfoRender.PROPERTY info){
+    public Color getColor(BlockState state, Utils.PROPERTY info){
         float rgbVal = switch (info){
-            case NOTE -> (AdvancedNoteBlock.getNoteValue(state) - 2) / 29.0F ;
+            case NOTE -> (this.getNoteValue(state) - 2) / 29.0F ;
             case TEMPO -> state.getValue(AdvancedNoteBlock.SUBTICK) / (AdvancedNoteBlock.MAX_SUBTICKS - 1.0F);
         };
         float rCol = Math.max(0.0F, Mth.sin((rgbVal + 0.0F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
@@ -251,10 +237,22 @@ public class AdvancedNoteBlock extends Block
         return new Color(rCol, gCol, bCol);
     }
 
-    public int changeNoteValueBy(int note, int value){
+    public int changeNoteValueBy(BlockState state, int value){
+        int note = getNoteValue(state);
         int _new = (note + value);
         if(_new >= note) return (_new <= MAX_NOTE_VAL) ? _new : ((_new % MAX_NOTE_VAL) - 1 + MIN_NOTE_VAL);
         else return (_new >= MIN_NOTE_VAL) ? _new : (MAX_NOTE_VAL - (MIN_NOTE_VAL % _new) + 1);
+    }
+
+    public InteractionResult onNoteChange(Level level, Player player, BlockState state, BlockPos pos, int new_val){
+        int old_val = this.getNoteValue(state);
+        int _new = net.neoforged.neoforge.common.CommonHooks.onNoteChange(level, pos, state, old_val, new_val);
+        if (_new == -1) return InteractionResult.FAIL;
+        state = this.setNoteValue(state, _new);
+        level.setBlock(pos, state, 3);
+        this.playNote(player, state, level, pos);
+        player.awardStat(Stats.TUNE_NOTEBLOCK);
+        return InteractionResult.SUCCESS;
     }
 
 }

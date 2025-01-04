@@ -20,4 +20,5 @@ public class Utils {
         return new Vec3(radius, radius, radius);
     }
 
+    public enum PROPERTY {NOTE, TEMPO}
 }

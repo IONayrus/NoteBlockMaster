@@ -27,9 +27,7 @@ public class ANBInfoRender {
 
     public static final int renderRadius = 16;
 
-    public enum PROPERTY { NOTE, TEMPO }
-
-    public static void renderNoteBlockInfo(RenderLevelStageEvent e, Player player, PROPERTY info){
+    public static void renderNoteBlockInfo(RenderLevelStageEvent e, Player player, Utils.PROPERTY info){
         Camera cam = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 camPos = cam.getPosition();
         Vec3 lookVec = new Vec3(cam.getLookVector());
@@ -47,10 +45,11 @@ public class ANBInfoRender {
         return (expand || pos.getCenter().subtract(center).dot(look) >= 0) && center.distanceToSqr(pos.getCenter()) <= renderRadius*renderRadius;
     }
 
-    public static void renderNoteBlockInfo(RenderLevelStageEvent e, BlockPos pos, BlockState state, Vec3 camPos, PROPERTY info){
+    public static void renderNoteBlockInfo(RenderLevelStageEvent e, BlockPos pos, BlockState state, Vec3 camPos, Utils.PROPERTY info){
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         PoseStack matrix = e.getPoseStack();
-        Color color = AdvancedNoteBlock.getColor(state, info);
+        AdvancedNoteBlock block = (AdvancedNoteBlock)state.getBlock();
+        Color color = block.getColor(state, info);
 
         matrix.pushPose();
         matrix.translate(-camPos.x(), -camPos.y(), -camPos.z());
@@ -58,7 +57,7 @@ public class ANBInfoRender {
         renderColoredCone(buffer, matrix, color, pos);
 
         String text = switch(info){
-            case NOTE -> Utils.NOTE_STRING[AdvancedNoteBlock.getNoteValue(state)];
+            case NOTE -> Utils.NOTE_STRING[block.getNoteValue(state)];
             case TEMPO -> state.getValue(AdvancedNoteBlock.SUBTICK).toString();
         };
         renderInfoLabel(buffer, matrix, text, color, pos, camPos);

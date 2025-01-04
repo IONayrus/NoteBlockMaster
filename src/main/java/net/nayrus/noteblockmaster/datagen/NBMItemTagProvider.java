@@ -5,8 +5,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.world.level.block.Block;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
-import net.nayrus.noteblockmaster.utils.Registry;
 import net.nayrus.noteblockmaster.utils.NBMTags;
+import net.nayrus.noteblockmaster.utils.Registry;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import javax.annotation.Nullable;
