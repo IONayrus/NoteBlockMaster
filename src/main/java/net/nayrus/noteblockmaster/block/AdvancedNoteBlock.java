@@ -2,7 +2,10 @@ package net.nayrus.noteblockmaster.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
@@ -19,6 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.NoteBlock;
+import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -184,8 +188,24 @@ public class AdvancedNoteBlock extends Block
     protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
         net.neoforged.neoforge.event.level.NoteBlockEvent.Play e = new net.neoforged.neoforge.event.level.NoteBlockEvent.Play(level, pos, state, getNoteValue(state), state.getValue(NoteBlock.INSTRUMENT));
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
-        SubTickScheduler.delayedNoteBlockEvent(state, level, pos, this);
+        NoteBlockInstrument noteblockinstrument = state.getValue(NoteBlock.INSTRUMENT);
+        Holder<SoundEvent> holder;
+        if (noteblockinstrument.hasCustomSound()) {
+            ResourceLocation resourcelocation = this.getCustomSoundId(level, pos);
+            if (resourcelocation == null) {
+                return false;
+            }
+            holder = Holder.direct(SoundEvent.createVariableRangeEvent(resourcelocation));
+        } else {
+            holder = noteblockinstrument.getSoundEvent();
+        }
+        SubTickScheduler.delayedNoteBlockEvent(state, level, pos, this, noteblockinstrument, holder);
         return true;
+    }
+
+    @Nullable
+    private ResourceLocation getCustomSoundId(Level level, BlockPos pos) {
+        return level.getBlockEntity(pos.above()) instanceof SkullBlockEntity skullblockentity ? skullblockentity.getNoteBlockSound() : null;
     }
 
     public static int noteStringAsInt(String note){

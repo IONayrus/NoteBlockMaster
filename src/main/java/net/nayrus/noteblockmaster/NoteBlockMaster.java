@@ -8,16 +8,16 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.command.BPMInfoCommand;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
-import net.nayrus.noteblockmaster.event.RenderLevelStage;
+import net.nayrus.noteblockmaster.event.ClientEvents;
+import net.nayrus.noteblockmaster.event.ServerEvents;
 import net.nayrus.noteblockmaster.utils.Registry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -46,17 +46,19 @@ public class NoteBlockMaster
 
         modEventBus.addListener(AdvancedNoteBlock::loadPropertiesFromConfig);
         NeoForge.EVENT_BUS.register(this);
-        NeoForge.EVENT_BUS.register(RenderLevelStage.class);
 
         Registry.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         RECIPE_SERIALIZERS.register(modEventBus);
 
-        modEventBus.addListener(this::addCreative);
-
+        if(FMLEnvironment.dist == Dist.CLIENT){
+            NeoForge.EVENT_BUS.register(ClientEvents.class);
+            modEventBus.addListener(this::addCreative);
+        }else{
+            NeoForge.EVENT_BUS.register(ServerEvents.class);
+        }
     }
 
-    // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event)
     {
         if(event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES){
@@ -71,19 +73,6 @@ public class NoteBlockMaster
     @SubscribeEvent
     public void onCommandRegister(RegisterCommandsEvent event){
         new BPMInfoCommand(event.getDispatcher());
-
         ConfigCommand.register(event.getDispatcher());
     }
-
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents
-    {
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-
-        }
-    }
-
 }

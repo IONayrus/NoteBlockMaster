@@ -10,7 +10,7 @@ import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
-public class RenderLevelStage {
+public class ClientEvents {
 
     @SubscribeEvent
     public static void renderBlockOverlays(RenderLevelStageEvent e){
