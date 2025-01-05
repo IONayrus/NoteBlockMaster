@@ -7,7 +7,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.command.BPMInfoCommand;
-import net.nayrus.noteblockmaster.command.ConfigSyncCommands;
+import net.nayrus.noteblockmaster.command.MainCommand;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
 import net.nayrus.noteblockmaster.event.ClientEvents;
 import net.nayrus.noteblockmaster.event.ServerEvents;
@@ -40,7 +40,6 @@ public class NoteBlockMaster
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, MOD_ID);
     public static final DeferredHolder<RecipeSerializer<?>, TunerRecipeSerializer> TUNER_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("tunerrecipe", () -> TunerRecipeSerializer.INSTANCE);
-
 
     public NoteBlockMaster(IEventBus modEventBus, ModContainer modContainer)
     {
@@ -77,7 +76,7 @@ public class NoteBlockMaster
     @SubscribeEvent
     public void onCommandRegister(RegisterCommandsEvent event){
         new BPMInfoCommand(event.getDispatcher());
-        ConfigSyncCommands.reloadConfigCommand(event.getDispatcher());
+        MainCommand.saveConfigCommand(event.getDispatcher());
         ConfigCommand.register(event.getDispatcher());
     }
 }

@@ -44,13 +44,23 @@ neoForge {
     // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
+            getGameDirectory().convention(project.getLayout().getProjectDirectory().dir("run/client"))
             client()
-
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
+        client2 {
+            getGameDirectory().convention(project.getLayout().getProjectDirectory().dir("run/client2"))
+            client()
+            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            programArgument '--username'
+            programArgument 'Dev2'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
         server {
+            getGameDirectory().convention(project.getLayout().getProjectDirectory().dir("run/server"))
             server()
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
