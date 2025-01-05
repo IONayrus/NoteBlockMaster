@@ -49,6 +49,7 @@ public class PacketHandler {
                 context.player().sendSystemMessage(Component.literal("Updated local configs. Restart your client to apply.")
                         .withColor(Color.GREEN.darker().getRGB()));
             }
+            //case RENDER -> {}
         }
     }
 }
