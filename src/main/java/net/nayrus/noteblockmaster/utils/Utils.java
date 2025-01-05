@@ -1,6 +1,12 @@
 package net.nayrus.noteblockmaster.utils;
 
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+
+import java.awt.*;
 
 public class Utils {
 
@@ -21,4 +27,10 @@ public class Utils {
     }
 
     public enum PROPERTY {NOTE, TEMPO}
+
+    public static void sendDesyncWarning(Player player){
+        player.sendSystemMessage(Component.literal("[WARNING] Advanced Note Block info render may be partially disabled. Click here to synchronize your local config with the server.")
+                .withColor(Color.ORANGE.getRGB())
+                .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nbm saveconfig"))));
+    }
 }

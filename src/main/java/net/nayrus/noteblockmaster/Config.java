@@ -6,7 +6,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class Config
 {
-    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     public static final ModConfigSpec.ConfigValue<Object> LOWER_NOTE_LIMIT = BUILDER
             .comment(" Lowest key possible.\n Range: \"C1\", \"C#1\", ..., \"F#3\" or 0 ~ 30")

@@ -7,9 +7,11 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.command.BPMInfoCommand;
+import net.nayrus.noteblockmaster.command.ConfigSyncCommands;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
 import net.nayrus.noteblockmaster.event.ClientEvents;
 import net.nayrus.noteblockmaster.event.ServerEvents;
+import net.nayrus.noteblockmaster.network.PacketHandler;
 import net.nayrus.noteblockmaster.utils.Registry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -51,6 +53,8 @@ public class NoteBlockMaster
         CREATIVE_MODE_TABS.register(modEventBus);
         RECIPE_SERIALIZERS.register(modEventBus);
 
+        modEventBus.addListener(PacketHandler::registerNetwork);
+
         if(FMLEnvironment.dist == Dist.CLIENT){
             NeoForge.EVENT_BUS.register(ClientEvents.class);
             modEventBus.addListener(this::addCreative);
@@ -73,6 +77,7 @@ public class NoteBlockMaster
     @SubscribeEvent
     public void onCommandRegister(RegisterCommandsEvent event){
         new BPMInfoCommand(event.getDispatcher());
+        ConfigSyncCommands.reloadConfigCommand(event.getDispatcher());
         ConfigCommand.register(event.getDispatcher());
     }
 }

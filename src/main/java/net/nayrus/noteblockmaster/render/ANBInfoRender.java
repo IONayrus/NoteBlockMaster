@@ -26,6 +26,8 @@ import java.awt.*;
 public class ANBInfoRender {
 
     public static final int renderRadius = 16;
+    public static boolean NOTE_OFF_SYNC = false;
+    public static boolean SUBTICK_OFF_SYNC = false;
 
     public static void renderNoteBlockInfo(RenderLevelStageEvent e, Player player, Utils.PROPERTY info){
         Camera cam = Minecraft.getInstance().gameRenderer.getMainCamera();
@@ -57,8 +59,8 @@ public class ANBInfoRender {
         renderColoredCone(buffer, matrix, color, pos);
 
         String text = switch(info){
-            case NOTE -> Utils.NOTE_STRING[block.getNoteValue(state)];
-            case TEMPO -> state.getValue(AdvancedNoteBlock.SUBTICK).toString();
+            case NOTE -> NOTE_OFF_SYNC ? "%" : Utils.NOTE_STRING[block.getNoteValue(state)];
+            case TEMPO -> SUBTICK_OFF_SYNC ? "%" : state.getValue(AdvancedNoteBlock.SUBTICK).toString();
         };
         renderInfoLabel(buffer, matrix, text, color, pos, camPos);
 

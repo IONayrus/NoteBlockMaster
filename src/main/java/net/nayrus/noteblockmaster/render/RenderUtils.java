@@ -51,5 +51,4 @@ public class RenderUtils {
         return new Color(base.getRed() / 255.0F, base.getGreen() / 255.0F, base.getBlue() / 255.0F, alpha);
     }
 
-
 }

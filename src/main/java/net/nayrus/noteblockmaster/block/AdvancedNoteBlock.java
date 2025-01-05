@@ -31,10 +31,13 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.Config;
+import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.utils.NBMTags;
 import net.nayrus.noteblockmaster.utils.Registry;
 import net.nayrus.noteblockmaster.utils.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.Utils;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import javax.annotation.Nullable;
@@ -164,6 +167,10 @@ public class AdvancedNoteBlock extends Block
                     this.playNote(player, state, level, pos);
                     player.awardStat(Stats.PLAY_NOTEBLOCK);
                 }
+                if(item.is(Registry.TEMPOTUNER)){
+                    player.displayClientMessage(Component.literal( "("+state.getValue(SUBTICK) * SUBTICK_LENGTH+" ms)")
+                            .withColor(this.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
+                }
             }
         }
     }
@@ -247,10 +254,16 @@ public class AdvancedNoteBlock extends Block
     }
 
     public Color getColor(BlockState state, Utils.PROPERTY info){
+        if(FMLEnvironment.dist != Dist.DEDICATED_SERVER)
+            switch (info){
+                case NOTE: if(ANBInfoRender.NOTE_OFF_SYNC) return Color.RED;
+                case TEMPO: if(ANBInfoRender.SUBTICK_OFF_SYNC) return Color.RED;
+            }
         float rgbVal = switch (info){
-            case NOTE -> (this.getNoteValue(state) - 2) / 29.0F ;
+            case NOTE -> (this.getNoteValue(state) - 2) / 29.0F;
             case TEMPO -> state.getValue(AdvancedNoteBlock.SUBTICK) / (AdvancedNoteBlock.MAX_SUBTICKS - 1.0F);
         };
+
         float rCol = Math.max(0.0F, Mth.sin((rgbVal + 0.0F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
         float gCol = Math.max(0.0F, Mth.sin((rgbVal + 0.33333334F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
         float bCol = Math.max(0.0F, Mth.sin((rgbVal + 0.6666667F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
