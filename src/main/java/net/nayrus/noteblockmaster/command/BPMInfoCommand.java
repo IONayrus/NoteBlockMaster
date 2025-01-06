@@ -7,7 +7,10 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.utils.Utils;
 
 import java.awt.*;
 
@@ -28,7 +31,8 @@ public class BPMInfoCommand {
 
     private Component calculateTiming(float bpm, int noteCount){
         float tPB = 60000 / bpm;
-        MutableComponent com = Component.literal("[0]").withColor(Color.MAGENTA.getRGB());
+
+        MutableComponent com = Component.literal("[0]").withColor(getColor(0));
 
         int lastTime = 0;
         for(int i = 1; i <=noteCount; i++){
@@ -37,15 +41,22 @@ public class BPMInfoCommand {
             int redClockTime = noteTimeMs - subTickTime;
             int subtick = (subTickTime - (subTickTime % AdvancedNoteBlock.SUBTICK_LENGTH)) / AdvancedNoteBlock.SUBTICK_LENGTH;
 
-            if(redClockTime == lastTime) com.append("-").withColor(Color.CYAN.getRGB()).append("["+subtick+"]").withColor(Color.MAGENTA.getRGB());
+            if(redClockTime == lastTime)
+                com.append(Component.literal("-").withColor(Color.CYAN.getRGB()))
+                        .append(Component.literal("["+subtick+"]").withColor(getColor(subtick)));
             else{
-                com.append("~").withColor(Color.GRAY.getRGB()).append(String.valueOf((redClockTime - lastTime) / 100))
-                        .withColor(Color.ORANGE.getRGB()).append("~").withColor(Color.GRAY.getRGB());
-                com.append("["+subtick+"]").withColor(Color.MAGENTA.getRGB());
+                com.append(Component.literal("~").withColor(Color.GRAY.getRGB())).append(Component.literal(String.valueOf((redClockTime - lastTime) / 100))
+                        .withColor(Color.WHITE.darker().getRGB())).append(Component.literal("~").withColor(Color.GRAY.getRGB()));
+                com.append(Component.literal("["+subtick+"]").withColor(getColor(subtick)));
             }
             lastTime = redClockTime;
         }
         return com;
+    }
+
+    public static final BlockState dummy = Registry.ADVANCED_NOTEBLOCK.get().defaultBlockState();
+    public static int getColor(int tick){
+        return AdvancedNoteBlock.getColor(dummy.setValue(AdvancedNoteBlock.SUBTICK, tick), Utils.PROPERTY.TEMPO).getRGB();
     }
 
 }

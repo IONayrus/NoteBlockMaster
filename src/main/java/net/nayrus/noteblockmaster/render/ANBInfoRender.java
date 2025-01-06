@@ -50,8 +50,7 @@ public class ANBInfoRender {
     public static void renderNoteBlockInfo(RenderLevelStageEvent e, BlockPos pos, BlockState state, Vec3 camPos, Utils.PROPERTY info){
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         PoseStack matrix = e.getPoseStack();
-        AdvancedNoteBlock block = (AdvancedNoteBlock)state.getBlock();
-        Color color = block.getColor(state, info);
+        Color color = AdvancedNoteBlock.getColor(state, info);
 
         matrix.pushPose();
         matrix.translate(-camPos.x(), -camPos.y(), -camPos.z());
@@ -59,7 +58,7 @@ public class ANBInfoRender {
         renderColoredCone(buffer, matrix, color, pos);
 
         String text = switch(info){
-            case NOTE -> NOTE_OFF_SYNC ? "%" : Utils.NOTE_STRING[block.getNoteValue(state)];
+            case NOTE -> NOTE_OFF_SYNC ? "%" : Utils.NOTE_STRING[AdvancedNoteBlock.getNoteValue(state)];
             case TEMPO -> SUBTICK_OFF_SYNC ? "%" : state.getValue(AdvancedNoteBlock.SUBTICK).toString();
         };
         renderInfoLabel(buffer, matrix, text, color, pos, camPos);

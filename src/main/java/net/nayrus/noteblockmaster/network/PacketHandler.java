@@ -45,9 +45,11 @@ public class PacketHandler {
         //noinspection SwitchStatementWithTooFewBranches
         switch(ActionPing.Action.values()[packet.action()]){
             case SAVE_STARTUP_CONFIG -> {
-                Config.updateStartUpAndSave();
-                context.player().sendSystemMessage(Component.literal("Updated local configs. Restart your client to apply.")
-                        .withColor(Color.GREEN.darker().getRGB()));
+                if(!Config.UPDATED) {
+                    Config.updateStartUpAndSave();
+                    context.player().sendSystemMessage(Component.literal("Updated local configs. Restart your client to apply.")
+                            .withColor(Color.GREEN.darker().getRGB()));
+                }
             }
             //case RENDER -> {}
         }

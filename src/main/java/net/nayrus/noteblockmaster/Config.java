@@ -33,10 +33,12 @@ public class Config
         catch (IllegalArgumentException e) {return false;}
     }
 
+    public static boolean UPDATED = false;
     public static void updateStartUpAndSave(){
         Config.LOWER_NOTE_LIMIT.set(AdvancedNoteBlock.MIN_NOTE_VAL);
         Config.HIGHER_NOTE_LIMIT.set(AdvancedNoteBlock.MAX_NOTE_VAL);
         Config.SUBTICK_LENGTH.set(AdvancedNoteBlock.SUBTICK_LENGTH);
         Config.START_UP.save();
+        UPDATED = true;
     }
 }

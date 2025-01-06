@@ -163,13 +163,13 @@ public class AdvancedNoteBlock extends Block
             else{
                 if(item.is(Registry.NOTETUNER)){
                     player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)])
-                            .withColor(this.getColor(state, Utils.PROPERTY.NOTE).getRGB()), true);
+                            .withColor(AdvancedNoteBlock.getColor(state, Utils.PROPERTY.NOTE).getRGB()), true);
                     this.playNote(player, state, level, pos);
                     player.awardStat(Stats.PLAY_NOTEBLOCK);
                 }
                 if(item.is(Registry.TEMPOTUNER)){
                     player.displayClientMessage(Component.literal( "("+state.getValue(SUBTICK) * SUBTICK_LENGTH+" ms)")
-                            .withColor(this.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
+                            .withColor(AdvancedNoteBlock.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
                 }
             }
         }
@@ -206,7 +206,7 @@ public class AdvancedNoteBlock extends Block
         } else {
             holder = noteblockinstrument.getSoundEvent();
         }
-        SubTickScheduler.delayedNoteBlockEvent(state, level, pos, this, noteblockinstrument, holder);
+        SubTickScheduler.delayedNoteBlockEvent(state, level, pos, noteblockinstrument, holder);
         return true;
     }
 
@@ -238,7 +238,7 @@ public class AdvancedNoteBlock extends Block
         }
     }
 
-    public int getNoteValue(BlockState state){
+    public static int getNoteValue(BlockState state){
         return state.getValue(NOTE);
     }
 
@@ -253,15 +253,15 @@ public class AdvancedNoteBlock extends Block
         return (float)Math.pow(2.0, (double)(note - 42) / 12.0);
     }
 
-    public Color getColor(BlockState state, Utils.PROPERTY info){
+    public static Color getColor(BlockState state, Utils.PROPERTY info){
         if(FMLEnvironment.dist != Dist.DEDICATED_SERVER)
             switch (info){
                 case NOTE: if(ANBInfoRender.NOTE_OFF_SYNC) return Color.RED;
                 case TEMPO: if(ANBInfoRender.SUBTICK_OFF_SYNC) return Color.RED;
             }
         float rgbVal = switch (info){
-            case NOTE -> (this.getNoteValue(state) - 2) / 29.0F;
-            case TEMPO -> state.getValue(AdvancedNoteBlock.SUBTICK) / (AdvancedNoteBlock.MAX_SUBTICKS - 1.0F);
+            case NOTE -> (getNoteValue(state) - 2) / 29.0F;
+            case TEMPO -> state.getValue(SUBTICK) / (MAX_SUBTICKS - 1.0F);
         };
 
         float rCol = Math.max(0.0F, Mth.sin((rgbVal + 0.0F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
@@ -278,7 +278,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     public InteractionResult onNoteChange(Level level, Player player, BlockState state, BlockPos pos, int new_val){
-        int old_val = this.getNoteValue(state);
+        int old_val = AdvancedNoteBlock.getNoteValue(state);
         int _new = net.neoforged.neoforge.common.CommonHooks.onNoteChange(level, pos, state, old_val, new_val);
         if (_new == -1) return InteractionResult.FAIL;
         state = this.setNoteValue(state, _new);

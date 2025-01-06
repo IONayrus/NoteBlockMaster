@@ -46,7 +46,7 @@ public class TunerItem extends Item {
 
                 level.setBlock(pos, state.setValue(AdvancedNoteBlock.SUBTICK, new_val), Block.UPDATE_ALL);
                 player.displayClientMessage(Component.literal( "("+new_val * AdvancedNoteBlock.SUBTICK_LENGTH+" ms)")
-                        .withColor(block.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
+                        .withColor(AdvancedNoteBlock.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
                 return InteractionResult.SUCCESS;
             }
             if (stack.is(Registry.NOTETUNER)) {

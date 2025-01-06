@@ -19,11 +19,11 @@ public class SubTickScheduler {
 
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos, AdvancedNoteBlock block, NoteBlockInstrument noteblockinstrument, Holder<SoundEvent> holder){
+    public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos, NoteBlockInstrument noteblockinstrument, Holder<SoundEvent> holder){
         executor.schedule(() -> {
             float f;
             if (noteblockinstrument.isTunable()) {
-                int i = block.getNoteValue(state);
+                int i = AdvancedNoteBlock.getNoteValue(state);
                 f = AdvancedNoteBlock.getPitchFromNote(i);
                 level.addParticle(
                         ParticleTypes.NOTE, (double) pos.getX() + 0.5, (double) pos.getY() + 1.2, (double) pos.getZ() + 0.5, (i - 2f) / 29, 0.0, 0.0

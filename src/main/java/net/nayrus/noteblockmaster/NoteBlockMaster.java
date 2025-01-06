@@ -60,7 +60,7 @@ public class NoteBlockMaster
     @SubscribeEvent
     public void onCommandRegister(RegisterCommandsEvent event){
         new BPMInfoCommand(event.getDispatcher());
-        MainCommand.saveConfigCommand(event.getDispatcher());
+        MainCommand.mainCommand(event.getDispatcher());
         ConfigCommand.register(event.getDispatcher());
     }
 }
