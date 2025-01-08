@@ -39,6 +39,7 @@ import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -92,7 +93,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+    public boolean onDestroyedByPlayer(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, Player player, boolean willHarvest, @NotNull FluidState fluid) {
         if(player.getWeaponItem().is(NBMTags.Items.TUNERS)){
             if(!level.isClientSide())
                 attack(state, level, pos, player);
@@ -102,13 +103,13 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
+    protected float getDestroyProgress(@NotNull BlockState state, Player player, @NotNull BlockGetter level, @NotNull BlockPos pos) {
         return player.getWeaponItem().is(NBMTags.Items.TUNERS) ? 0.0f : super.getDestroyProgress(state, player, level, pos);
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(
-            ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected @NotNull ItemInteractionResult useItemOn(
+            ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
         if(!stack.is(NBMTags.Items.TUNERS)){
             return stack.is(ItemTags.NOTE_BLOCK_TOP_INSTRUMENTS) && hitResult.getDirection() == Direction.UP
                     ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
@@ -123,7 +124,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
@@ -134,7 +135,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level level, @NotNull BlockPos pos, @NotNull Block block, @NotNull BlockPos fromPos, boolean isMoving) {
         boolean flag = level.hasNeighborSignal(pos);
         if (flag != state.getValue(NoteBlock.POWERED)) {
             if (flag) {
@@ -153,7 +154,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
+    protected void attack(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player) {
         if (!level.isClientSide) {
             ItemStack item = player.getWeaponItem();
             if(!item.is(NBMTags.Items.TUNERS)) {
@@ -181,7 +182,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+    protected @NotNull BlockState updateShape(@NotNull BlockState state, Direction facing, @NotNull BlockState facingState, @NotNull LevelAccessor level, @NotNull BlockPos currentPos, @NotNull BlockPos facingPos) {
         boolean flag = facing.getAxis() == Direction.Axis.Y;
         return flag ? this.setInstrument(level, currentPos, state) : super.updateShape(state, facing, facingState, level, currentPos, facingPos);
     }
@@ -192,7 +193,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
+    protected boolean triggerEvent(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, int id, int param) {
         net.neoforged.neoforge.event.level.NoteBlockEvent.Play e = new net.neoforged.neoforge.event.level.NoteBlockEvent.Play(level, pos, state, getNoteValue(state), state.getValue(NoteBlock.INSTRUMENT));
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
         NoteBlockInstrument noteblockinstrument = state.getValue(NoteBlock.INSTRUMENT);

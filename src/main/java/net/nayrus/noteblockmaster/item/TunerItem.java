@@ -25,7 +25,7 @@ public class TunerItem extends Item {
     }
 
     @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack) {
+    public boolean hasCraftingRemainingItem(@NotNull ItemStack stack) {
         return true;
     }
 
@@ -35,7 +35,7 @@ public class TunerItem extends Item {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public @NotNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
@@ -43,7 +43,7 @@ public class TunerItem extends Item {
         Player player = context.getPlayer();
         if(player==null) return InteractionResult.FAIL;
         if(!(state.getBlock() instanceof AdvancedNoteBlock block)) return InteractionResult.PASS;
-        if(!level.isClientSide) {
+        if(!level.isClientSide && !player.isShiftKeyDown()) { //TODO Has to handle Tuner Data now
             if (stack.is(Registry.TEMPOTUNER)) {
                 int state_val = state.getValue(AdvancedNoteBlock.SUBTICK);
                 int new_val = (player.isShiftKeyDown() ? state_val + 5 : state_val + 1) % AdvancedNoteBlock.MAX_SUBTICKS;
@@ -62,11 +62,11 @@ public class TunerItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        if(level.isClientSide()){
-            Minecraft.getInstance().setScreen(new TempoTunerScreen(Component.literal("Hello")));
-        }
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
         ItemStack itemstack = player.getItemInHand(usedHand);
+        if(level.isClientSide()){
+            Minecraft.getInstance().setScreen(new TempoTunerScreen(itemstack));
+        }
         return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemstack);
     }
 }
