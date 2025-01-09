@@ -10,32 +10,32 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
-import net.nayrus.noteblockmaster.item.TunerData;
+import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.item.TunerItem;
+import net.nayrus.noteblockmaster.network.payload.TunerData;
 import net.nayrus.noteblockmaster.screen.widget.TunerEditBox;
 import net.nayrus.noteblockmaster.screen.widget.ValueSlider;
 import net.nayrus.noteblockmaster.utils.Registry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-public class TempoTunerScreen extends Screen implements Button.OnPress{
+public class TempoTunerScreen extends Screen implements Button.OnPress {
 
     private final ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png");
     public final int imageWidth = 176;
     public final int imageHeight = 53;
-    private TunerEditBox input;
+    public TunerEditBox input;
     private Button add;
     private Button set;
+    private ValueSlider slider;
     private final ItemStack tuner;
-    private int subtick_val;
+    public int subtick_val;
     private boolean setmode;
 
     public TempoTunerScreen(ItemStack item) {
         super(Component.literal(""));
         this.tuner = item;
-        TunerData data = tuner.get(Registry.TUNER_DATA);
-        if(data == null) {
-            data = new TunerData(0, false);
-            tuner.set(Registry.TUNER_DATA, data);
-        }
+        TunerData data = TunerItem.getTunerData(item);
         subtick_val = data.value();
         setmode = data.setmode();
     }
@@ -44,12 +44,19 @@ public class TempoTunerScreen extends Screen implements Button.OnPress{
     protected void init() {
         super.init();
 
-        input = new TunerEditBox(Minecraft.getInstance().font, getRelX() + 100, getRelY() + 16, 27,20);
+        input = new TunerEditBox(Minecraft.getInstance().font, getRelX() + 100, getRelY() + 16, 27,20, AdvancedNoteBlock.SUBTICKS);
 
         addRenderableWidget(input);
         setFocused(input);
         input.setFocused(false);
         input.setValue(Integer.toString(subtick_val));
+        input.setResponder(s -> {
+            if(!s.isEmpty()) {
+                int _new = Integer.parseInt(s);
+                this.subtick_val = _new;
+                this.slider.setValue(_new/(AdvancedNoteBlock.SUBTICKS - 1.0));
+            }
+        });
 
         add = new Button.Builder(Component.literal("Add"), this).pos(getRelX() + 135, getRelY() + 8).size(30,17).build();
         set = new Button.Builder(Component.literal("Set"), this).pos(getRelX() + 135, getRelY() + 28).size(30,17).build();
@@ -59,7 +66,10 @@ public class TempoTunerScreen extends Screen implements Button.OnPress{
         addRenderableWidget(add);
         addRenderableWidget(set);
 
-        ValueSlider slider = new ValueSlider(getRelX() + 10, getRelY() + 16, 80, 20, subtick_val);
+        slider = new ValueSlider(getRelX() + 10, getRelY() + 16, 80, 20, subtick_val/(AdvancedNoteBlock.SUBTICKS - 1.0), val -> {
+            this.subtick_val = (int)(val * (AdvancedNoteBlock.SUBTICKS -1));
+            input.setValue(Integer.toString(this.subtick_val));
+        });
         addRenderableWidget(slider);
     }
 
@@ -108,13 +118,16 @@ public class TempoTunerScreen extends Screen implements Button.OnPress{
     }
 
     private void updateButton(){
-        add.active = !setmode;
-        set.active = setmode;
+        add.active = setmode;
+        set.active = !setmode;
     }
 
     @Override
     public void onClose() {
-        tuner.set(Registry.TUNER_DATA, new TunerData(subtick_val, setmode));
+        TunerData _new = new TunerData(subtick_val, setmode);
+        tuner.set(Registry.TUNER_DATA, _new);
+        PacketDistributor.sendToServer(_new);
         super.onClose();
     }
+
 }

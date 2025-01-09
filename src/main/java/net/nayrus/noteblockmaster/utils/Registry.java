@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
-import net.nayrus.noteblockmaster.item.TunerData;
+import net.nayrus.noteblockmaster.network.payload.TunerData;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -36,7 +36,7 @@ public class Registry
             () -> new TunerItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<TunerData>> TUNER_DATA = DATA_COMPONENT_TYPES.registerComponentType("tuner_data",
-            builder -> builder.persistent(TunerData.TUNER_CODEC).networkSynchronized(TunerData.TUNER_STREAM_CODEC));
+            builder -> builder.persistent(TunerData.TUNER_CODEC));
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

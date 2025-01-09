@@ -6,6 +6,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
@@ -31,6 +33,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.Config;
+import net.nayrus.noteblockmaster.item.TunerItem;
+import net.nayrus.noteblockmaster.network.payload.TunerData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.utils.NBMTags;
 import net.nayrus.noteblockmaster.utils.Registry;
@@ -47,7 +51,7 @@ import java.awt.*;
 public class AdvancedNoteBlock extends Block
 {
 
-    public static int MAX_SUBTICKS;
+    public static int SUBTICKS;
     public static int SUBTICK_LENGTH;
     public static IntegerProperty SUBTICK;
     public static IntegerProperty NOTE;
@@ -72,8 +76,8 @@ public class AdvancedNoteBlock extends Block
 
     public static void loadPropertiesFromConfig(final NewRegistryEvent ignoredEvent){
         SUBTICK_LENGTH = Config.SUBTICK_LENGTH.get();
-        MAX_SUBTICKS = (int) (100.0F / SUBTICK_LENGTH);
-        SUBTICK = IntegerProperty.create("subtick",0,MAX_SUBTICKS - 1);
+        SUBTICKS = (int) (100.0F / SUBTICK_LENGTH);
+        SUBTICK = IntegerProperty.create("subtick",0, SUBTICKS - 1);
         MIN_NOTE_VAL = Config.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.LOWER_NOTE_LIMIT.get()) : (int) Config.LOWER_NOTE_LIMIT.get();
         MAX_NOTE_VAL = Config.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.HIGHER_NOTE_LIMIT.get()) : (int) Config.HIGHER_NOTE_LIMIT.get();
         NOTE = IntegerProperty.create("note", MIN_NOTE_VAL, MAX_NOTE_VAL);
@@ -162,15 +166,29 @@ public class AdvancedNoteBlock extends Block
                 player.awardStat(Stats.PLAY_NOTEBLOCK);
             }
             else{
+                TunerData data = TunerItem.getTunerData(item);
                 if(item.is(Registry.NOTETUNER)){
-                    player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)])
+                    if(!player.isShiftKeyDown())
+                        player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)])
                             .withColor(AdvancedNoteBlock.getColor(state, Utils.PROPERTY.NOTE).getRGB()), true);
-                    this.playNote(player, state, level, pos);
-                    player.awardStat(Stats.PLAY_NOTEBLOCK);
+                    else{
+                        int new_val = data.setmode() ? data.value() : this.changeNoteValueBy(state, -data.value());
+                        this.onNoteChange(level, player, state, pos, new_val);
+                    }
                 }
                 if(item.is(Registry.TEMPOTUNER)){
-                    player.displayClientMessage(Component.literal( "("+state.getValue(SUBTICK) * SUBTICK_LENGTH+" ms)")
+                    if(!player.isShiftKeyDown())
+                        player.displayClientMessage(Component.literal( "("+state.getValue(SUBTICK) * SUBTICK_LENGTH+" ms)")
                             .withColor(AdvancedNoteBlock.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
+                    else{
+                        int new_val;
+                        if(data.setmode()) new_val = data.value();
+                        else{
+                            int diff = state.getValue(AdvancedNoteBlock.SUBTICK) - data.value();
+                            new_val = diff < 0 ? (diff + AdvancedNoteBlock.SUBTICKS) : diff;
+                        }
+                        this.onSubtickChange(level, player, state, pos, new_val, false);
+                    }
                 }
             }
         }
@@ -262,7 +280,7 @@ public class AdvancedNoteBlock extends Block
             }
         float rgbVal = switch (info){
             case NOTE -> (getNoteValue(state) - 2) / 29.0F;
-            case TEMPO -> state.getValue(SUBTICK) / (MAX_SUBTICKS - 1.0F);
+            case TEMPO -> state.getValue(SUBTICK) / (SUBTICKS - 1.0F);
         };
 
         float rCol = Math.max(0.0F, Mth.sin((rgbVal + 0.0F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
@@ -286,6 +304,22 @@ public class AdvancedNoteBlock extends Block
         level.setBlock(pos, state, 3);
         this.playNote(player, state, level, pos);
         player.awardStat(Stats.TUNE_NOTEBLOCK);
+        return InteractionResult.SUCCESS;
+    }
+
+    public InteractionResult onSubtickChange(Level level, Player player, BlockState state, BlockPos pos, int new_val, boolean add){
+        state = state.setValue(AdvancedNoteBlock.SUBTICK, new_val);
+        level.setBlock(pos, state, Block.UPDATE_ALL);
+        level.playSound(null,
+                (double) pos.getX() + 0.5,
+                (double) pos.getY() + 0.5,
+                (double) pos.getZ() + 0.5,
+                add ? SoundEvents.WOODEN_BUTTON_CLICK_ON : SoundEvents.WOODEN_BUTTON_CLICK_OFF,
+                SoundSource.RECORDS,
+                1.0F,
+                1.0F);
+        player.displayClientMessage(Component.literal( "("+new_val * AdvancedNoteBlock.SUBTICK_LENGTH+" ms)")
+                .withColor(AdvancedNoteBlock.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
         return InteractionResult.SUCCESS;
     }
 
