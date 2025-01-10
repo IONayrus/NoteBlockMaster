@@ -168,11 +168,14 @@ public class AdvancedNoteBlock extends Block
             else{
                 TunerData data = TunerItem.getTunerData(item);
                 if(item.is(Registry.NOTETUNER)){
-                    if(!player.isShiftKeyDown())
+                    if(!player.isShiftKeyDown()) {
                         player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)])
-                            .withColor(AdvancedNoteBlock.getColor(state, Utils.PROPERTY.NOTE).getRGB()), true);
+                                .withColor(getColor(state, Utils.PROPERTY.NOTE).getRGB()), true);
+                        this.playNote(player, state, level, pos);
+                        player.awardStat(Stats.PLAY_NOTEBLOCK);
+                    }
                     else{
-                        int new_val = data.setmode() ? data.value() : this.changeNoteValueBy(state, -data.value());
+                        int new_val = data.setmode() ? data.value() + MIN_NOTE_VAL : this.changeNoteValueBy(state, -data.value());
                         this.onNoteChange(level, player, state, pos, new_val);
                     }
                 }
@@ -184,8 +187,8 @@ public class AdvancedNoteBlock extends Block
                         int new_val;
                         if(data.setmode()) new_val = data.value();
                         else{
-                            int diff = state.getValue(AdvancedNoteBlock.SUBTICK) - data.value();
-                            new_val = diff < 0 ? (diff + AdvancedNoteBlock.SUBTICKS) : diff;
+                            int diff = state.getValue(SUBTICK) - data.value();
+                            new_val = diff < 0 ? (diff + SUBTICKS) : diff;
                         }
                         this.onSubtickChange(level, player, state, pos, new_val, false);
                     }
@@ -244,7 +247,7 @@ public class AdvancedNoteBlock extends Block
             if(note.length() > 3 || note.length() < 2) throw new IllegalArgumentException();
             int val = note.length() == 3 ? 1 : 0;
             switch(note.charAt(0)){
-                case 'B': val ++;
+                case 'B': val += 2;
                 case 'A': val += 2;
                 case 'G': val += 2;
                 case 'F': val ++;

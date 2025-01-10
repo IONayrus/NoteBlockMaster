@@ -1,6 +1,7 @@
 package net.nayrus.noteblockmaster.screen;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -26,26 +27,30 @@ public class NoteTunerScreen extends ValueTunerScreen implements Button.OnPress{
         input.setFocused(false);
         input.setValue(setmode ? Utils.NOTE_STRING[this.value+ AdvancedNoteBlock.MIN_NOTE_VAL] : Integer.toString(value));
         input.setResponder(s -> {
-            if(s.length() == 3) {
-                int _new = AdvancedNoteBlock.noteStringAsInt(s)-AdvancedNoteBlock.MIN_NOTE_VAL;
-                this.value = _new;
-                this.slider.setValue(_new/(double)this.maxValue);
+            //0 ~ TotalNotes = Slider Range (AddMode)
+            //MinNote ~ MaxNote = Slider Range(Setmode)  - MinNote beim Setten!
+            //0 ~ MaxNote = char typed sonst maxNote
+            if(!s.isEmpty()) {
+                if(!setmode){
+                    int _new = Integer.parseInt(s);
+                    this.value = _new;
+                    this.slider.setValue((_new) / (double) this.maxValue);
+                }else{
+                    try{
+                        int _new = AdvancedNoteBlock.noteStringAsInt(s) - AdvancedNoteBlock.MIN_NOTE_VAL;
+                        this.value = _new;
+                        this.slider.setValue((_new) / (double) this.maxValue);
+                    } catch (IllegalArgumentException ignored) {}
+                }
             }
         });
         input.setFilter(s -> {
-            if(s.isEmpty()) return true;
-            if(s.length()==1 && Utils.isPartOfNoteString(s)) return true;
             try{
-                AdvancedNoteBlock.noteStringAsInt(s);
+                if(s.isEmpty()) return true;
+                Integer.parseInt(s);
                 return true;
-            } catch (IllegalArgumentException e) {
-                if(!setmode)
-                    try{
-                        return Integer.parseInt(s) < this.maxValue;
-                    } catch (NumberFormatException ex) {
-                        return false;
-                    }
-                return false;
+            } catch (NumberFormatException e) {
+                return Utils.isPartOfNoteString(s) && setmode;
             }
         });
 
@@ -57,7 +62,7 @@ public class NoteTunerScreen extends ValueTunerScreen implements Button.OnPress{
 
         slider = new ValueSlider(getRelX() + 10 - ext/2, getRelY() + 16, 80 + ext, 20, value /(double)this.maxValue, val -> {
             this.value = (int)(val * AdvancedNoteBlock.TOTAL_NOTES);
-            input.setValue(setmode ? Utils.NOTE_STRING[this.value+ AdvancedNoteBlock.MIN_NOTE_VAL] : Integer.toString(value));
+            input.setValue(setmode ? Utils.NOTE_STRING[this.value + AdvancedNoteBlock.MIN_NOTE_VAL] : Integer.toString(value));
         });
         addRenderableWidget(slider);
 
@@ -70,5 +75,17 @@ public class NoteTunerScreen extends ValueTunerScreen implements Button.OnPress{
         this.input.setValue(setmode ? Utils.NOTE_STRING[this.value+ AdvancedNoteBlock.MIN_NOTE_VAL] : Integer.toString(value));
     }
 
-
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        Options op = Minecraft.getInstance().options;
+        if((op.keyUp.matches(keyCode, scanCode)
+                || op.keyDown.matches(keyCode, scanCode)
+                || op.keyRight.matches(keyCode, scanCode)
+                || op.keyLeft.matches(keyCode, scanCode)
+                || op.keyShift.matches(keyCode, scanCode)
+                || op.keyJump.matches(keyCode, scanCode))
+                && !(Utils.isIntInRange(keyCode, 'A', 'G') && setmode))
+            this.onClose();
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
 }

@@ -34,11 +34,6 @@ public class TunerEditBox extends EditBox {
         }
     }
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
     public int getNumber(){
         if(this.getValue().isEmpty()) return 0;
         return Integer.parseInt(this.getValue());

@@ -1,8 +1,6 @@
 package net.nayrus.noteblockmaster.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -69,19 +67,6 @@ public class ValueTunerScreen extends Screen implements Button.OnPress{
 
     public int getExtension(){
         return Math.max(0, this.maxValue - 20) * 4;
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        Options op = Minecraft.getInstance().options;
-        if(op.keyUp.matches(keyCode, scanCode)
-                || op.keyDown.matches(keyCode, scanCode)
-                || op.keyRight.matches(keyCode, scanCode)
-                || op.keyLeft.matches(keyCode, scanCode)
-                || op.keyShift.matches(keyCode, scanCode)
-                || op.keyJump.matches(keyCode, scanCode))
-            this.onClose();
-        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

@@ -22,7 +22,7 @@ public class Utils {
 
     public static boolean isPartOfNoteString(String s){
         String t = s.replace('#','♯').toUpperCase();
-        return Arrays.stream(NOTE_STRING).noneMatch(r -> r.contains(t));
+        return Arrays.stream(NOTE_STRING).anyMatch(r -> r.contains(t));
     }
 
     public static boolean isIntInRange(int value, int min, int max) {

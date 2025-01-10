@@ -18,9 +18,9 @@ public class NoteEditBox extends TunerEditBox{
                 this.setValue("");
                 first = false;
             }
-            this.insertText(Character.toString(codePoint));
+            this.insertText(Character.toString(Character.toUpperCase(codePoint)));
             try {
-                if (AdvancedNoteBlock.noteStringAsInt(this.getValue(),false) >= this.maxVal)
+                if (AdvancedNoteBlock.noteStringAsInt(this.getValue(),false) - AdvancedNoteBlock.MIN_NOTE_VAL >= this.maxVal)
                     this.setValue(Utils.NOTE_STRING[AdvancedNoteBlock.MAX_NOTE_VAL]);
             }catch(IllegalArgumentException ignored){}
             return true;
