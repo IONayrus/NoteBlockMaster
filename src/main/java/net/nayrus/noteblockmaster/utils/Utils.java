@@ -4,7 +4,10 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
@@ -40,5 +43,16 @@ public class Utils {
                 .withColor(Color.ORANGE.getRGB())
                 .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nbm saveconfig"))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Synchronize & Safe conig").withColor(Color.LIGHT_GRAY.getRGB())))));
+    }
+
+    public static void removeItemsFromInventory(Inventory inv, Item item, int amount){
+        int removed = 0;
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack itemstack = inv.getItem(i);
+            if (itemstack.getItem().equals(item)) {
+                removed += inv.removeItem(i, amount - removed).getCount();
+                if(removed == amount) break;
+            }
+        }
     }
 }

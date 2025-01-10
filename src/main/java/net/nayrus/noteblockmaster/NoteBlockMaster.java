@@ -8,6 +8,7 @@ import net.nayrus.noteblockmaster.command.BPMInfoCommand;
 import net.nayrus.noteblockmaster.command.MainCommand;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
 import net.nayrus.noteblockmaster.event.ClientEvents;
+import net.nayrus.noteblockmaster.event.CommonEvents;
 import net.nayrus.noteblockmaster.event.ServerEvents;
 import net.nayrus.noteblockmaster.network.PacketHandler;
 import net.nayrus.noteblockmaster.utils.Registry;
@@ -55,6 +56,7 @@ public class NoteBlockMaster
         }else{
             NeoForge.EVENT_BUS.register(ServerEvents.class);
         }
+        NeoForge.EVENT_BUS.register(CommonEvents.class);
     }
 
     @SubscribeEvent

@@ -1,5 +1,6 @@
 {
     "block.noteblockmaster.advanced_noteblock": "Advanced Note Block",
     "item.noteblockmaster.tempotuner": "Tempo Tuner",
-    "item.noteblockmaster.notetuner": "Note Tuner"
+    "item.noteblockmaster.notetuner": "Note Tuner",
+    "sounds.noteblockmaster.noteblock_smithing": "Note block upgraded"
 }

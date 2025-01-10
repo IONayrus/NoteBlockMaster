@@ -58,8 +58,7 @@ public class AdvancedNoteBlock extends Block
     public static int MIN_NOTE_VAL;
     public static int MAX_NOTE_VAL;
     public static int TOTAL_NOTES;
-
-    private final int defaultNoteValue;
+    public static final int DEFAULT_NOTE = noteStringAsInt("F#3", false);
 
     public AdvancedNoteBlock(Properties properties) {
         super(properties);
@@ -69,9 +68,8 @@ public class AdvancedNoteBlock extends Block
                         .setValue(NoteBlock.INSTRUMENT, NoteBlockInstrument.HARP)
                         .setValue(NoteBlock.POWERED,false)
                         .setValue(SUBTICK, 0)
-                        .setValue(NOTE, noteStringAsInt("F#3", false))
+                        .setValue(NOTE, DEFAULT_NOTE)
         );
-        defaultNoteValue = getNoteValue(this.defaultBlockState());
     }
 
     public static void loadPropertiesFromConfig(final NewRegistryEvent ignoredEvent){
@@ -133,7 +131,7 @@ public class AdvancedNoteBlock extends Block
             return InteractionResult.SUCCESS;
         } else {
             int val = getNoteValue(state);
-            int _new = ((val+1) >= (defaultNoteValue + 25) || (val+1) < defaultNoteValue) ? defaultNoteValue : val+1;
+            int _new = ((val+1) >= (DEFAULT_NOTE + 25) || (val+1) < DEFAULT_NOTE) ? DEFAULT_NOTE : val+1;
             return onNoteChange(level, player, state, pos, _new);
         }
     }

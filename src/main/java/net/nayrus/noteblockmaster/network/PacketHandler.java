@@ -1,8 +1,12 @@
 package net.nayrus.noteblockmaster.network;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.Config;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
@@ -49,7 +53,6 @@ public class PacketHandler {
     }
 
     public static void handleActionPing(final ActionPing packet, final IPayloadContext context){
-        //noinspection SwitchStatementWithTooFewBranches
         switch(ActionPing.Action.values()[packet.action()]){
             case SAVE_STARTUP_CONFIG -> {
                 if(!Config.UPDATED) {
@@ -58,7 +61,10 @@ public class PacketHandler {
                             .withColor(Color.GREEN.darker().getRGB()));
                 }
             }
-            //case RENDER -> {}
+            case GOLD_BREAK -> {
+                if(Minecraft.getInstance().level instanceof ClientLevel level)
+                    level.addDestroyBlockEffect(((BlockHitResult)context.player().pick(8, 0, false)).getBlockPos(), Blocks.GOLD_BLOCK.defaultBlockState());
+            }
         }
     }
 
