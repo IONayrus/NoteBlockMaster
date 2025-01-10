@@ -27,9 +27,6 @@ public class NoteTunerScreen extends ValueTunerScreen implements Button.OnPress{
         input.setFocused(false);
         input.setValue(setmode ? Utils.NOTE_STRING[this.value+ AdvancedNoteBlock.MIN_NOTE_VAL] : Integer.toString(value));
         input.setResponder(s -> {
-            //0 ~ TotalNotes = Slider Range (AddMode)
-            //MinNote ~ MaxNote = Slider Range(Setmode)  - MinNote beim Setten!
-            //0 ~ MaxNote = char typed sonst maxNote
             if(!s.isEmpty()) {
                 if(!setmode){
                     int _new = Integer.parseInt(s);

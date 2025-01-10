@@ -48,7 +48,11 @@ public class ValueTunerScreen extends Screen implements Button.OnPress{
         RenderSystem.setShaderTexture(0, GUI);
         int extend = getExtension();
         guiGraphics.blit(GUI, getRelX() - extend/2, getRelY(), 0, 0, this.imageWidth/2, this.imageHeight);
-        guiGraphics.blit(GUI, getRelX() + this.imageWidth/2 - extend/2, getRelY(), this.imageWidth/2, 0, extend, this.imageHeight);
+        guiGraphics.blit(GUI, getRelX() + this.imageWidth/2 - extend/2, getRelY(), 5, 0,
+                extend > this.imageWidth ? extend/2 : extend, this.imageHeight);
+        if(extend > this.imageWidth)
+            guiGraphics.blit(GUI, getRelX() + this.imageWidth/2, getRelY(), 5, 0,
+                    extend/2, this.imageHeight);
         guiGraphics.blit(GUI, getRelX() + this.imageWidth/2 + extend/2, getRelY(), this.imageWidth/2, 0, this.imageWidth/2, this.imageHeight);
     }
 
