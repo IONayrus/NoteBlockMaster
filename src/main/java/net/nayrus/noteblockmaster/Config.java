@@ -28,7 +28,7 @@ public class Config
             else return false;
         }
         try{
-            return high ? AdvancedNoteBlock.noteStringAsInt(configStr) >= 54 : AdvancedNoteBlock.noteStringAsInt(configStr) <= 30;
+            return high ? AdvancedNoteBlock.noteStringAsInt(configStr, false) >= 54 : AdvancedNoteBlock.noteStringAsInt(configStr, false) <= 30;
         }
         catch (IllegalArgumentException e) {return false;}
     }

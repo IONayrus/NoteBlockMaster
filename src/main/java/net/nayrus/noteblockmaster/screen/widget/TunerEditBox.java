@@ -7,21 +7,14 @@ import net.minecraft.util.StringUtil;
 
 public class TunerEditBox extends EditBox {
 
-    private boolean first = true;
-    private final int maxVal;
+    protected boolean first = true;
+    protected final int maxVal;
+
     public TunerEditBox(Font font, int x, int y, int width, int height, int maxVal) {
         super(font, x, y, width, height, Component.literal("0"));
         this.maxVal = maxVal;
         this.setEditable(true);
         this.setMaxLength(3);
-        this.setFilter(s -> {
-            try{
-                if(s.isEmpty()) return true;
-                Integer.parseInt(s);
-                return true;
-            } catch (NumberFormatException e) {
-                return false;
-            }});
         this.setCursorPosition(0);
     }
 

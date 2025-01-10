@@ -57,6 +57,15 @@ public class TempoTunerScreen extends Screen implements Button.OnPress {
                 this.slider.setValue(_new/(AdvancedNoteBlock.SUBTICKS - 1.0));
             }
         });
+        input.setFilter(s -> {
+            try{
+                if(s.isEmpty()) return true;
+                Integer.parseInt(s);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        });
 
         add = new Button.Builder(Component.literal("Add"), this).pos(getRelX() + 135, getRelY() + 8).size(30,17).build();
         set = new Button.Builder(Component.literal("Set"), this).pos(getRelX() + 135, getRelY() + 28).size(30,17).build();

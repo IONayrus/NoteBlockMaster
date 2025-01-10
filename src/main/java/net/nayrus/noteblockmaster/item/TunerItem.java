@@ -58,7 +58,7 @@ public class TunerItem extends Item {
                 return block.onSubtickChange(level, player, state, pos, new_val, true);
             }
             if (stack.is(Registry.NOTETUNER)) {
-                int new_val = data.setmode() ? data.value() : block.changeNoteValueBy(state, data.value());
+                int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
                 return block.onNoteChange(level, player, state, pos, new_val);
             }
         }

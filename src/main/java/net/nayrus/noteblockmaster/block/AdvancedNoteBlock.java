@@ -69,7 +69,7 @@ public class AdvancedNoteBlock extends Block
                         .setValue(NoteBlock.INSTRUMENT, NoteBlockInstrument.HARP)
                         .setValue(NoteBlock.POWERED,false)
                         .setValue(SUBTICK, 0)
-                        .setValue(NOTE, noteStringAsInt("F#3"))
+                        .setValue(NOTE, noteStringAsInt("F#3", false))
         );
         defaultNoteValue = getNoteValue(this.defaultBlockState());
     }
@@ -78,8 +78,8 @@ public class AdvancedNoteBlock extends Block
         SUBTICK_LENGTH = Config.SUBTICK_LENGTH.get();
         SUBTICKS = (int) (100.0F / SUBTICK_LENGTH);
         SUBTICK = IntegerProperty.create("subtick",0, SUBTICKS - 1);
-        MIN_NOTE_VAL = Config.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.LOWER_NOTE_LIMIT.get()) : (int) Config.LOWER_NOTE_LIMIT.get();
-        MAX_NOTE_VAL = Config.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.HIGHER_NOTE_LIMIT.get()) : (int) Config.HIGHER_NOTE_LIMIT.get();
+        MIN_NOTE_VAL = Config.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.LOWER_NOTE_LIMIT.get(), false) : (int) Config.LOWER_NOTE_LIMIT.get();
+        MAX_NOTE_VAL = Config.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.HIGHER_NOTE_LIMIT.get(), false) : (int) Config.HIGHER_NOTE_LIMIT.get();
         NOTE = IntegerProperty.create("note", MIN_NOTE_VAL, MAX_NOTE_VAL);
 
         TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
@@ -234,9 +234,11 @@ public class AdvancedNoteBlock extends Block
         return level.getBlockEntity(pos.above()) instanceof SkullBlockEntity skullblockentity ? skullblockentity.getNoteBlockSound() : null;
     }
 
-    public static int noteStringAsInt(String note){
+    public static int noteStringAsInt(String note, boolean validate){
         try{
-            return Integer.parseInt(note);
+            int num = Integer.parseInt(note);
+            if(validate && !Utils.isIntInRange(num, MIN_NOTE_VAL, MAX_NOTE_VAL)) throw new IllegalArgumentException();
+            return num;
         } catch (NumberFormatException e) {
             note = note.toUpperCase();
             if(note.length() > 3 || note.length() < 2) throw new IllegalArgumentException();
@@ -253,8 +255,13 @@ public class AdvancedNoteBlock extends Block
             }
             val += ((Character.getNumericValue(note.charAt(note.length()-1)) - 1) * 12);
             if(val < 0 || val >= Utils.NOTE_STRING.length) throw new IllegalArgumentException();
+            if(validate && !Utils.isIntInRange(val, MIN_NOTE_VAL, MAX_NOTE_VAL)) throw new IllegalArgumentException();
             return val;
         }
+    }
+
+    public static int noteStringAsInt(String note){
+        return noteStringAsInt(note, true);
     }
 
     public static int getNoteValue(BlockState state){
