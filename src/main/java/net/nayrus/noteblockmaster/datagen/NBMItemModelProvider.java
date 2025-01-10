@@ -19,6 +19,8 @@ public class NBMItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         handheldItem(Registry.TEMPOTUNER);
         handheldItem(Registry.NOTETUNER);
+
+        basicItem(Registry.COMPOSER.getId());
     }
 
     private ItemModelBuilder handheldItem(DeferredItem<?> item) {

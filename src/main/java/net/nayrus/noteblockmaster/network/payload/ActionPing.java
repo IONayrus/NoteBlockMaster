@@ -15,7 +15,7 @@ public record ActionPing(byte action) implements CustomPacketPayload {
 
     public static final Type<ActionPing> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "actionping"));
 
-    public enum Action {SAVE_STARTUP_CONFIG, GOLD_BREAK}
+    public enum Action {SAVE_STARTUP_CONFIG, GOLD_BREAK, SWING_OFFHAND}
 
     public static byte toByte(Action action){
         return (byte) action.ordinal();

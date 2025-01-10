@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.network.payload;
+package net.nayrus.noteblockmaster.network.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

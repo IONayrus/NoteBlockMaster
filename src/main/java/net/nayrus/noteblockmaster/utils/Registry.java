@@ -13,7 +13,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
-import net.nayrus.noteblockmaster.network.payload.TunerData;
+import net.nayrus.noteblockmaster.item.ComposersNote;
+import net.nayrus.noteblockmaster.network.data.ComposeData;
+import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -36,13 +38,14 @@ public class Registry
     public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock",
             () -> new AdvancedNoteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK).noOcclusion()));
 
-    public static final DeferredItem<Item> TEMPOTUNER = ITEMS.register("tempotuner",
-            () -> new TunerItem(new Item.Properties().stacksTo(1)));
-    public static final DeferredItem<Item> NOTETUNER = ITEMS.register("notetuner",
-            () -> new TunerItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> TEMPOTUNER = ITEMS.register("tempotuner", TunerItem::new);
+    public static final DeferredItem<Item> NOTETUNER = ITEMS.register("notetuner", TunerItem::new);
+    public static final DeferredItem<Item> COMPOSER = ITEMS.register("composer", ComposersNote::new);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<TunerData>> TUNER_DATA = DATA_COMPONENT_TYPES.registerComponentType("tuner_data",
             builder -> builder.persistent(TunerData.TUNER_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ComposeData>> COMPOSE_DATA = DATA_COMPONENT_TYPES.registerComponentType("compose_data",
+            builder -> builder.persistent(ComposeData.TUNER_CODEC));
 
     public static final Supplier<SoundEvent> SMITHING = SOUND_EVENTS.register("noteblock_smithing", () ->
         SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID,"noteblock_smithing"))

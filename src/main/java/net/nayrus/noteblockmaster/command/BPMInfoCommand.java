@@ -7,8 +7,12 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.item.ComposersNote;
+import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.utils.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 
@@ -23,7 +27,14 @@ public class BPMInfoCommand {
                                 .executes(context -> {
                                     float bpm = FloatArgumentType.getFloat(context, "bpm");
                                     int noteCount = 100;
-                                    context.getSource().sendSuccess(()->calculateTiming(bpm, noteCount), true);
+                                    //context.getSource().sendSuccess(()->calculateTiming(bpm, noteCount), true);
+                                    if(context.getSource().getPlayer() instanceof Player player) {
+                                        if(player.getMainHandItem().is(Registry.COMPOSER)){
+                                            Tuple<Integer, Integer> t = ComposersNote.subtickAndPauseOnBeat(0, bpm);
+                                            player.getMainHandItem().set(Registry.COMPOSE_DATA,
+                                                    new ComposeData(0,t.getA(),t.getB(),bpm));
+                                        }
+                                    }
                                     return Command.SINGLE_SUCCESS;
                                 })
                 ).executes(context -> Command.SINGLE_SUCCESS));
@@ -58,5 +69,6 @@ public class BPMInfoCommand {
     public static int getColor(int tick){
         return AdvancedNoteBlock.getColor(dummy.setValue(AdvancedNoteBlock.SUBTICK, tick), Utils.PROPERTY.TEMPO).getRGB();
     }
+
 
 }

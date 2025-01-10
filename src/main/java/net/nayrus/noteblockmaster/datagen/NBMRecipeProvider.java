@@ -2,10 +2,7 @@ package net.nayrus.noteblockmaster.datagen;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeBuilder;
 import net.nayrus.noteblockmaster.utils.NBMTags;
@@ -35,6 +32,11 @@ public class NBMRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern(" W ")
                 .define('N', Tags.Items.NUGGETS_GOLD).define('B', Items.NOTE_BLOCK).define('W', NBMTags.Items.TUNERS)
                 .unlockedBy("has_waker", has(Registry.TEMPOTUNER)).save(recipeOutput);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Registry.COMPOSER)
+                .requires(NBMTags.Items.TUNERS)
+                .requires(Items.PAPER)
+                .requires(Items.LAPIS_LAZULI)
+                .unlockedBy("has_waker", has(NBMTags.Items.TUNERS)).save(recipeOutput);
 
         TunerRecipeBuilder.shaped(RecipeCategory.MISC, Registry.NOTETUNER.get())
                 .pattern("PG")

@@ -9,10 +9,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.item.TunerItem;
-import net.nayrus.noteblockmaster.network.payload.TunerData;
+import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.screen.widget.TunerEditBox;
 import net.nayrus.noteblockmaster.screen.widget.ValueSlider;
 import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,11 +49,9 @@ public class ValueTunerScreen extends Screen implements Button.OnPress{
         RenderSystem.setShaderTexture(0, GUI);
         int extend = getExtension();
         guiGraphics.blit(GUI, getRelX() - extend/2, getRelY(), 0, 0, this.imageWidth/2, this.imageHeight);
-        guiGraphics.blit(GUI, getRelX() + this.imageWidth/2 - extend/2, getRelY(), 5, 0,
-                extend > this.imageWidth ? extend/2 : extend, this.imageHeight);
-        if(extend > this.imageWidth)
-            guiGraphics.blit(GUI, getRelX() + this.imageWidth/2, getRelY(), 5, 0,
-                    extend/2, this.imageHeight);
+        guiGraphics.blit(GUI, getRelX() + this.imageWidth/2 - extend/2, getRelY(), 5, 0, extend > (this.imageWidth - 5) ? extend/2 : extend, this.imageHeight);
+        if(extend > this.imageWidth - 5)
+            guiGraphics.blit(GUI, getRelX() + this.imageWidth/2, getRelY(), 5, 0, extend/2, this.imageHeight);
         guiGraphics.blit(GUI, getRelX() + this.imageWidth/2 + extend/2, getRelY(), this.imageWidth/2, 0, this.imageWidth/2, this.imageHeight);
     }
 
@@ -91,5 +90,14 @@ public class ValueTunerScreen extends Screen implements Button.OnPress{
         tuner.set(Registry.TUNER_DATA, _new);
         PacketDistributor.sendToServer(_new);
         super.onClose();
+    }
+
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        super.mouseMoved(mouseX, mouseY);
+        int extend2 = getExtension() / 2;
+        if(!Utils.isIntInRange((int)mouseX, getRelX() - extend2, getRelX() + this.imageWidth + extend2)
+                || !Utils.isIntInRange((int)mouseY, getRelY(), getRelY() + this.imageHeight))
+            onClose();
     }
 }

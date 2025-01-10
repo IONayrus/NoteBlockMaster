@@ -18,7 +18,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -34,7 +33,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.Config;
 import net.nayrus.noteblockmaster.item.TunerItem;
-import net.nayrus.noteblockmaster.network.payload.TunerData;
+import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.utils.NBMTags;
 import net.nayrus.noteblockmaster.utils.Registry;
@@ -112,17 +111,12 @@ public class AdvancedNoteBlock extends Block
     @Override
     protected @NotNull ItemInteractionResult useItemOn(
             ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
-        if(!stack.is(NBMTags.Items.TUNERS)){
+        if(!stack.is(NBMTags.Items.TUNERS) && !stack.is(Registry.COMPOSER)){
             return stack.is(ItemTags.NOTE_BLOCK_TOP_INSTRUMENTS) && hitResult.getDirection() == Direction.UP
                     ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
                     : super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         }
-        InteractionResult result = stack.getItem().useOn(new UseOnContext(level, player, hand, stack, hitResult));
-        switch(result){
-            case SUCCESS -> { return ItemInteractionResult.SUCCESS;}
-            case PASS -> { return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;}
-            default -> { return ItemInteractionResult.FAIL;}
-        }
+        return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
