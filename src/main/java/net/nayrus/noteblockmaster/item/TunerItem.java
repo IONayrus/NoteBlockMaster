@@ -2,15 +2,19 @@ package net.nayrus.noteblockmaster.item;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
@@ -18,6 +22,7 @@ import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.screen.NoteTunerScreen;
 import net.nayrus.noteblockmaster.screen.TempoTunerScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 
 public class TunerItem extends Item {
@@ -56,7 +61,37 @@ public class TunerItem extends Item {
             tuner = composer;
             composer = context.getItemInHand();
         }
-        if(!(state.getBlock() instanceof AdvancedNoteBlock block)) return InteractionResult.PASS;
+        if(!(state.getBlock() instanceof AdvancedNoteBlock block)){
+            TunerData data = getTunerData(tuner);
+            if(!data.setmode() && !composer.is(Registry.COMPOSER)) return InteractionResult.PASS;
+            Inventory inv = player.getInventory();
+            if(inv.contains(item -> item.is(Registry.ADVANCED_NOTEBLOCK.asItem())) && !doOffHandSwing){
+                if(!level.isClientSide()){
+                    Block block = Registry.ADVANCED_NOTEBLOCK.get();
+                    if(tuner.is(Registry.NOTETUNER))
+                        level.setBlock(pos.above(), block.defaultBlockState()
+                                .setValue(AdvancedNoteBlock.NOTE, data.value() + AdvancedNoteBlock.MIN_NOTE_VAL), Block.UPDATE_ALL);
+                    else{
+                        if(composer.is(Registry.COMPOSER)){
+                            ComposeData cData = ComposeData.getComposeData(composer);
+                            level.setBlock(pos.above(), block.defaultBlockState()
+                                    .setValue(AdvancedNoteBlock.SUBTICK, cData.subtick()), Block.UPDATE_ALL);
+                            if(!player.isShiftKeyDown()){
+                                Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
+                                composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
+                            }
+                        }
+                        else
+                            level.setBlock(pos.above(), block.defaultBlockState()
+                                .setValue(AdvancedNoteBlock.SUBTICK, data.value()), Block.UPDATE_ALL);
+                    }
+                    level.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
+                    if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Registry.ADVANCED_NOTEBLOCK.asItem(), 1);
+                }
+                return InteractionResult.SUCCESS;
+            }
+            return InteractionResult.PASS;
+        }
         if(!player.isShiftKeyDown()) {
             TunerData data = getTunerData(tuner);
             if (tuner.is(Registry.TEMPOTUNER)) {
@@ -78,13 +113,14 @@ public class TunerItem extends Item {
                     }
                 }
                 if(doOffHandSwing) player.swing(InteractionHand.OFF_HAND);
+                return InteractionResult.CONSUME;
             }
             if (tuner.is(Registry.NOTETUNER)) {
                 int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
                 return block.onNoteChange(level, player, state, pos, new_val);
             }
         }
-        return InteractionResult.CONSUME;
+        return InteractionResult.PASS;
     }
 
     @Override
