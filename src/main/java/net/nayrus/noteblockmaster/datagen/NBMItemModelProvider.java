@@ -4,7 +4,7 @@ package net.nayrus.noteblockmaster.datagen;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
-import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.setup.Registry;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;

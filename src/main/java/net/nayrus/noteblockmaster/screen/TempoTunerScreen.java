@@ -6,13 +6,21 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.screen.widget.TunerEditBox;
 import net.nayrus.noteblockmaster.screen.widget.ValueSlider;
+import net.nayrus.noteblockmaster.setup.Registry;
 
 public class TempoTunerScreen extends ValueTunerScreen implements Button.OnPress {
-    
-    public TempoTunerScreen(ItemStack item) {
+
+    private boolean disableButtons;
+
+    public TempoTunerScreen(ItemStack item, ItemStack composer) {
         super(item, AdvancedNoteBlock.SUBTICKS);
+        if(!composer.is(Registry.COMPOSER)) return;
+        this.setmode = true;
+        this.value = ComposeData.getComposeData(composer).subtick();
+        this.disableButtons = true;
     }
 
     @Override
@@ -23,6 +31,7 @@ public class TempoTunerScreen extends ValueTunerScreen implements Button.OnPress
 
         addRenderableWidget(input);
         setFocused(input);
+        input.setEditable(!this.disableButtons);
         input.setFocused(false);
         input.setValue(Integer.toString(this.value));
         input.setResponder(s -> {
@@ -54,6 +63,7 @@ public class TempoTunerScreen extends ValueTunerScreen implements Button.OnPress
             this.value = (int)(val * (this.maxValue - 1));
             input.setValue(Integer.toString(this.value));
         });
+        slider.active = !this.disableButtons;
         addRenderableWidget(slider);
     }
 
@@ -70,4 +80,8 @@ public class TempoTunerScreen extends ValueTunerScreen implements Button.OnPress
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    @Override
+    public void onPress(Button button) {
+        if(!disableButtons) super.onPress(button);
+    }
 }

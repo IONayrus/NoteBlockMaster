@@ -6,7 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.nayrus.noteblockmaster.Config;
+import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;

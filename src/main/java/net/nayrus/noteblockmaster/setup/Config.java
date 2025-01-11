@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster;
+package net.nayrus.noteblockmaster.setup;
 
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.utils.Utils;

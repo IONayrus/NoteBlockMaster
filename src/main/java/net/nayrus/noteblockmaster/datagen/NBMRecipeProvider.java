@@ -5,8 +5,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeBuilder;
-import net.nayrus.noteblockmaster.utils.NBMTags;
-import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.setup.NBMTags;
+import net.nayrus.noteblockmaster.setup.Registry;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 

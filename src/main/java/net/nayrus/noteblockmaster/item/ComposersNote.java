@@ -4,27 +4,14 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
-import net.nayrus.noteblockmaster.network.data.ComposeData;
-import net.nayrus.noteblockmaster.utils.Registry;
-import org.jetbrains.annotations.NotNull;
 
 public class ComposersNote extends Item {
 
     public ComposersNote() {
         super(new Item.Properties()
                 .stacksTo(1));
-    }
-
-    public static @NotNull ComposeData getComposeData(ItemStack stack){
-        ComposeData data = stack.get(Registry.COMPOSE_DATA);
-        if(data == null) {
-            data = new ComposeData(0, 0,1,600);
-            stack.set(Registry.COMPOSE_DATA, data);
-        }
-        return data;
     }
 
     @Override

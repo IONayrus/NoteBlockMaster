@@ -19,7 +19,7 @@ import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.screen.NoteTunerScreen;
 import net.nayrus.noteblockmaster.screen.TempoTunerScreen;
-import net.nayrus.noteblockmaster.utils.Registry;
+import net.nayrus.noteblockmaster.setup.Registry;
 import org.jetbrains.annotations.NotNull;
 
 public class TunerItem extends Item {
@@ -66,7 +66,7 @@ public class TunerItem extends Item {
                 if(!composer.is(Registry.COMPOSER))
                     new_val = (data.setmode() ? data.value() : state.getValue(AdvancedNoteBlock.SUBTICK) + data.value()) % AdvancedNoteBlock.SUBTICKS;
                 else{
-                    ComposeData cData = ComposersNote.getComposeData(composer);
+                    ComposeData cData = ComposeData.getComposeData(composer);
                     new_val= cData.subtick();
 
                     Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
@@ -98,7 +98,7 @@ public class TunerItem extends Item {
         ItemStack itemstack = player.getItemInHand(usedHand);
         if(level.isClientSide()){
             if(itemstack.is(Registry.TEMPOTUNER))
-                Minecraft.getInstance().setScreen(new TempoTunerScreen(itemstack));
+                Minecraft.getInstance().setScreen(new TempoTunerScreen(itemstack, player.getItemInHand(InteractionHand.values()[(usedHand.ordinal() + 1) % 2])));
             if(itemstack.is(Registry.NOTETUNER))
                 Minecraft.getInstance().setScreen(new NoteTunerScreen(itemstack));
         }
