@@ -23,22 +23,21 @@ public class ComposersNote extends Item {
 
     public static Tuple<Integer, Integer> subtickAndPauseOnBeat(int beat, float bpm){
         float tPB = 60000 / bpm;
-        int first_subtick = 0;
-        int next_pauseticks = 0;
+        int current_subtick = 0;
+        int pre_delay = 0;
         int lastTime = 0;
-        for(int i = beat; i <=(beat + 1); i++){
+        for(int i = (beat - 1); i <= beat; i++){
             int noteTimeMs = (int) (i * tPB);
             int subTickTime = noteTimeMs % 100;
             int redClockTime = noteTimeMs - subTickTime;
             int subtick = (subTickTime - (subTickTime % AdvancedNoteBlock.SUBTICK_LENGTH)) / AdvancedNoteBlock.SUBTICK_LENGTH;
 
-            if(i == beat)
-               first_subtick = subtick;
-            else{
-                 next_pauseticks = ((redClockTime - lastTime) / 100);
+            if(i == beat){
+               current_subtick = subtick;
+               pre_delay = ((redClockTime - lastTime) / 100);
             }
             lastTime = redClockTime;
         }
-        return new Tuple<>(first_subtick, next_pauseticks);
+        return new Tuple<>(current_subtick, pre_delay);
     }
 }

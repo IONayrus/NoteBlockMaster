@@ -32,6 +32,10 @@ public class FinalTuple<A, B> {
             return getA().is(item) || getB().is(item);
         }
 
+        public boolean contains(Class<? extends Item> itemclass) {
+            return itemclass.isInstance(getA().getItem()) || itemclass.isInstance(getB().getItem());
+        }
+
         public ItemStack getFirst(Item item){
             if(getA().is(item)) return getA();
             if(getB().is(item)) return getB();

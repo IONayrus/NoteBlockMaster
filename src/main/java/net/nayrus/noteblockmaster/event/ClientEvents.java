@@ -31,7 +31,7 @@ public class ClientEvents {
         if(items.contains(Registry.COMPOSER.get())){
             ItemStack composer = items.getFirst(Registry.COMPOSER.get());
             ComposeData cData = ComposeData.getComposeData(composer);
-            player.displayClientMessage(Component.literal("Next repeater delay: " + cData.nextRepeater()).withColor(Color.RED.darker().getRGB()), true);
+            player.displayClientMessage(Component.literal("Repeater delay: " + cData.preDelay()).withColor(Color.RED.darker().getRGB()), true);
         }
     }
 

@@ -1,21 +1,16 @@
 package net.nayrus.noteblockmaster.network;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.BlockHitResult;
-import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.item.TunerItem;
+import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
-import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
+import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -54,6 +49,7 @@ public class PacketHandler {
     }
 
     public static void handleActionPing(final ActionPing packet, final IPayloadContext context){
+        //noinspection SwitchStatementWithTooFewBranches
         switch(ActionPing.Action.values()[packet.action()]){
             case SAVE_STARTUP_CONFIG -> {
                 if(!Config.UPDATED) {
@@ -62,11 +58,6 @@ public class PacketHandler {
                             .withColor(Color.GREEN.darker().getRGB()));
                 }
             }
-            case GOLD_BREAK -> {
-                if(Minecraft.getInstance().level instanceof ClientLevel level)
-                    level.addDestroyBlockEffect(((BlockHitResult)context.player().pick(8, 0, false)).getBlockPos(), Blocks.GOLD_BLOCK.defaultBlockState());
-            }
-            case SWING_OFFHAND -> context.player().swing(InteractionHand.OFF_HAND, true);
         }
     }
 

@@ -2,7 +2,6 @@ package net.nayrus.noteblockmaster.item;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -16,7 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
-import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.screen.NoteTunerScreen;
 import net.nayrus.noteblockmaster.screen.TempoTunerScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -59,26 +57,27 @@ public class TunerItem extends Item {
             composer = context.getItemInHand();
         }
         if(!(state.getBlock() instanceof AdvancedNoteBlock block)) return InteractionResult.PASS;
-        if(!level.isClientSide && !player.isShiftKeyDown()) {
+        if(!player.isShiftKeyDown()) {
             TunerData data = getTunerData(tuner);
             if (tuner.is(Registry.TEMPOTUNER)) {
-                int new_val;
-                if(!composer.is(Registry.COMPOSER))
-                    new_val = (data.setmode() ? data.value() : state.getValue(AdvancedNoteBlock.SUBTICK) + data.value()) % AdvancedNoteBlock.SUBTICKS;
-                else{
-                    ComposeData cData = ComposeData.getComposeData(composer);
-                    new_val= cData.subtick();
+                if(!level.isClientSide()) {
+                    int new_val;
+                    if (!composer.is(Registry.COMPOSER))
+                        new_val = (data.setmode() ? data.value() : state.getValue(AdvancedNoteBlock.SUBTICK) + data.value()) % AdvancedNoteBlock.SUBTICKS;
+                    else {
+                        ComposeData cData = ComposeData.getComposeData(composer);
+                        new_val = cData.subtick();
 
-                    Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
-                    composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
+                        Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
+                        composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
+                    }
+                    if (!doOffHandSwing) return block.onSubtickChange(level, player, state, pos, new_val, true);
+                    else {
+                        block.onSubtickChange(level, player, state, pos, new_val, true);
+                        return InteractionResult.CONSUME;
+                    }
                 }
-                if(!doOffHandSwing)
-                    return block.onSubtickChange(level, player, state, pos, new_val, true);
-                else{
-                    ActionPing.sendActionPing((ServerPlayer) player, ActionPing.Action.SWING_OFFHAND);
-                    block.onSubtickChange(level, player, state, pos, new_val, true);
-                    return InteractionResult.CONSUME;
-                }
+                if(doOffHandSwing) player.swing(InteractionHand.OFF_HAND);
             }
             if (tuner.is(Registry.NOTETUNER)) {
                 int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());

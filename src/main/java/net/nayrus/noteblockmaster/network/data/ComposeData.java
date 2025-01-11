@@ -6,13 +6,13 @@ import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.setup.Registry;
 import org.jetbrains.annotations.NotNull;
 
-public record ComposeData(int beat, int subtick, int nextRepeater, float bpm) {
+public record ComposeData(int beat, int subtick, int preDelay, float bpm) {
 
     public static final Codec<ComposeData> TUNER_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.INT.fieldOf("beat").forGetter(ComposeData::beat),
                     Codec.INT.fieldOf("subtick").forGetter(ComposeData::subtick),
-                    Codec.INT.fieldOf("repeater").forGetter(ComposeData::nextRepeater),
+                    Codec.INT.fieldOf("repeater").forGetter(ComposeData::preDelay),
                     Codec.FLOAT.fieldOf("bpm").forGetter(ComposeData::bpm)
             ).apply(instance, ComposeData::new)
 
