@@ -11,7 +11,7 @@ import net.nayrus.noteblockmaster.NoteBlockMaster;
 public class NBMTags {
     public static class Blocks {
 
-        public static final TagKey<Block> NBM_BLOCKS = createTag("nbmaster_block");
+        public static final TagKey<Block> NBM_BLOCKS = createTag("nbmaster_noteblock");
 
         private static TagKey<Block> createTag(String name) {
             return BlockTags.create(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, name));

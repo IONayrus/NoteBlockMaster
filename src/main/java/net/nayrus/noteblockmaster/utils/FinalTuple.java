@@ -41,6 +41,12 @@ public class FinalTuple<A, B> {
             if(getB().is(item)) return getB();
             return ItemStack.EMPTY;
         }
+
+        public ItemStack getFirst(Class<? extends Item> itemclass) {
+            if(itemclass.isInstance(getA().getItem())) return getA();
+            if(itemclass.isInstance(getB().getItem())) return getB();
+            return ItemStack.EMPTY;
+        }
     }
 
     public static ItemStackTuple getHeldItems(Player player){

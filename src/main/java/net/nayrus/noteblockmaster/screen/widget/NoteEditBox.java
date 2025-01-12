@@ -5,10 +5,10 @@ import net.minecraft.util.StringUtil;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.utils.Utils;
 
-public class NoteEditBox extends TunerEditBox{
+public class NoteEditBox extends IntegerEditBox {
 
     public NoteEditBox(Font font, int x, int y, int width, int height, int maxVal) {
-        super(font, x, y, width, height, maxVal);
+        super(font, x, y, width, height, maxVal, true);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class NoteEditBox extends TunerEditBox{
             }
             this.insertText(Character.toString(Character.toUpperCase(codePoint)));
             try {
-                if (AdvancedNoteBlock.noteStringAsInt(this.getValue(),false) - AdvancedNoteBlock.MIN_NOTE_VAL >= this.maxVal)
+                if (AdvancedNoteBlock.noteStringAsInt(this.getValue(),false) - AdvancedNoteBlock.MIN_NOTE_VAL >= this.getMaxVal())
                     this.setValue(Utils.NOTE_STRING[AdvancedNoteBlock.MAX_NOTE_VAL]);
             }catch(IllegalArgumentException ignored){}
             return true;

@@ -1,5 +1,6 @@
 package net.nayrus.noteblockmaster.item;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
@@ -18,11 +19,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
+import net.nayrus.noteblockmaster.screen.ComposerScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
+import org.jetbrains.annotations.NotNull;
 
 public class ComposersNote extends Item {
 
@@ -32,7 +34,7 @@ public class ComposersNote extends Item {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public @NotNull InteractionResult useOn(UseOnContext context) {
         if(!((context.getPlayer()) instanceof Player player)) return InteractionResult.FAIL;
         if(player.getOffhandItem().getItem() instanceof TunerItem item){
             Level level = context.getLevel();
@@ -87,10 +89,10 @@ public class ComposersNote extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, @NotNull InteractionHand usedHand) {
         ItemStack item = player.getItemInHand(usedHand);
         if(level.isClientSide()){
-            NoteBlockMaster.LOGGER.debug("Open GUI");
+            Minecraft.getInstance().setScreen(new ComposerScreen(item));
         }
         return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
     }

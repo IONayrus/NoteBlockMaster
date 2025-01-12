@@ -45,7 +45,7 @@ public class Registry
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<TunerData>> TUNER_DATA = DATA_COMPONENT_TYPES.registerComponentType("tuner_data",
             builder -> builder.persistent(TunerData.TUNER_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ComposeData>> COMPOSE_DATA = DATA_COMPONENT_TYPES.registerComponentType("compose_data",
-            builder -> builder.persistent(ComposeData.TUNER_CODEC));
+            builder -> builder.persistent(ComposeData.CODEC));
 
     public static final Supplier<SoundEvent> SMITHING = SOUND_EVENTS.register("noteblock_smithing", () ->
         SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID,"noteblock_smithing"))

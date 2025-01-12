@@ -10,7 +10,7 @@ import net.nayrus.noteblockmaster.screen.widget.NoteEditBox;
 import net.nayrus.noteblockmaster.screen.widget.ValueSlider;
 import net.nayrus.noteblockmaster.utils.Utils;
 
-public class NoteTunerScreen extends ValueTunerScreen implements Button.OnPress{
+public class NoteTunerScreen extends BaseTunerScreen implements Button.OnPress{
 
     public NoteTunerScreen(ItemStack item) {
         super(item, AdvancedNoteBlock.TOTAL_NOTES);
@@ -25,6 +25,7 @@ public class NoteTunerScreen extends ValueTunerScreen implements Button.OnPress{
         addRenderableWidget(input);
         setFocused(input);
         input.setFocused(false);
+        input.setMaxLength(3);
         input.setValue(setmode ? Utils.NOTE_STRING[this.value+ AdvancedNoteBlock.MIN_NOTE_VAL] : Integer.toString(value));
         input.setResponder(s -> {
             if(!s.isEmpty()) {

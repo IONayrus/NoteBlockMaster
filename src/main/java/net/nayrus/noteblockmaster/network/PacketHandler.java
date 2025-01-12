@@ -6,12 +6,14 @@ import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.item.TunerItem;
+import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -29,6 +31,7 @@ public class PacketHandler {
         reg.playToClient(ActionPing.TYPE, ActionPing.STREAM_CODEC, PacketHandler::handleActionPing);
 
         reg.playToServer(TunerData.TYPE, TunerData.TUNER_STREAM_CODEC, PacketHandler::handleTunerData);
+        reg.playToServer(ComposeData.TYPE, ComposeData.STREAM_CODEC, PacketHandler::handleComposeData);
     }
 
     public static void handleStartUpSync(final ConfigCheck packet, final IPayloadContext context) {
@@ -63,8 +66,17 @@ public class PacketHandler {
 
     public static void handleTunerData(final TunerData data, final IPayloadContext context){
         Player player = context.player();
-        if(!(player.getMainHandItem().getItem() instanceof TunerItem)) return;
-        ItemStack stack = player.getMainHandItem();
+        FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
+        if(!(items.contains(TunerItem.class))) return;
+        ItemStack stack = items.getFirst(TunerItem.class);
         stack.set(Registry.TUNER_DATA, data);
+    }
+
+    public static void handleComposeData(final ComposeData data, final IPayloadContext context) {
+        Player player = context.player();
+        FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
+        if(!(items.contains(Registry.COMPOSER.get()))) return;
+        ItemStack stack = items.getFirst(Registry.COMPOSER.get());
+        stack.set(Registry.COMPOSE_DATA, data);
     }
 }

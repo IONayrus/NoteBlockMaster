@@ -7,11 +7,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
-import net.nayrus.noteblockmaster.screen.widget.TunerEditBox;
+import net.nayrus.noteblockmaster.screen.widget.IntegerEditBox;
 import net.nayrus.noteblockmaster.screen.widget.ValueSlider;
 import net.nayrus.noteblockmaster.setup.Registry;
+import org.jetbrains.annotations.NotNull;
 
-public class TempoTunerScreen extends ValueTunerScreen implements Button.OnPress {
+public class TempoTunerScreen extends BaseTunerScreen implements Button.OnPress {
 
     private boolean disableButtons;
 
@@ -27,27 +28,19 @@ public class TempoTunerScreen extends ValueTunerScreen implements Button.OnPress
     protected void init() {
         super.init();
 
-        input = new TunerEditBox(Minecraft.getInstance().font, getRelX() + 100, getRelY() + 16, 27,20, this.maxValue);
+        input = new IntegerEditBox(Minecraft.getInstance().font, getRelX() + 100, getRelY() + 16, 27,20, this.maxValue, true);
 
         addRenderableWidget(input);
         setFocused(input);
         input.setEditable(!this.disableButtons);
         input.setFocused(false);
+        input.setMaxLength(3);
         input.setValue(Integer.toString(this.value));
         input.setResponder(s -> {
             if(!s.isEmpty()) {
                 int _new = Integer.parseInt(s);
                 this.value = _new;
                 this.slider.setValue(_new/(this.maxValue - 1.0));
-            }
-        });
-        input.setFilter(s -> {
-            try{
-                if(s.isEmpty()) return true;
-                Integer.parseInt(s);
-                return true;
-            } catch (NumberFormatException e) {
-                return false;
             }
         });
 
@@ -81,7 +74,7 @@ public class TempoTunerScreen extends ValueTunerScreen implements Button.OnPress
     }
 
     @Override
-    public void onPress(Button button) {
+    public void onPress(@NotNull Button button) {
         if(!disableButtons) super.onPress(button);
     }
 }
