@@ -74,7 +74,10 @@ public class CommonEvents {
                         player.swing(InteractionHand.OFF_HAND);
                     }
                 }
-                else event.cancelWithResult(ItemInteractionResult.FAIL);
+                else{
+                    event.cancelWithResult(ItemInteractionResult.FAIL);
+                    if(level.isClientSide()) Utils.playFailUse(level, player, pos);
+                }
             }
         }
     }

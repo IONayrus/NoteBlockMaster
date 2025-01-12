@@ -1,13 +1,17 @@
 package net.nayrus.noteblockmaster.utils;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
@@ -54,5 +58,9 @@ public class Utils {
                 if(removed == amount) break;
             }
         }
+    }
+
+    public static void playFailUse(Level level, Player player, BlockPos pos){
+        level.playSound(player, pos, SoundEvents.CHICKEN_EGG, SoundSource.BLOCKS, 1.0F, 0.8F);
     }
 }

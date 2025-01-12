@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -56,7 +57,10 @@ public class ComposersNote extends Item {
                         if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Items.REPEATER, 1);
                     }
                     return InteractionResult.SUCCESS;
-                }else return InteractionResult.FAIL;
+                }else{
+                    if(level.isClientSide()) Utils.playFailUse(level, player, pos);
+                    return InteractionResult.FAIL;
+                }
             }
         }
         return InteractionResult.PASS;
@@ -84,6 +88,10 @@ public class ComposersNote extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        return super.use(level, player, usedHand);
+        ItemStack item = player.getItemInHand(usedHand);
+        if(level.isClientSide()){
+            NoteBlockMaster.LOGGER.debug("Open GUI");
+        }
+        return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
     }
 }
