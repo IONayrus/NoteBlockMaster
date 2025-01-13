@@ -23,7 +23,7 @@ import net.nayrus.noteblockmaster.screen.NoteTunerScreen;
 import net.nayrus.noteblockmaster.screen.TempoTunerScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
-import org.jetbrains.annotations.NotNull;
+
 
 public class TunerItem extends Item {
     public TunerItem() {
@@ -31,16 +31,16 @@ public class TunerItem extends Item {
     }
 
     @Override
-    public boolean hasCraftingRemainingItem(@NotNull ItemStack stack) {
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
         return true;
     }
 
     @Override
-    public @NotNull ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
         return itemStack.copy();
     }
 
-    public static @NotNull TunerData getTunerData(ItemStack stack){
+    public static TunerData getTunerData(ItemStack stack){
         TunerData data = stack.get(Registry.TUNER_DATA);
         if(data == null) {
             data = new TunerData(1, false);
@@ -49,7 +49,7 @@ public class TunerItem extends Item {
         return data;
     }
 
-    public @NotNull InteractionResult useOn(UseOnContext context, boolean doOffHandSwing) {
+    public InteractionResult useOn(UseOnContext context, boolean doOffHandSwing) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
@@ -69,21 +69,21 @@ public class TunerItem extends Item {
                 if(!level.isClientSide()){
                     Block block = Registry.ADVANCED_NOTEBLOCK.get();
                     if(tuner.is(Registry.NOTETUNER))
-                        level.setBlock(pos.above(), block.defaultBlockState()
-                                .setValue(AdvancedNoteBlock.NOTE, data.value() + AdvancedNoteBlock.MIN_NOTE_VAL), Block.UPDATE_ALL);
+                        level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
+                                .setValue(AdvancedNoteBlock.NOTE, data.value() + AdvancedNoteBlock.MIN_NOTE_VAL));
                     else{
                         if(composer.is(Registry.COMPOSER)){
                             ComposeData cData = ComposeData.getComposeData(composer);
-                            level.setBlock(pos.above(), block.defaultBlockState()
-                                    .setValue(AdvancedNoteBlock.SUBTICK, cData.subtick()), Block.UPDATE_ALL);
+                            level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
+                                    .setValue(AdvancedNoteBlock.SUBTICK, cData.subtick()));
                             if(!player.isShiftKeyDown()){
                                 Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
                                 composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
                             }
                         }
                         else
-                            level.setBlock(pos.above(), block.defaultBlockState()
-                                .setValue(AdvancedNoteBlock.SUBTICK, data.value()), Block.UPDATE_ALL);
+                            level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
+                                .setValue(AdvancedNoteBlock.SUBTICK, data.value()));
                     }
                     level.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
                     if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Registry.ADVANCED_NOTEBLOCK.asItem(), 1);
@@ -129,7 +129,7 @@ public class TunerItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         ItemStack itemstack = player.getItemInHand(usedHand);
         if(level.isClientSide()){
             if(itemstack.is(Registry.TEMPOTUNER))

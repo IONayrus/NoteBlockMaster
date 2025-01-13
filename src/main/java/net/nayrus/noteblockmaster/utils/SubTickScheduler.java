@@ -33,10 +33,8 @@ public class SubTickScheduler {
             }
             level.playSound(
                     null,
-                    (double) pos.getX() + 0.5,
-                    (double) pos.getY() + 0.5,
-                    (double) pos.getZ() + 0.5,
-                    holder,
+                    pos,
+                    holder.value(),
                     SoundSource.RECORDS,
                     3.0F,
                     f

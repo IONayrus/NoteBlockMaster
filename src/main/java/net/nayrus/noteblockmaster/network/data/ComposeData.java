@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.setup.Registry;
-import org.jetbrains.annotations.NotNull;
 
 public record ComposeData(int beat, int subtick, int preDelay, float bpm) implements CustomPacketPayload {
 
@@ -35,11 +34,11 @@ public record ComposeData(int beat, int subtick, int preDelay, float bpm) implem
     );
 
     @Override
-    public @NotNull Type<ComposeData> type() {
+    public Type<ComposeData> type() {
         return TYPE;
     }
 
-    public static @NotNull ComposeData getComposeData(ItemStack stack){
+    public static ComposeData getComposeData(ItemStack stack){
         ComposeData data = stack.get(Registry.COMPOSE_DATA);
         if(data == null) {
             data = new ComposeData(0, 0,1,600);

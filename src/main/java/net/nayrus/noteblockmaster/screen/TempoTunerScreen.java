@@ -10,7 +10,6 @@ import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.screen.widget.IntegerEditBox;
 import net.nayrus.noteblockmaster.screen.widget.ValueSlider;
 import net.nayrus.noteblockmaster.setup.Registry;
-import org.jetbrains.annotations.NotNull;
 
 public class TempoTunerScreen extends BaseTunerScreen implements Button.OnPress {
 
@@ -74,7 +73,7 @@ public class TempoTunerScreen extends BaseTunerScreen implements Button.OnPress 
     }
 
     @Override
-    public void onPress(@NotNull Button button) {
+    public void onPress(Button button) {
         if(!disableButtons) super.onPress(button);
     }
 }

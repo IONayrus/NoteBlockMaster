@@ -31,10 +31,10 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
+import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.SubTickScheduler;
@@ -42,7 +42,6 @@ import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -94,7 +93,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    public boolean onDestroyedByPlayer(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, Player player, boolean willHarvest, @NotNull FluidState fluid) {
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
         if(player.getWeaponItem().is(NBMTags.Items.TUNERS)){
             if(!level.isClientSide())
                 attack(state, level, pos, player);
@@ -104,13 +103,12 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected float getDestroyProgress(@NotNull BlockState state, Player player, @NotNull BlockGetter level, @NotNull BlockPos pos) {
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
         return player.getWeaponItem().is(NBMTags.Items.TUNERS) ? 0.0f : super.getDestroyProgress(state, player, level, pos);
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(
-            ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(!stack.is(NBMTags.Items.TUNERS) && !stack.is(Registry.COMPOSER)){
             return stack.is(ItemTags.NOTE_BLOCK_TOP_INSTRUMENTS) && hitResult.getDirection() == Direction.UP
                     ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
@@ -120,7 +118,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
@@ -131,14 +129,14 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, @NotNull BlockPos pos, @NotNull Block block, @NotNull BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
         boolean flag = level.hasNeighborSignal(pos);
         if (flag != state.getValue(NoteBlock.POWERED)) {
             if (flag) {
                 this.playNote(null, state, level, pos);
             }
 
-            level.setBlock(pos, state.setValue(NoteBlock.POWERED, flag), 3);
+            level.setBlockAndUpdate(pos, state.setValue(NoteBlock.POWERED, flag));
         }
     }
 
@@ -150,7 +148,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected void attack(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player) {
+    protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
         if (!level.isClientSide) {
             ItemStack item = player.getWeaponItem();
             if(!item.is(NBMTags.Items.TUNERS)) {
@@ -195,7 +193,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected @NotNull BlockState updateShape(@NotNull BlockState state, Direction facing, @NotNull BlockState facingState, @NotNull LevelAccessor level, @NotNull BlockPos currentPos, @NotNull BlockPos facingPos) {
+    protected BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
         boolean flag = facing.getAxis() == Direction.Axis.Y;
         return flag ? this.setInstrument(level, currentPos, state) : super.updateShape(state, facing, facingState, level, currentPos, facingPos);
     }
@@ -206,7 +204,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected boolean triggerEvent(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, int id, int param) {
+    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
         net.neoforged.neoforge.event.level.NoteBlockEvent.Play e = new net.neoforged.neoforge.event.level.NoteBlockEvent.Play(level, pos, state, getNoteValue(state), state.getValue(NoteBlock.INSTRUMENT));
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
         NoteBlockInstrument noteblockinstrument = state.getValue(NoteBlock.INSTRUMENT);
@@ -232,13 +230,14 @@ public class AdvancedNoteBlock extends Block
     public static int noteStringAsInt(String note, boolean validate){
         try{
             int num = Integer.parseInt(note);
-            if(validate && !Utils.isIntInRange(num, MIN_NOTE_VAL, MAX_NOTE_VAL)) throw new IllegalArgumentException();
+            if(validate && !Utils.isIntInRange(num, MIN_NOTE_VAL, MAX_NOTE_VAL)) throw new IllegalArgumentException("Note "+note+" is out of limited range "+MIN_NOTE_VAL+" ~ "+MAX_NOTE_VAL);
             return num;
         } catch (NumberFormatException e) {
             note = note.toUpperCase();
-            if(note.length() > 3 || note.length() < 2) throw new IllegalArgumentException();
+            if(note.length() > 3 || note.length() < 2) throw new IllegalArgumentException("Unexpected note format: Length not in range 2 ~ 3");
             int val = note.length() == 3 ? 1 : 0;
-            switch(note.charAt(0)){
+            char key = note.charAt(0);
+            switch(key){
                 case 'B': val += 2;
                 case 'A': val += 2;
                 case 'G': val += 2;
@@ -246,11 +245,11 @@ public class AdvancedNoteBlock extends Block
                 case 'E': val += 2;
                 case 'D': val += 2;
                 case 'C': break;
-                default: throw new IllegalArgumentException();
+                default: throw new IllegalArgumentException("Unknown key '"+key+"'");
             }
             val += ((Character.getNumericValue(note.charAt(note.length()-1)) - 1) * 12);
-            if(val < 0 || val >= Utils.NOTE_STRING.length) throw new IllegalArgumentException();
-            if(validate && !Utils.isIntInRange(val, MIN_NOTE_VAL, MAX_NOTE_VAL)) throw new IllegalArgumentException();
+            if(val < 0 || val >= Utils.NOTE_STRING.length) throw new IllegalArgumentException("Note "+note+" is out of max range");
+            if(validate && !Utils.isIntInRange(val, MIN_NOTE_VAL, MAX_NOTE_VAL)) throw new IllegalArgumentException("Note "+note+" is out of limited range "+MIN_NOTE_VAL+" ~ "+MAX_NOTE_VAL);
             return val;
         }
     }
@@ -303,7 +302,7 @@ public class AdvancedNoteBlock extends Block
         int _new = net.neoforged.neoforge.common.CommonHooks.onNoteChange(level, pos, state, old_val, new_val);
         if (_new == -1) return InteractionResult.FAIL;
         state = this.setNoteValue(state, _new);
-        level.setBlock(pos, state, 3);
+        level.setBlockAndUpdate(pos, state);
         this.playNote(player, state, level, pos);
         player.awardStat(Stats.TUNE_NOTEBLOCK);
         return InteractionResult.SUCCESS;
@@ -311,11 +310,9 @@ public class AdvancedNoteBlock extends Block
 
     public InteractionResult onSubtickChange(Level level, Player player, BlockState state, BlockPos pos, int new_val, boolean add){
         state = state.setValue(AdvancedNoteBlock.SUBTICK, new_val);
-        level.setBlock(pos, state, Block.UPDATE_ALL);
+        level.setBlockAndUpdate(pos, state);
         level.playSound(null,
-                (double) pos.getX() + 0.5,
-                (double) pos.getY() + 0.5,
-                (double) pos.getZ() + 0.5,
+                pos,
                 add ? SoundEvents.WOODEN_BUTTON_CLICK_ON : SoundEvents.WOODEN_BUTTON_CLICK_OFF,
                 SoundSource.RECORDS,
                 1.0F,

@@ -8,7 +8,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
-import org.jetbrains.annotations.NotNull;
 
 public record TunerData(int value, boolean setmode) implements CustomPacketPayload {
 
@@ -27,7 +26,7 @@ public record TunerData(int value, boolean setmode) implements CustomPacketPaylo
     );
 
     @Override
-    public @NotNull Type<TunerData> type() {
+    public Type<TunerData> type() {
         return TYPE;
     }
 }
