@@ -18,6 +18,7 @@ public class NBMBlockLootTableProvider extends BlockLootSubProvider {
     @Override
     protected void generate() {
         dropSelf(Registry.ADVANCED_NOTEBLOCK.get());
+        dropSelf(Registry.SUSTAINED_NOTEBLOCK.get());
     }
 
     @Override

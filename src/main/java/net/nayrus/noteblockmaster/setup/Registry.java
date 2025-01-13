@@ -11,10 +11,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.block.SustainedNoteBlock;
+import net.nayrus.noteblockmaster.block.SustainedBlockEntity;
 import net.nayrus.noteblockmaster.item.ComposersNote;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
+import net.nayrus.noteblockmaster.network.data.SustainData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.neoforged.bus.api.IEventBus;
@@ -30,6 +34,7 @@ import java.util.function.Supplier;
 public class Registry
 {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MOD_ID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MOD_ID);
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
     public static final DeferredRegister.DataComponents DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MOD_ID);
@@ -37,6 +42,8 @@ public class Registry
 
     public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock",
             () -> new AdvancedNoteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK)));
+    public static final DeferredBlock<Block> SUSTAINED_NOTEBLOCK = Registry.BLOCKS.register("sustained_noteblock",
+            () -> new SustainedNoteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK)));
 
     public static final DeferredItem<Item> TEMPOTUNER = ITEMS.register("tempotuner", TunerItem::new);
     public static final DeferredItem<Item> NOTETUNER = ITEMS.register("notetuner", TunerItem::new);
@@ -46,13 +53,19 @@ public class Registry
             builder -> builder.persistent(TunerData.TUNER_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ComposeData>> COMPOSE_DATA = DATA_COMPONENT_TYPES.registerComponentType("compose_data",
             builder -> builder.persistent(ComposeData.CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SustainData>> SUSTAIN_DATA = DATA_COMPONENT_TYPES.registerComponentType("sustain_data",
+            builder -> builder.persistent(SustainData.CODEC));
 
     public static final Supplier<SoundEvent> SMITHING = SOUND_EVENTS.register("noteblock_smithing", () ->
         SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID,"noteblock_smithing"))
     );
 
+    public static final Supplier<BlockEntityType<SustainedBlockEntity>> SUSTAINED_NOTEBLOCK_ENTITY = BLOCK_ENTITIES.register("sustained_noteblock_entity", ()
+            -> BlockEntityType.Builder.of(SustainedBlockEntity::new, SUSTAINED_NOTEBLOCK.get()).build(SustainedBlockEntity.TYPE));
+
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
+        BLOCK_ENTITIES.register(eventBus);
         ITEMS.register(eventBus);
         CREATIVE_MODE_TABS.register(eventBus);
         DATA_COMPONENT_TYPES.register(eventBus);
@@ -62,6 +75,8 @@ public class Registry
     static{
         Registry.ITEMS.register("advanced_noteblock",
                 ()-> new BlockItem(Registry.ADVANCED_NOTEBLOCK.get(), new Item.Properties()));
+        Registry.ITEMS.register("sustained_noteblock",
+                ()-> new BlockItem(Registry.SUSTAINED_NOTEBLOCK.get(), new Item.Properties()));
 
         CREATIVE_MODE_TABS.register("noteblockmaster", ()-> CreativeModeTab.builder()
                 .title(Component.literal("Note Block Master"))

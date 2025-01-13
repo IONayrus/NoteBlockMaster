@@ -116,8 +116,11 @@ public class TunerItem extends Item {
                 return InteractionResult.CONSUME;
             }
             if (tuner.is(Registry.NOTETUNER)) {
-                int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
-                return block.onNoteChange(level, player, state, pos, new_val);
+                if(!level.isClientSide()) {
+                    int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
+                    return block.onNoteChange(level, player, state, pos, new_val);
+                }
+                return InteractionResult.CONSUME;
             }
         }
         return InteractionResult.PASS;

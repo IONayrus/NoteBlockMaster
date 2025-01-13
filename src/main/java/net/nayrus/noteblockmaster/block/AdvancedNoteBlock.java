@@ -223,7 +223,7 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Nullable
-    private ResourceLocation getCustomSoundId(Level level, BlockPos pos) {
+    protected ResourceLocation getCustomSoundId(Level level, BlockPos pos) {
         return level.getBlockEntity(pos.above()) instanceof SkullBlockEntity skullblockentity ? skullblockentity.getNoteBlockSound() : null;
     }
 
@@ -261,8 +261,6 @@ public class AdvancedNoteBlock extends Block
     public static int getNoteValue(BlockState state){
         return state.getValue(NOTE);
     }
-
-
 
     public BlockState setNoteValue(BlockState state, int value){
         value %= Utils.NOTE_STRING.length;

@@ -71,7 +71,6 @@ public class BaseTunerScreen extends BaseScreen implements Button.OnPress{
 
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
-        super.mouseMoved(mouseX, mouseY);
         int extend2 = getExtension() / 2;
         if(!Utils.isIntInRange((int)mouseX, getRelX() - extend2, getRelX() + this.guiWidth + extend2)
                 || !Utils.isIntInRange((int)mouseY, getRelY(), getRelY() + this.guiHeight))

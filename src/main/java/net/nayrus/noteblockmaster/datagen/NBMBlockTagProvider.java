@@ -19,6 +19,7 @@ public class NBMBlockTagProvider extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         tag(NBMTags.Blocks.NBM_BLOCKS)
-                .add(Registry.ADVANCED_NOTEBLOCK.get());
+                .add(Registry.ADVANCED_NOTEBLOCK.get())
+                .add(Registry.SUSTAINED_NOTEBLOCK.get());
     }
 }
