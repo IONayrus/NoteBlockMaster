@@ -43,28 +43,32 @@ public class ComposersNote extends Item {
             ItemStack tuner = player.getOffhandItem();
             Inventory inv = player.getInventory();
             if(tuner.is(Registry.TEMPOTUNER) && inv.contains(stack -> stack.is(Items.REPEATER))){
-                ItemStack composer = context.getItemInHand();
-                ComposeData cData = ComposeData.getComposeData(composer);
-                int target = cData.preDelay();
-                int set = Math.min(target, 4);
-                if(target>0) {
-                    target -= set;
-                    if(!level.isClientSide()){
-                        level.setBlock(pos.above(), Blocks.REPEATER.defaultBlockState()
-                                .setValue(RepeaterBlock.DELAY, set).setValue(RepeaterBlock.FACING, context.getHorizontalDirection().getOpposite()), Block.UPDATE_ALL);
-                        composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat(), cData.subtick(), target, cData.bpm()));
-
-                        level.playSound(null, pos, SoundType.STONE.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
-                        if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Items.REPEATER, 1);
-                    }
-                    return InteractionResult.SUCCESS;
-                }else{
-                    if(level.isClientSide()) Utils.playFailUse(level, player, pos);
-                    return InteractionResult.FAIL;
-                }
+                return placeRepeater(context, player, level, pos, inv);
             }
         }
         return InteractionResult.PASS;
+    }
+
+    private static InteractionResult placeRepeater(UseOnContext context, Player player, Level level, BlockPos pos, Inventory inv) {
+        ItemStack composer = context.getItemInHand();
+        ComposeData cData = ComposeData.getComposeData(composer);
+        int target = cData.preDelay();
+        int set = Math.min(target, 4);
+        if(target>0) {
+            target -= set;
+            if(!level.isClientSide()){
+                level.setBlock(pos.above(), Blocks.REPEATER.defaultBlockState()
+                        .setValue(RepeaterBlock.DELAY, set).setValue(RepeaterBlock.FACING, context.getHorizontalDirection().getOpposite()), Block.UPDATE_ALL);
+                composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat(), cData.subtick(), target, cData.bpm()));
+
+                level.playSound(null, pos, SoundType.STONE.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
+                if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Items.REPEATER, 1);
+            }
+            return InteractionResult.SUCCESS;
+        }else{
+            if(level.isClientSide()) Utils.playFailUse(level, player, pos);
+            return InteractionResult.FAIL;
+        }
     }
 
     public static Tuple<Integer, Integer> subtickAndPauseOnBeat(int beat, float bpm){

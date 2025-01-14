@@ -61,69 +61,74 @@ public class TunerItem extends Item {
             tuner = composer;
             composer = context.getItemInHand();
         }
+        TunerData data = getTunerData(tuner);
         if(!(state.getBlock() instanceof AdvancedNoteBlock block)){
-            TunerData data = getTunerData(tuner);
             if(!data.setmode() && !composer.is(Registry.COMPOSER)) return InteractionResult.PASS;
             Inventory inv = player.getInventory();
             if(inv.contains(item -> item.is(Registry.ADVANCED_NOTEBLOCK.asItem())) && !doOffHandSwing){
-                if(!level.isClientSide()){
-                    Block block = Registry.ADVANCED_NOTEBLOCK.get();
-                    if(tuner.is(Registry.NOTETUNER))
-                        level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
-                                .setValue(AdvancedNoteBlock.NOTE, data.value() + AdvancedNoteBlock.MIN_NOTE_VAL));
-                    else{
-                        if(composer.is(Registry.COMPOSER)){
-                            ComposeData cData = ComposeData.getComposeData(composer);
-                            level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
-                                    .setValue(AdvancedNoteBlock.SUBTICK, cData.subtick()));
-                            if(!player.isShiftKeyDown()){
-                                Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
-                                composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
-                            }
-                        }
-                        else
-                            level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
-                                .setValue(AdvancedNoteBlock.SUBTICK, data.value()));
-                    }
-                    level.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
-                    if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Registry.ADVANCED_NOTEBLOCK.asItem(), 1);
-                }
+                placeAdvancedNoteBlock(level, tuner, pos, data, composer, player, inv);
                 return InteractionResult.SUCCESS;
             }
             return InteractionResult.PASS;
         }
         if(!player.isShiftKeyDown()) {
-            TunerData data = getTunerData(tuner);
-            if (tuner.is(Registry.TEMPOTUNER)) {
-                if(!level.isClientSide()) {
-                    int new_val;
-                    if (!composer.is(Registry.COMPOSER))
-                        new_val = (data.setmode() ? data.value() : state.getValue(AdvancedNoteBlock.SUBTICK) + data.value()) % AdvancedNoteBlock.SUBTICKS;
-                    else {
-                        ComposeData cData = ComposeData.getComposeData(composer);
-                        new_val = cData.subtick();
+            if (tuner.is(Registry.TEMPOTUNER)) return changeSubtickOn(level, block, composer, data, state, player, pos, doOffHandSwing);
+            if (tuner.is(Registry.NOTETUNER)) return changeNoteOn(level, state, block, data, player, pos);
+        }
+        return InteractionResult.PASS;
+    }
 
+    private static void placeAdvancedNoteBlock(Level level, ItemStack tuner, BlockPos pos, TunerData data, ItemStack composer, Player player, Inventory inv) {
+        if(!level.isClientSide()){
+            Block block = Registry.ADVANCED_NOTEBLOCK.get();
+            if(tuner.is(Registry.NOTETUNER))
+                level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
+                        .setValue(AdvancedNoteBlock.NOTE, data.value() + AdvancedNoteBlock.MIN_NOTE_VAL));
+            else{
+                if(composer.is(Registry.COMPOSER)){
+                    ComposeData cData = ComposeData.getComposeData(composer);
+                    level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
+                            .setValue(AdvancedNoteBlock.SUBTICK, cData.subtick()));
+                    if(!player.isShiftKeyDown()){
                         Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
                         composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
                     }
-                    if (!doOffHandSwing) return block.onSubtickChange(level, player, state, pos, new_val, true);
-                    else {
-                        block.onSubtickChange(level, player, state, pos, new_val, true);
-                        return InteractionResult.CONSUME;
-                    }
                 }
-                if(doOffHandSwing) player.swing(InteractionHand.OFF_HAND);
-                return InteractionResult.CONSUME;
+                else level.setBlockAndUpdate(pos.above(), block.defaultBlockState().setValue(AdvancedNoteBlock.SUBTICK, data.value()));
             }
-            if (tuner.is(Registry.NOTETUNER)) {
-                if(!level.isClientSide()) {
-                    int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
-                    return block.onNoteChange(level, player, state, pos, new_val);
-                }
+            level.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
+            if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Registry.ADVANCED_NOTEBLOCK.asItem(), 1);
+        }
+    }
+
+    private static InteractionResult changeNoteOn(Level level, BlockState state, AdvancedNoteBlock block, TunerData data, Player player, BlockPos pos) {
+        if(!level.isClientSide()) {
+            int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
+            return block.onNoteChange(level, player, state, pos, new_val);
+        }
+        return InteractionResult.CONSUME;
+    }
+
+    private static InteractionResult changeSubtickOn(Level level, AdvancedNoteBlock block, ItemStack composer, TunerData data, BlockState state, Player player, BlockPos pos, boolean doOffHandSwing) {
+        if(!level.isClientSide()) {
+            int new_val;
+            if (!composer.is(Registry.COMPOSER))
+                new_val = (data.setmode() ? data.value() : state.getValue(AdvancedNoteBlock.SUBTICK) + data.value()) % AdvancedNoteBlock.SUBTICKS;
+            else {
+                ComposeData cData = ComposeData.getComposeData(composer);
+                new_val = cData.subtick();
+
+                Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
+                composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
+            }
+            if (!doOffHandSwing) return block.onSubtickChange(level, player, state, pos, new_val, true);
+            else {
+                block.onSubtickChange(level, player, state, pos, new_val, true);
                 return InteractionResult.CONSUME;
             }
         }
-        return InteractionResult.PASS;
+        if(doOffHandSwing) player.swing(InteractionHand.OFF_HAND);
+        return InteractionResult.CONSUME;
     }
 
     @Override

@@ -16,7 +16,7 @@ public class NBMBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         blockWithItem(Registry.ADVANCED_NOTEBLOCK);
-        blockWithItem(Registry.SUSTAINED_NOTEBLOCK);
+        blockWithItem(Registry.TUNINGCORE);
     }
 
     private void blockWithItem(DeferredBlock<?> deferredBlock) {
