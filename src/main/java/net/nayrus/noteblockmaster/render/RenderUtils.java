@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 
 public class RenderUtils {
 
+    public static Vec3 CURRENT_CAM_POS = Vec3.ZERO;
+
     public static void renderFlippedCone(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float alpha) {
         float red = color.getRed() / 255f, green = color.getGreen() / 255f, blue = color.getBlue() / 255f;
 
@@ -26,8 +28,8 @@ public class RenderUtils {
         int resolution = 32;
 
         for(int i = 0; i < resolution; i++){
-            float w1 = (i / (float)resolution) * (float) Math.PI * 2;
-            float w2 = ((i + 1) /(float)resolution) * (float) Math.PI * 2;
+            float w1 = (i / (float)resolution) * Utils.PI * 2;
+            float w2 = ((i + 1) /(float)resolution) * Utils.PI * 2;
             //Top
             builder.addVertex(matrix, midX, endY, midZ).setColor(red, green, blue, alpha);
             builder.addVertex(matrix, midX + dX * Mth.cos(w1), endY, midZ + dZ * Mth.sin(w1)).setColor(red, green, blue, alpha);
@@ -39,7 +41,7 @@ public class RenderUtils {
         }
     }
 
-    public static void buildTorus(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float radius, float innerRadius, float alpha) {
+    public static void buildHalfTorus(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float radius, float innerRadius, float radialOffset, float alpha) {
         float red = color.getRed() / 255f, green = color.getGreen() / 255f, blue = color.getBlue() / 255f;
 
         float startX = 0 + (1 - scale) / 2, startY = 0 + (1 - scale) / 2, startZ = -1 + (1 - scale) / 2, endX = 1 - (1 - scale) / 2, endY = 1 - (1 - scale) / 2, endZ = 0 - (1 - scale) / 2;
@@ -49,15 +51,15 @@ public class RenderUtils {
 
         int resolution = 32;
 
-        for(int i = 0; i< resolution; i++) {
-            float w1 = (i / (float) resolution) * (float) Math.PI * 2;
-            float w2 = ((i + 1) / (float) resolution) * (float) Math.PI * 2;
+        for(int i = 0; i< resolution / 2; i++) {
+            float w1 = (i / (float) resolution) * Utils.PI * 2 + radialOffset;
+            float w2 = ((i + 1) / (float) resolution) * Utils.PI * 2 + radialOffset;
             float cos1 = Mth.cos(w1), cos2 = Mth.cos(w2);
             float sin1 = Mth.sin(w1), sin2 = Mth.sin(w2);
 
             for (int k = 0; k < resolution; k++) {
-                float w3 = (k / (float) resolution) * (float) Math.PI * 2;
-                float w4 = ((k + 1) / (float) resolution) * (float) Math.PI * 2;
+                float w3 = (k / (float) resolution) * Utils.PI * 2;
+                float w4 = ((k + 1) / (float) resolution) * Utils.PI * 2;
                 float cos3 = Mth.cos(w3), cos4 = Mth.cos(w4);
                 float sin3 = Mth.sin(w3), sin4 = Mth.sin(w4);
 
@@ -89,19 +91,18 @@ public class RenderUtils {
         return new Color(base.getRed() / 255.0F, base.getGreen() / 255.0F, base.getBlue() / 255.0F, alpha);
     }
 
-    public static Vec3 getCameraCenter(Camera cam){
-        Vec3 camPos = cam.getPosition();
-        return cam.isDetached() ? camPos.add(new Vec3(cam.getLookVector()).multiply(Utils.sphereVec(4))) : camPos;
+    public static Vec3 getStableEyeCenter(Camera cam){
+        return cam.isDetached() ? CURRENT_CAM_POS.add(new Vec3(cam.getLookVector()).multiply(Utils.sphereVec(4))) : CURRENT_CAM_POS;
     }
 
-    public static Vec3 getCameraCenter(){
-        return getCameraCenter(Minecraft.getInstance().gameRenderer.getMainCamera());
+    public static Vec3 getStableEyeCenter(){
+        return getStableEyeCenter(Minecraft.getInstance().gameRenderer.getMainCamera());
     }
 
     public static Stream<BlockPos> getBlocksInRange(int renderRadius){
         Camera cam = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 lookVec = new Vec3(cam.getLookVector());
-        Vec3 blockCenter = getCameraCenter(cam);
+        Vec3 blockCenter = getStableEyeCenter(cam);
         return BlockPos.betweenClosedStream(new AABB(blockCenter.add(Utils.sphereVec(-renderRadius)), blockCenter.add(Utils.sphereVec(renderRadius))))
                 .filter(pos -> isInRenderRange(pos, blockCenter, lookVec, cam.isDetached(), renderRadius));
     }
@@ -115,9 +116,8 @@ public class RenderUtils {
     }
 
     public static void pushAndTranslateRelativeToCam(PoseStack stack){
-        Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         stack.pushPose();
-        stack.translate(-camPos.x(), -camPos.y(), -camPos.z());
+        stack.translate(-CURRENT_CAM_POS.x(), -CURRENT_CAM_POS.y(), -CURRENT_CAM_POS.z());
     }
 
 }

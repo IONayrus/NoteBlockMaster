@@ -26,6 +26,7 @@ public class Utils {
                                                 "C5", "C♯5", "D5", "D♯5", "E5", "F5", "F♯5", "G5", "G♯5", "A5", "A♯5", "B5",
                                                 "C6", "C♯6", "D6", "D♯6", "E6", "F6", "F♯6", "G6", "G♯6", "A6", "A♯6", "B6",
                                                 "C7", "C♯7", "D7", "D♯7", "E7", "F7", "F♯7", "G7", "G♯7", "A7", "A♯7", "B7"};
+    public static final float PI = (float) Math.PI;
 
     public static boolean isPartOfNoteString(String s){
         String t = s.replace('#','♯').toUpperCase();
@@ -66,5 +67,12 @@ public class Utils {
 
     public static float exponentialFloor(float start, float max, float current, float power){
         return Math.max(0.05F, start - (float)((Math.pow(current, power) * start) / Math.pow(max, power)));
+    }
+
+    public static float getRotationToX(Vec3 vec){
+        Vec3 vecXZ = vec.subtract(0, vec.y(), 0).normalize();
+        double dotX = vecXZ.dot(new Vec3(1,0,0));
+        double dotZ = vecXZ.dot(new Vec3(0,0,1));
+        return (float) (Math.acos(dotX) * (dotZ < 0 ? -1 : 1));
     }
 }
