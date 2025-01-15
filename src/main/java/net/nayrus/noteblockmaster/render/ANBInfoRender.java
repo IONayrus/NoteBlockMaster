@@ -8,10 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -25,26 +23,18 @@ import java.awt.*;
 
 public class ANBInfoRender {
 
-    public static final int renderRadius = 16;
+    public static final int renderRadius = 18;
     public static boolean NOTE_OFF_SYNC = false;
     public static boolean SUBTICK_OFF_SYNC = false;
 
-    public static void renderNoteBlockInfo(RenderLevelStageEvent e, Player player, Utils.PROPERTY info){
+    public static void renderNoteBlockInfo(RenderLevelStageEvent e, Level level, Utils.PROPERTY info){
         Camera cam = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 camPos = cam.getPosition();
-        Vec3 lookVec = new Vec3(cam.getLookVector());
-        boolean detached = cam.isDetached();
-        Vec3 blockCenter = detached ? camPos.add(lookVec.multiply(Utils.sphereVec(4))) : camPos;
-        Level level = player.level();
         RenderSystem.disableDepthTest();
-        BlockPos.betweenClosedStream(new AABB(blockCenter.add(Utils.sphereVec(-renderRadius)), blockCenter.add(Utils.sphereVec(renderRadius))))
-                .filter(pos -> level.getBlockState(pos).is(Registry.ADVANCED_NOTEBLOCK) && isInRenderRange(pos, blockCenter, lookVec, detached))
+        RenderUtils.getBlocksInRange(renderRadius)
+                .filter(pos -> level.getBlockState(pos).is(Registry.ADVANCED_NOTEBLOCK))
                 .forEach(pos -> renderNoteBlockInfo(e, pos, level.getBlockState(pos), camPos, info));
         RenderSystem.enableDepthTest();
-    }
-
-    public static boolean isInRenderRange(BlockPos pos, Vec3 center, Vec3 look, boolean expand){
-        return (expand || pos.getCenter().subtract(center).dot(look) >= 0) && center.distanceToSqr(pos.getCenter()) <= renderRadius*renderRadius;
     }
 
     public static void renderNoteBlockInfo(RenderLevelStageEvent e, BlockPos pos, BlockState state, Vec3 camPos, Utils.PROPERTY info){
@@ -55,37 +45,36 @@ public class ANBInfoRender {
         matrix.pushPose();
         matrix.translate(-camPos.x(), -camPos.y(), -camPos.z());
 
-        renderColoredCone(buffer, matrix, color, pos);
+        float alpha = Utils.exponentialFloor(1.0F, renderRadius, (float) RenderUtils.distanceVecToBlock(RenderUtils.getCameraCenter(), pos), 4);
+        renderColoredCone(buffer, matrix, color, pos, 0.2F, 0.33F * alpha);
 
         String text = switch(info){
             case NOTE -> NOTE_OFF_SYNC ? "%" : Utils.NOTE_STRING[AdvancedNoteBlock.getNoteValue(state)];
             case TEMPO -> SUBTICK_OFF_SYNC ? "%" : state.getValue(AdvancedNoteBlock.SUBTICK).toString();
         };
-        renderInfoLabel(buffer, matrix, text, color, pos, camPos);
+        renderInfoLabel(buffer, matrix, text, color, pos, camPos, 0.025F, alpha);
 
         matrix.popPose();
     }
 
-    public static void renderColoredCone(MultiBufferSource.BufferSource buffer, PoseStack matrix, Color color, BlockPos pos){
+    public static void renderColoredCone(MultiBufferSource.BufferSource buffer, PoseStack matrix, Color color, BlockPos pos, float scale, float alpha){
         matrix.pushPose();
         matrix.translate(pos.getX(), pos.getY() + 0.7F, pos.getZ());
         matrix.mulPose(Axis.YP.rotationDegrees(-90.0F));
         Matrix4f positionMatrix = matrix.last().pose();
 
-        RenderUtils.renderFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.SEE_THROUGH_TRIANGLES), color, 0.2F, 0.33F);
+        RenderUtils.renderFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.SEE_THROUGH_TRIANGLES), color, scale, alpha);
 
         matrix.popPose();
     }
 
-    public static void renderInfoLabel(MultiBufferSource.BufferSource buffer, PoseStack matrix, String text, Color color, BlockPos pos, Vec3 camPos){
-        float scale = 0.025F;
-
+    public static void renderInfoLabel(MultiBufferSource.BufferSource buffer, PoseStack matrix, String text, Color color, BlockPos pos, Vec3 camPos, float scale, float alpha){
         matrix.pushPose();
         matrix.translate(pos.getX() + 0.5, pos.getY() + 1.6F, pos.getZ() + 0.5);
 
-        renderInfoText(buffer, matrix, pos, camPos, text, RenderUtils.shiftColor(Color.LIGHT_GRAY, color, 0.8F), scale, new Vector3f(),0);
-        renderInfoText(buffer, matrix, pos, camPos, text, RenderUtils.applyAlpha(RenderUtils.shiftColor(color, Color.BLACK, 0.5F), 0.8F), scale, new Vector3f(-0.008F),0);
-        renderInfoText(buffer, matrix, pos, camPos, " ".repeat(text.length() + 2), Color.BLACK, scale - 0.003F, new Vector3f(0.0F,0F,-0.02F), RenderUtils.applyAlpha(RenderUtils.shiftColor(Color.WHITE, color, 0.33F), 0.33F).getRGB());
+        renderInfoText(buffer, matrix, pos, camPos, text, RenderUtils.applyAlpha(RenderUtils.shiftColor(Color.LIGHT_GRAY, color, 0.8F), alpha), scale, new Vector3f(),0);
+        renderInfoText(buffer, matrix, pos, camPos, text, RenderUtils.applyAlpha(RenderUtils.shiftColor(color, Color.BLACK, 0.5F), alpha / 1.25F), scale, new Vector3f(-0.008F),0);
+        renderInfoText(buffer, matrix, pos, camPos, " ".repeat(text.length() + 2), Color.BLACK, scale - 0.003F, new Vector3f(0.0F,0F,-0.02F), RenderUtils.applyAlpha(RenderUtils.shiftColor(Color.WHITE, color, 0.33F), alpha / 3.0F).getRGB());
 
         matrix.popPose();
     }

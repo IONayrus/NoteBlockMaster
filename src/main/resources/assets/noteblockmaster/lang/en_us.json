@@ -1,8 +1,11 @@
 {
     "block.noteblockmaster.advanced_noteblock": "Advanced Note Block",
-    "block.noteblockmaster.sustained_noteblock": "Sustained Note Block",
+    "block.noteblockmaster.tuningcore": "Tuning Core",
     "item.noteblockmaster.tempotuner": "Tempo Tuner",
     "item.noteblockmaster.notetuner": "Note Tuner",
     "item.noteblockmaster.composer": "Composers Note",
+    "item.noteblockmaster.core": "Composers Core",
+    "item.noteblockmaster.sustain": "Sustaining Core",
+    "item.noteblockmaster.volume": "Muffling Core",
     "sounds.noteblockmaster.noteblock_smithing": "Note block upgraded"
 }

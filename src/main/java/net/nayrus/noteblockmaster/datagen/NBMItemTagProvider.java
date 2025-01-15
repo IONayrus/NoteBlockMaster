@@ -19,8 +19,11 @@ public class NBMItemTagProvider extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(NBMTags.Items.TUNERS)
-                .add(Registry.NOTETUNER.get())
-                .add(Registry.TEMPOTUNER.get());
+        tag(NBMTags.Items.TUNERS).add(
+                Registry.NOTETUNER.get(),
+                Registry.TEMPOTUNER.get());
+        tag(NBMTags.Items.CORES).add(
+                Registry.SUSTAIN.get(),
+                Registry.VOLUME.get());
     }
 }

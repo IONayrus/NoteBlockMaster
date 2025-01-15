@@ -9,7 +9,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -99,6 +98,8 @@ public class AdvancedNoteBlock extends Block
                 attack(state, level, pos, player);
             return false;
         }
+        if(!level.isClientSide() && level.getBlockState(pos.above()).getBlock() instanceof TuningCore core)
+            level.scheduleTick(pos.above(), core, 1);
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 
@@ -109,11 +110,8 @@ public class AdvancedNoteBlock extends Block
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(!stack.is(NBMTags.Items.TUNERS) && !stack.is(Registry.COMPOSER)){
-            return stack.is(ItemTags.NOTE_BLOCK_TOP_INSTRUMENTS) && hitResult.getDirection() == Direction.UP
-                    ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
-                    : super.useItemOn(stack, state, level, pos, player, hand, hitResult);
-        }
+        if(!stack.is(NBMTags.Items.TUNERS) && !stack.is(Registry.COMPOSER) && !stack.is(NBMTags.Items.CORES))
+            return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
     }
 
@@ -133,15 +131,15 @@ public class AdvancedNoteBlock extends Block
         boolean flag = level.hasNeighborSignal(pos);
         if (flag != state.getValue(NoteBlock.POWERED)) {
             if (flag) {
-                this.playNote(null, state, level, pos);
+                this.playNote(null, level, pos);
             }
 
             level.setBlockAndUpdate(pos, state.setValue(NoteBlock.POWERED, flag));
         }
     }
 
-    public void playNote(@Nullable Entity entity, BlockState state, Level level, BlockPos pos) {
-        if (state.getValue(NoteBlock.INSTRUMENT).worksAboveNoteBlock() || level.getBlockState(pos.above()).isAir()) {
+    public void playNote(@Nullable Entity entity, Level level, BlockPos pos) {
+        if ((level.getBlockState(pos.above()).is(Registry.TUNINGCORE)) || level.getBlockState(pos.above()).isAir()) {
             level.blockEvent(pos, this, 0, 0);
             level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, pos);
         }
@@ -152,7 +150,7 @@ public class AdvancedNoteBlock extends Block
         if (!level.isClientSide) {
             ItemStack item = player.getWeaponItem();
             if(!item.is(NBMTags.Items.TUNERS)) {
-                this.playNote(player, state, level, pos);
+                this.playNote(player, level, pos);
                 player.awardStat(Stats.PLAY_NOTEBLOCK);
             }
             else{
@@ -161,7 +159,7 @@ public class AdvancedNoteBlock extends Block
                     if(!player.isShiftKeyDown()) {
                         player.displayClientMessage(Component.literal(Utils.NOTE_STRING[getNoteValue(state)])
                                 .withColor(getColor(state, Utils.PROPERTY.NOTE).getRGB()), true);
-                        this.playNote(player, state, level, pos);
+                        this.playNote(player, level, pos);
                         player.awardStat(Stats.PLAY_NOTEBLOCK);
                     }
                     else{
@@ -301,7 +299,7 @@ public class AdvancedNoteBlock extends Block
         if (_new == -1) return InteractionResult.FAIL;
         state = this.setNoteValue(state, _new);
         level.setBlockAndUpdate(pos, state);
-        this.playNote(player, state, level, pos);
+        this.playNote(player, level, pos);
         player.awardStat(Stats.TUNE_NOTEBLOCK);
         return InteractionResult.SUCCESS;
     }

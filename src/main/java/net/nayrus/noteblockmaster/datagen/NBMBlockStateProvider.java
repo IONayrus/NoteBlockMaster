@@ -16,7 +16,9 @@ public class NBMBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         blockWithItem(Registry.ADVANCED_NOTEBLOCK);
-        blockWithItem(Registry.TUNINGCORE);
+        simpleBlock(Registry.TUNINGCORE.get());
+        models().cubeAll(Registry.TUNINGCORE.getRegisteredName(), blockTexture(Registry.TUNINGCORE.get()))
+                .renderType("cutout");
     }
 
     private void blockWithItem(DeferredBlock<?> deferredBlock) {

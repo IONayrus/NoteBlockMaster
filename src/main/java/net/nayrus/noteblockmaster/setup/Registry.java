@@ -15,19 +15,20 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
+import net.nayrus.noteblockmaster.item.AnimatedCore;
 import net.nayrus.noteblockmaster.item.ComposersNote;
+import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
-import net.nayrus.noteblockmaster.item.TunerItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import static net.nayrus.noteblockmaster.NoteBlockMaster.MOD_ID;
-
 import java.util.function.Supplier;
+
+import static net.nayrus.noteblockmaster.NoteBlockMaster.MOD_ID;
 
 public class Registry
 {
@@ -38,14 +39,17 @@ public class Registry
     public static final DeferredRegister.DataComponents DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MOD_ID);
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(Registries.SOUND_EVENT, MOD_ID);
 
+
     public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock",
             () -> new AdvancedNoteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK)));
-    public static final DeferredBlock<Block> TUNINGCORE = Registry.BLOCKS.register("tuningcore",
-            () -> new TuningCore(BlockBehaviour.Properties.of().instabreak().noCollission().noOcclusion()));
+    public static final DeferredBlock<Block> TUNINGCORE = Registry.BLOCKS.register("tuningcore", TuningCore::new);
 
     public static final DeferredItem<Item> TEMPOTUNER = ITEMS.register("tempotuner", TunerItem::new);
     public static final DeferredItem<Item> NOTETUNER = ITEMS.register("notetuner", TunerItem::new);
     public static final DeferredItem<Item> COMPOSER = ITEMS.register("composer", ComposersNote::new);
+    public static final DeferredItem<Item> CORE = ITEMS.register("core", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> SUSTAIN = ITEMS.register("sustain", AnimatedCore::new);
+    public static final DeferredItem<Item> VOLUME = ITEMS.register("volume", AnimatedCore::new);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<TunerData>> TUNER_DATA = DATA_COMPONENT_TYPES.registerComponentType("tuner_data",
             builder -> builder.persistent(TunerData.TUNER_CODEC));

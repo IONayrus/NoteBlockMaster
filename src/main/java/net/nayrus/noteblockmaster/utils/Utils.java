@@ -63,4 +63,8 @@ public class Utils {
     public static void playFailUse(Level level, Player player, BlockPos pos){
         level.playSound(player, pos, SoundEvents.CHICKEN_EGG, SoundSource.BLOCKS, 1.0F, 0.8F);
     }
+
+    public static float exponentialFloor(float start, float max, float current, float power){
+        return Math.max(0.05F, start - (float)((Math.pow(current, power) * start) / Math.pow(max, power)));
+    }
 }
