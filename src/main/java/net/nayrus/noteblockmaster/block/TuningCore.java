@@ -93,16 +93,18 @@ public class TuningCore extends TransparentBlock {
     }
 
     public static boolean isSustaining(BlockState state){
-        return state.getValue(SUSTAIN) != 0;
+        return getSustain(state) != 0;
     }
 
     public static boolean isMuffling(BlockState state){
-        return state.getValue(VOLUME) != 20;
+        return getVolume(state) != 20;
     }
 
-    //    SimpleSoundInstance simplesoundinstance = new SimpleSoundInstance(
-//            soundEvent, source, volume, pitch, RandomSource.create(this.threadSafeRandom.nextLong()), x, y, z
-//    );
+    public static int getSustain(BlockState state){
+        return state.getValue(SUSTAIN);
+    }
 
-    //TODO Make this a blockstate based addon for advanced noteblock instead
+    public static int getVolume(BlockState state){
+        return state.getValue(VOLUME);
+    }
 }

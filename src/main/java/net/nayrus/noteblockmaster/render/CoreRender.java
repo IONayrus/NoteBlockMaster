@@ -55,14 +55,6 @@ public class CoreRender {
         BlockPos immutablePos = pos.immutable();
         ANIMATION_ON_POS.putIfAbsent(immutablePos, Util.getNanos());
         long anime = Math.abs(ANIMATION_ON_POS.get(immutablePos));
-        if(TuningCore.isSustaining(state)){
-            int sustain = state.getValue(TuningCore.SUSTAIN);
-            int steps = (int)(100.0 * (5 - 4 * (1 / (200.0 / sustain))));
-            float animation = (anime % steps) / (steps * 2.0F);
-            float halfShift = (animation + 0.25F) % 0.5F;
-            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SUSTAIN_BASECOLOR, Color.BLUE, getAlphaFactor(animation) * 0.8F), pos, pos.getY() - animation + 0.1F, 0.5F, alpha * getAlphaFactor(animation), 0.65F, 0.05F);
-            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SUSTAIN_BASECOLOR, Color.BLUE, getAlphaFactor(halfShift) * 0.8F), pos, pos.getY() - halfShift + 0.1F, 0.5F, alpha * getAlphaFactor(halfShift), 0.65F, 0.05F);
-        }
         if(TuningCore.isMuffling(state)){
             int volume = state.getValue(TuningCore.VOLUME);
             int steps = (int)(100.0 * (5 - 4 * (1 / (18.0 / (19 - volume)))));
@@ -70,6 +62,14 @@ public class CoreRender {
             float halfShift = (animation + 0.25F) % 0.5F;
             renderTorus(buffer, stack, stage, RenderUtils.shiftColor(Color.DARK_GRAY, Color.WHITE, getAlphaFactor(animation)), pos, pos.getY() - 0.45F, 0.5F, alpha * getAlphaFactor(animation), 1 - animation * 1.8F, 0.05F);
             renderTorus(buffer, stack, stage, RenderUtils.shiftColor(Color.DARK_GRAY, Color.WHITE, getAlphaFactor(halfShift)), pos, pos.getY() - 0.45F, 0.5F, alpha * getAlphaFactor(halfShift), 1 - halfShift * 1.8F, 0.05F);
+        }
+        if(TuningCore.isSustaining(state)){
+            int sustain = state.getValue(TuningCore.SUSTAIN);
+            int steps = (int)(100.0 * (5 - 4 * (1 / (200.0 / sustain))));
+            float animation = (anime % steps) / (steps * 2.0F);
+            float halfShift = (animation + 0.25F) % 0.5F;
+            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SUSTAIN_BASECOLOR, Color.BLUE, getAlphaFactor(animation) * 0.8F), pos, pos.getY() - animation + 0.1F, 0.5F, alpha * getAlphaFactor(animation), 0.65F, 0.05F);
+            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SUSTAIN_BASECOLOR, Color.BLUE, getAlphaFactor(halfShift) * 0.8F), pos, pos.getY() - halfShift + 0.1F, 0.5F, alpha * getAlphaFactor(halfShift), 0.65F, 0.05F);
         }
         stack.popPose();
     }

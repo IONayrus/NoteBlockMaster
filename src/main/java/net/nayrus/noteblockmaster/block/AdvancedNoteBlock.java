@@ -2,11 +2,8 @@ package net.nayrus.noteblockmaster.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -23,9 +20,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.NoteBlock;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -37,6 +34,7 @@ import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.utils.AdvancedInstrument;
 import net.nayrus.noteblockmaster.utils.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.api.distmarker.Dist;
@@ -51,6 +49,7 @@ public class AdvancedNoteBlock extends Block
 
     public static int SUBTICKS;
     public static int SUBTICK_LENGTH;
+    public static final EnumProperty<AdvancedInstrument> INSTRUMENT = EnumProperty.create("advanced_instrument", AdvancedInstrument.class);
     public static IntegerProperty SUBTICK;
     public static IntegerProperty NOTE;
     public static int MIN_NOTE_VAL;
@@ -63,7 +62,7 @@ public class AdvancedNoteBlock extends Block
         this.registerDefaultState(
                 this.stateDefinition
                         .any()
-                        .setValue(NoteBlock.INSTRUMENT, NoteBlockInstrument.HARP)
+                        .setValue(INSTRUMENT, AdvancedInstrument.HARP)
                         .setValue(NoteBlock.POWERED,false)
                         .setValue(SUBTICK, 0)
                         .setValue(NOTE, DEFAULT_NOTE)
@@ -82,14 +81,9 @@ public class AdvancedNoteBlock extends Block
     }
 
     private BlockState setInstrument(LevelAccessor level, BlockPos pos, BlockState state) {
-        NoteBlockInstrument noteblockinstrument = level.getBlockState(pos.above()).instrument();
-        if (noteblockinstrument.worksAboveNoteBlock()) {
-            return state.setValue(NoteBlock.INSTRUMENT, noteblockinstrument);
-        } else {
-            NoteBlockInstrument noteblockinstrument1 = level.getBlockState(pos.below()).instrument();
-            NoteBlockInstrument noteblockinstrument2 = noteblockinstrument1.worksAboveNoteBlock() ? NoteBlockInstrument.HARP : noteblockinstrument1;
-            return state.setValue(NoteBlock.INSTRUMENT, noteblockinstrument2);
-        }
+        NoteBlockInstrument noteblockinstrument = level.getBlockState(pos.below()).instrument();
+        AdvancedInstrument instrument = noteblockinstrument.worksAboveNoteBlock() ? AdvancedInstrument.HARP : AdvancedInstrument.values()[noteblockinstrument.ordinal()];
+        return state.setValue(INSTRUMENT, instrument);
     }
 
     @Override
@@ -140,10 +134,13 @@ public class AdvancedNoteBlock extends Block
     }
 
     public void playNote(@Nullable Entity entity, Level level, BlockPos pos) {
-        if ((level.getBlockState(pos.above()).is(Registry.TUNINGCORE)) || level.getBlockState(pos.above()).isAir()) {
-            level.blockEvent(pos, this, 0, 0);
-            level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, pos);
-        }
+        BlockState stateAbove = level.getBlockState(pos.above());
+        boolean isTuned = stateAbove.is(Registry.TUNINGCORE);
+        if (!((isTuned || stateAbove.isAir()))) return;
+        int eventID = 0;
+        if(isTuned) eventID += TuningCore.isSustaining(stateAbove) ? 2 : 1;
+        level.blockEvent(pos, this, eventID, 0);
+        level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, pos);
     }
 
     @Override
@@ -199,31 +196,18 @@ public class AdvancedNoteBlock extends Block
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(NoteBlock.INSTRUMENT, NoteBlock.POWERED, SUBTICK, NOTE);
+        builder.add(INSTRUMENT, NoteBlock.POWERED, SUBTICK, NOTE);
     }
 
     @Override
     protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
-        net.neoforged.neoforge.event.level.NoteBlockEvent.Play e = new net.neoforged.neoforge.event.level.NoteBlockEvent.Play(level, pos, state, getNoteValue(state), state.getValue(NoteBlock.INSTRUMENT));
+        net.neoforged.neoforge.event.level.NoteBlockEvent.Play e = new net.neoforged.neoforge.event.level.NoteBlockEvent.Play(level, pos, state, getNoteValue(state), NoteBlockInstrument.values()[state.getValue(INSTRUMENT).ordinal()]);
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
-        NoteBlockInstrument noteblockinstrument = state.getValue(NoteBlock.INSTRUMENT);
-        Holder<SoundEvent> holder;
-        if (noteblockinstrument.hasCustomSound()) {
-            ResourceLocation resourcelocation = this.getCustomSoundId(level, pos);
-            if (resourcelocation == null) {
-                return false;
-            }
-            holder = Holder.direct(SoundEvent.createVariableRangeEvent(resourcelocation));
-        } else {
-            holder = noteblockinstrument.getSoundEvent();
-        }
-        SubTickScheduler.delayedNoteBlockEvent(state, level, pos, noteblockinstrument, holder);
+        AdvancedInstrument instrument = state.getValue(INSTRUMENT);
+        if(id == 0) SubTickScheduler.delayedNoteBlockEvent(state, level, pos, instrument, 3.0F);
+        if(id == 1) SubTickScheduler.delayedNoteBlockEvent(state, level, pos, instrument, 3.0F * (20.0F / TuningCore.getVolume(level.getBlockState(pos.above()))));
+        if(id == 2) SubTickScheduler.delayedSustainedNoteBlockEvent(state, level.getBlockState(pos.above()), level, pos, instrument);
         return true;
-    }
-
-    @Nullable
-    protected ResourceLocation getCustomSoundId(Level level, BlockPos pos) {
-        return level.getBlockEntity(pos.above()) instanceof SkullBlockEntity skullblockentity ? skullblockentity.getNoteBlockSound() : null;
     }
 
     public static int noteStringAsInt(String note, boolean validate){

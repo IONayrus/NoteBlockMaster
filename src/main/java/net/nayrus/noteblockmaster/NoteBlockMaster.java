@@ -19,7 +19,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -55,7 +54,6 @@ public class NoteBlockMaster
 
         if(FMLEnvironment.dist == Dist.CLIENT){
             NeoForge.EVENT_BUS.register(ClientEvents.class);
-            modEventBus.addListener(this::onClientSetup);
         }else{
             NeoForge.EVENT_BUS.register(ServerEvents.class);
         }
@@ -67,9 +65,5 @@ public class NoteBlockMaster
         new BPMInfoCommand(event.getDispatcher());
         MainCommand.mainCommand(event.getDispatcher());
         ConfigCommand.register(event.getDispatcher());
-    }
-
-    public void onClientSetup(FMLClientSetupEvent e){
-
     }
 }
