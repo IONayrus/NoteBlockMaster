@@ -8,6 +8,8 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -81,5 +83,10 @@ public class Utils {
     public static void scheduleTick(ServerLevel level, BlockPos pos, Block block, int delay){
         if(!level.getBlockTicks().hasScheduledTick(pos, block))
             level.scheduleTick(pos, block, delay);
+    }
+
+    public static InteractionResult swingHelper(Player player, InteractionHand hand, boolean client){
+        if(hand.equals(InteractionHand.MAIN_HAND)) return InteractionResult.SUCCESS;
+        if(client) player.swing(hand); return  InteractionResult.CONSUME;
     }
 }

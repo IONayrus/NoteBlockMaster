@@ -87,8 +87,8 @@ public class TuningCore extends TransparentBlock {
     @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         List<ItemStack> drops = new ArrayList<>();
-        if(state.getValue(VOLUME) != 0) drops.add(new ItemStack(Registry.VOLUME.get()));
-        if(state.getValue(SUSTAIN) != 0) drops.add(new ItemStack(Registry.SUSTAIN.get()));
+        if(isMuffling(state)) drops.add(new ItemStack(Registry.VOLUME.get()));
+        if(isSustaining(state)) drops.add(new ItemStack(Registry.SUSTAIN.get()));
         return drops;
     }
 
