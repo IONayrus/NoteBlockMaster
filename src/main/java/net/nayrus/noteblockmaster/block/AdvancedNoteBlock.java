@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -99,7 +100,7 @@ public class AdvancedNoteBlock extends Block
             return false;
         }
         if(!level.isClientSide() && level.getBlockState(pos.above()).getBlock() instanceof TuningCore core)
-            level.scheduleTick(pos.above(), core, 1);
+            Utils.scheduleTick((ServerLevel) level, pos.above(), core, 0);
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 

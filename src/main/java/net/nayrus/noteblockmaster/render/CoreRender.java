@@ -10,9 +10,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.TuningCore;
+import net.nayrus.noteblockmaster.network.payload.TickSchedule;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
 
 import java.awt.*;
@@ -30,7 +32,11 @@ public class CoreRender {
         RenderLevelStageEvent.Stage stage = e.getStage();
         if(stage == AFTER_LEVEL){
             ANIMATION_ON_POS.entrySet().removeIf(entry -> {
-                if (!level.getBlockState(entry.getKey()).is(Registry.TUNINGCORE)) return true;
+                BlockPos pos = entry.getKey();
+                if (!level.getBlockState(pos).is(Registry.TUNINGCORE)){
+                    PacketDistributor.sendToServer(new TickSchedule(pos, Registry.TUNINGCORE, 0));
+                    return true;
+                }
                 entry.setValue(entry.getValue() + 1);
                 return false;
             });

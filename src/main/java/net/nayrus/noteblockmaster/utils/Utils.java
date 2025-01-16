@@ -5,6 +5,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
@@ -74,5 +76,10 @@ public class Utils {
         double dotX = vecXZ.dot(new Vec3(1,0,0));
         double dotZ = vecXZ.dot(new Vec3(0,0,1));
         return (float) (Math.acos(dotX) * (dotZ < 0 ? -1 : 1));
+    }
+
+    public static void scheduleTick(ServerLevel level, BlockPos pos, Block block, int delay){
+        if(!level.getBlockTicks().hasScheduledTick(pos, block))
+            level.scheduleTick(pos, block, delay);
     }
 }

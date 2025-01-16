@@ -7,7 +7,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -26,6 +25,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
+import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.common.util.DeferredSoundType;
 
 import java.util.ArrayList;
@@ -73,7 +73,8 @@ public class TuningCore extends TransparentBlock {
 
     @Override
     public void onNeighborChange(BlockState state, LevelReader level, BlockPos pos, BlockPos neighbor) {
-        if(level.getChunk(pos).getLevel() instanceof Level l) l.scheduleTick(pos, this, 1);
+        if(level.getChunk(pos).getLevel() instanceof ServerLevel l)
+            Utils.scheduleTick(l, pos, this, 1);
         super.onNeighborChange(state, level, pos, neighbor);
     }
 

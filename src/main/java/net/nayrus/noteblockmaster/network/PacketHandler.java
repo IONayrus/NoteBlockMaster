@@ -1,6 +1,7 @@
 package net.nayrus.noteblockmaster.network;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
@@ -10,6 +11,7 @@ import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
+import net.nayrus.noteblockmaster.network.payload.TickSchedule;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -32,9 +34,10 @@ public class PacketHandler {
 
         reg.playToServer(TunerData.TYPE, TunerData.TUNER_STREAM_CODEC, PacketHandler::handleTunerData);
         reg.playToServer(ComposeData.TYPE, ComposeData.STREAM_CODEC, PacketHandler::handleComposeData);
+        reg.playToServer(TickSchedule.TYPE, TickSchedule.STREAM_CODEC, PacketHandler::handleTickSchedule);
     }
 
-    public static void handleStartUpSync(final ConfigCheck packet, final IPayloadContext context) {
+    private static void handleStartUpSync(final ConfigCheck packet, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if(AdvancedNoteBlock.MIN_NOTE_VAL != packet.minNote() || AdvancedNoteBlock.MAX_NOTE_VAL != packet.maxNote()){
                 ANBInfoRender.NOTE_OFF_SYNC = true;
@@ -51,7 +54,7 @@ public class PacketHandler {
         });
     }
 
-    public static void handleActionPing(final ActionPing packet, final IPayloadContext context){
+    private static void handleActionPing(final ActionPing packet, final IPayloadContext context){
         //noinspection SwitchStatementWithTooFewBranches
         switch(ActionPing.Action.values()[packet.action()]){
             case SAVE_STARTUP_CONFIG -> {
@@ -64,7 +67,7 @@ public class PacketHandler {
         }
     }
 
-    public static void handleTunerData(final TunerData data, final IPayloadContext context){
+    private static void handleTunerData(final TunerData data, final IPayloadContext context){
         Player player = context.player();
         FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
         if(!(items.contains(TunerItem.class))) return;
@@ -72,11 +75,16 @@ public class PacketHandler {
         stack.set(Registry.TUNER_DATA, data);
     }
 
-    public static void handleComposeData(final ComposeData data, final IPayloadContext context) {
+    private static void handleComposeData(final ComposeData data, final IPayloadContext context) {
         Player player = context.player();
         FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
         if(!(items.contains(Registry.COMPOSER.get()))) return;
         ItemStack stack = items.getFirst(Registry.COMPOSER.get());
         stack.set(Registry.COMPOSE_DATA, data);
+    }
+
+    public static void handleTickSchedule(final TickSchedule tickSchedule, final IPayloadContext context) {
+        ServerLevel level = (ServerLevel) context.player().level();
+        Utils.scheduleTick(level, tickSchedule.pos(), tickSchedule.block().value(), tickSchedule.delay());
     }
 }
