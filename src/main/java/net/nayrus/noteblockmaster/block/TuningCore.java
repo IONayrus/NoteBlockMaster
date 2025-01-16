@@ -33,7 +33,7 @@ import java.util.List;
 
 public class TuningCore extends TransparentBlock {
 
-    public static final IntegerProperty VOLUME = IntegerProperty.create("volume",0,20);
+    public static final IntegerProperty VOLUME = IntegerProperty.create("volume",1,20);
     public static final IntegerProperty SUSTAIN = IntegerProperty.create("sustain",0,200);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DeferredSoundType CORE_SOUNDS = new DeferredSoundType(1.0F,1.0F,
@@ -89,6 +89,14 @@ public class TuningCore extends TransparentBlock {
         if(state.getValue(VOLUME) != 0) drops.add(new ItemStack(Registry.VOLUME.get()));
         if(state.getValue(SUSTAIN) != 0) drops.add(new ItemStack(Registry.SUSTAIN.get()));
         return drops;
+    }
+
+    public static boolean isSustaining(BlockState state){
+        return state.getValue(SUSTAIN) != 0;
+    }
+
+    public static boolean isMuffling(BlockState state){
+        return state.getValue(VOLUME) != 20;
     }
 
     //    SimpleSoundInstance simplesoundinstance = new SimpleSoundInstance(
