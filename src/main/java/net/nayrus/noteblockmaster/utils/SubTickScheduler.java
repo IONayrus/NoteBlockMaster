@@ -1,10 +1,10 @@
 package net.nayrus.noteblockmaster.utils;
 
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
@@ -13,14 +13,13 @@ import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.concurrent.*;
 
 public class SubTickScheduler {
 
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new SubTickThread());
+    public static HashMap<BlockPos, FinalTuple<SimpleSoundInstance, ScheduledFuture<?>>> SUSTAINED_SOUNDS = new HashMap<>();
 
     public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos, AdvancedInstrument instrument, float volume){
         executor.schedule(() -> {
@@ -41,12 +40,30 @@ public class SubTickScheduler {
 
     public static void delayedSustainedNoteBlockEvent(BlockState anb, BlockState core, Level level, BlockPos pos, AdvancedInstrument instrument){
         if(level.isClientSide()) {
-            SoundEvent sound = instrument.getSoundEvent().value();
-            SimpleSoundInstance simplesoundinstance = new SimpleSoundInstance(
-                    sound, SoundSource.RECORDS, 3.0F * TuningCore.getVolume(core), AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb)),
+            SimpleSoundInstance instance = new SimpleSoundInstance(
+                    instrument.getSustainedEvent(), SoundSource.RECORDS, 3.0F * TuningCore.getVolume(core), AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb)),
                     RandomSource.create(level.getRandom().nextLong()), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5
             );
+            level.addParticle(
+                    ParticleTypes.NOTE, (double) pos.getX() + 0.5, (double) pos.getY() + 1.2, (double) pos.getZ() + 0.5, (AdvancedNoteBlock.getNoteValue(anb) - 2f) / 29, 0.0, 0.0
+            );
+            schedulePlaypack(pos, instance, (long) anb.getValue(AdvancedNoteBlock.SUBTICK) * AdvancedNoteBlock.SUBTICK_LENGTH, TuningCore.getSustain(core) * 100L);
         }
+    }
+
+    public static void schedulePlaypack(BlockPos pos, SimpleSoundInstance sound, long delay, long sustain){
+        executor.schedule(()-> {
+            Minecraft.getInstance().getSoundManager().play(sound);
+            SUSTAINED_SOUNDS.put(pos.immutable(), new FinalTuple<>(sound, executor.schedule(() -> playbackStop(pos), sustain, TimeUnit.MILLISECONDS)));
+        }, delay, TimeUnit.MILLISECONDS);
+    }
+
+    public static void playbackStop(BlockPos pos){
+        SUSTAINED_SOUNDS.computeIfPresent(pos.immutable(), (p, tuple) -> {
+            Minecraft.getInstance().getSoundManager().stop(tuple.getA());
+            tuple.getB().cancel(true);
+            return null;
+        });
     }
 
     static class SubTickThread implements ThreadFactory{

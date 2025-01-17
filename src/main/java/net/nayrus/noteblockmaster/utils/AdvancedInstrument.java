@@ -39,4 +39,8 @@ public enum AdvancedInstrument implements StringRepresentable {
     public Holder<SoundEvent> getSoundEvent() {
         return this.soundEvent;
     }
+
+    public SoundEvent getSustainedEvent(){
+        return SustainedInstrument.values()[this.ordinal()].getSoundEvent();
+    }
 }
