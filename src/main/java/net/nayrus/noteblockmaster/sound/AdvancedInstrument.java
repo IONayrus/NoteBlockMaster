@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.utils;
+package net.nayrus.noteblockmaster.sound;
 
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;

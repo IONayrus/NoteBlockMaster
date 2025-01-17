@@ -34,8 +34,8 @@ import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
-import net.nayrus.noteblockmaster.utils.AdvancedInstrument;
-import net.nayrus.noteblockmaster.utils.SubTickScheduler;
+import net.nayrus.noteblockmaster.sound.AdvancedInstrument;
+import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -205,7 +205,7 @@ public class AdvancedNoteBlock extends Block
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
         AdvancedInstrument instrument = state.getValue(INSTRUMENT);
         if(id == 0) SubTickScheduler.delayedNoteBlockEvent(state, level, pos, instrument, 3.0F);
-        if(id == 1) SubTickScheduler.delayedNoteBlockEvent(state, level, pos, instrument, 3.0F * (20.0F / TuningCore.getVolume(level.getBlockState(pos.above()))));
+        if(id == 1) SubTickScheduler.delayedNoteBlockEvent(state, level, pos, instrument, 3.0F * (TuningCore.getVolume(level.getBlockState(pos.above())) / 20.0F));
         if(id == 2) SubTickScheduler.delayedSustainedNoteBlockEvent(state, level.getBlockState(pos.above()), level, pos, instrument);
         return true;
     }

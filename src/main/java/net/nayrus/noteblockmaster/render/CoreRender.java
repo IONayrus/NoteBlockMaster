@@ -25,36 +25,36 @@ import static net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.*;
 
 public class CoreRender {
 
-    public static Map<BlockPos, Long> ANIMATION_ON_POS = new HashMap<>();
+    public static Map<BlockPos, Float> OFFSET_ON_POS = new HashMap<>();
     private static final Color SUSTAIN_BASECOLOR = RenderUtils.shiftColor(Color.BLUE, Color.GREEN, 0.33F);
 
     public static void renderCoresInRange(RenderLevelStageEvent e, Level level, int range){
         Vec3 camCenter = RenderUtils.getStableEyeCenter(Minecraft.getInstance().gameRenderer.getMainCamera());
         RenderLevelStageEvent.Stage stage = e.getStage();
         if(stage == AFTER_LEVEL){
-            ANIMATION_ON_POS.entrySet().removeIf(entry -> {
+            OFFSET_ON_POS.entrySet().removeIf(entry -> {
                 BlockPos pos = entry.getKey();
                 if (!level.getBlockState(pos).is(Registry.TUNINGCORE)){
                     PacketDistributor.sendToServer(new TickSchedule(pos, Registry.TUNINGCORE, 0));
                     return true;
                 }
-                entry.setValue(entry.getValue() + 1);
                 return false;
             });
         }
         if(stage == AFTER_TRANSLUCENT_BLOCKS || stage == AFTER_PARTICLES) {
             RenderUtils.getBlocksInRange(range)
                     .filter(pos -> level.getBlockState(pos).is(Registry.TUNINGCORE))
-                    .forEach(pos -> renderCore(pos, level.getBlockState(pos), e.getPoseStack(), stage, Utils.exponentialFloor(0.5F, range, (float) RenderUtils.distanceVecToBlock(camCenter, pos), 2)));
+                    .forEach(pos -> renderCore(level, pos, level.getBlockState(pos), e.getPoseStack(), stage, Utils.exponentialFloor(0.5F, range, (float) RenderUtils.distanceVecToBlock(camCenter, pos), 2)));
         }
+
     }
 
-    public static void renderCore(BlockPos pos, BlockState state, PoseStack stack, RenderLevelStageEvent.Stage stage, float alpha){
+    public static void renderCore(Level level, BlockPos pos, BlockState state, PoseStack stack, RenderLevelStageEvent.Stage stage, float alpha){
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         RenderUtils.pushAndTranslateRelativeToCam(stack);
         BlockPos immutablePos = pos.immutable();
-        ANIMATION_ON_POS.putIfAbsent(immutablePos, Util.getNanos());
-        long anime = Math.abs(ANIMATION_ON_POS.get(immutablePos));
+        OFFSET_ON_POS.putIfAbsent(immutablePos, Math.abs(level.getRandom().nextFloat()));
+        float anime = Util.getMillis()/6.0F + OFFSET_ON_POS.get(immutablePos);
         if(TuningCore.isMuffling(state)){
             int volume = state.getValue(TuningCore.VOLUME);
             int steps = (int)(100.0 * (5 - 4 * (1 / (18.0 / (19 - volume)))));

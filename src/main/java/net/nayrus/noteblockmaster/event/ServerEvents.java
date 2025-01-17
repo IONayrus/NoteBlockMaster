@@ -3,7 +3,7 @@ package net.nayrus.noteblockmaster.event;
 import net.minecraft.server.level.ServerPlayer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
-import net.nayrus.noteblockmaster.utils.SubTickScheduler;
+import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;

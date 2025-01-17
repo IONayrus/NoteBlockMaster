@@ -1,8 +1,0 @@
-{
-  "noteblock_smithing": {
-    "subtitle": "sounds.noteblockmaster.noteblock_smithing",
-    "sounds": [
-      "minecraft:block/smithing_table/smithing_table2"
-    ]
-  }
-}

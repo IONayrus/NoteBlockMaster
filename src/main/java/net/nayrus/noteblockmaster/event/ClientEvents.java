@@ -10,10 +10,13 @@ import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.render.CoreRender;
 import net.nayrus.noteblockmaster.render.RenderUtils;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.sound.SubTickScheduler;
+import net.nayrus.noteblockmaster.sound.SustainingSound;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.sound.PlaySoundSourceEvent;
 
 import java.awt.*;
 
@@ -42,6 +45,13 @@ public class ClientEvents {
         }
 
         CoreRender.renderCoresInRange(e, level, 20);
+    }
+
+    @SubscribeEvent
+    public static void playSoundSourceEvent(PlaySoundSourceEvent e){
+        if(!(e.getSound() instanceof SustainingSound sound)) return;
+        sound.addNoteParticle();
+        SubTickScheduler.scheduleStop(sound);
     }
 
 }
