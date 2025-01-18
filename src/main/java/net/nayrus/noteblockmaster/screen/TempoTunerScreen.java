@@ -28,7 +28,7 @@ public class TempoTunerScreen extends BaseTunerScreen implements Button.OnPress 
     protected void init() {
         super.init();
 
-        input = new IntegerEditBox(Minecraft.getInstance().font, getRelX() + 100, getRelY() + 16, 27,20, this.maxValue, true);
+        input = new IntegerEditBox(this.font, getRelX() + 100, getRelY() + 16, 27,20, this.maxValue, true);
 
         addRenderableWidget(input);
         setFocused(input);

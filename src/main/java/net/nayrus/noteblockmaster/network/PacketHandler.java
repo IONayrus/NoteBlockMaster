@@ -5,13 +5,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.block.TuningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
+import net.nayrus.noteblockmaster.network.payload.CoreUpdate;
 import net.nayrus.noteblockmaster.network.payload.TickSchedule;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.setup.Config;
@@ -36,6 +39,7 @@ public class PacketHandler {
         reg.playToServer(TunerData.TYPE, TunerData.TUNER_STREAM_CODEC, PacketHandler::handleTunerData);
         reg.playToServer(ComposeData.TYPE, ComposeData.STREAM_CODEC, PacketHandler::handleComposeData);
         reg.playToServer(TickSchedule.TYPE, TickSchedule.STREAM_CODEC, PacketHandler::handleTickSchedule);
+        reg.playToServer(CoreUpdate.TYPE, CoreUpdate.STREAM_CODEC, PacketHandler::handleCoreUpdate);
     }
 
     private static void handleStartUpSync(final ConfigCheck packet, final IPayloadContext context) {
@@ -88,5 +92,13 @@ public class PacketHandler {
         ServerLevel level = (ServerLevel) context.player().level();
         BlockPos pos = tickSchedule.pos();
         Utils.scheduleTick(level, pos, level.getBlockState(pos).getBlock(), tickSchedule.delay());
+    }
+
+    public static void handleCoreUpdate(final CoreUpdate coreUpdate, final IPayloadContext context) {
+        Level level = context.player().level();
+        BlockPos pos = coreUpdate.pos();
+        level.setBlockAndUpdate(pos, level.getBlockState(pos)
+                .setValue(TuningCore.VOLUME, coreUpdate.volume())
+                .setValue(TuningCore.SUSTAIN, coreUpdate.sustain()));
     }
 }

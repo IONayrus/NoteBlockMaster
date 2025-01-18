@@ -40,6 +40,7 @@ import java.util.List;
 
 public class TuningCore extends TransparentBlock {
 
+    public static final int SUSTAIN_BASEVAL = 100;
     public static final IntegerProperty VOLUME = IntegerProperty.create("volume",1,20);
     public static final IntegerProperty SUSTAIN = IntegerProperty.create("sustain",0,200);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
