@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.screen;
+package net.nayrus.noteblockmaster.screen.base;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;

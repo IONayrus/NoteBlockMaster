@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.screen.base.BaseTunerScreen;
 import net.nayrus.noteblockmaster.screen.widget.NoteEditBox;
 import net.nayrus.noteblockmaster.screen.widget.ValueSlider;
 import net.nayrus.noteblockmaster.utils.Utils;

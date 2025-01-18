@@ -35,7 +35,7 @@ public class CoreRender {
             OFFSET_ON_POS.entrySet().removeIf(entry -> {
                 BlockPos pos = entry.getKey();
                 if (!level.getBlockState(pos).is(Registry.TUNINGCORE)){
-                    PacketDistributor.sendToServer(new TickSchedule(pos, Registry.TUNINGCORE, 0));
+                    PacketDistributor.sendToServer(new TickSchedule(pos, 0));
                     return true;
                 }
                 return false;

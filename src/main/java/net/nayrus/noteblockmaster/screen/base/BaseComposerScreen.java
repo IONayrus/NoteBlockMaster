@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.screen;
+package net.nayrus.noteblockmaster.screen.base;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;

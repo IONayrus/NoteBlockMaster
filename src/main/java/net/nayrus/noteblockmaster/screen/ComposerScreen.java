@@ -7,10 +7,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.nayrus.noteblockmaster.screen.base.BaseComposerScreen;
 import net.nayrus.noteblockmaster.screen.widget.FloatEditBox;
 import net.nayrus.noteblockmaster.screen.widget.IntegerEditBox;
 
-public class ComposerScreen extends BaseComposerScreen{
+public class ComposerScreen extends BaseComposerScreen {
 
     public ComposerScreen(ItemStack composer) {
         super(composer);

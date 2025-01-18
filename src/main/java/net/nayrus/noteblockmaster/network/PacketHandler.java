@@ -1,5 +1,6 @@
 package net.nayrus.noteblockmaster.network;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -85,6 +86,7 @@ public class PacketHandler {
 
     public static void handleTickSchedule(final TickSchedule tickSchedule, final IPayloadContext context) {
         ServerLevel level = (ServerLevel) context.player().level();
-        Utils.scheduleTick(level, tickSchedule.pos(), tickSchedule.block().value(), tickSchedule.delay());
+        BlockPos pos = tickSchedule.pos();
+        Utils.scheduleTick(level, pos, level.getBlockState(pos).getBlock(), tickSchedule.delay());
     }
 }
