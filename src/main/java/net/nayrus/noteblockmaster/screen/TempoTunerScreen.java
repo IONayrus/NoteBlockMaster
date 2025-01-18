@@ -77,4 +77,16 @@ public class TempoTunerScreen extends BaseTunerScreen implements Button.OnPress 
     public void onPress(Button button) {
         if(!disableButtons) super.onPress(button);
     }
-}
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if(this.slider.isMouseOver(mouseX, mouseY) || this.input.isMouseOver(mouseX, mouseY))
+            changeValue((int)(this.value + scrollY));
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    public void changeValue(int new_val) {
+        this.value = Math.min(Math.max(0, new_val), this.maxValue - 1);
+        this.input.setValue(Integer.toString(this.value));
+        this.slider.setValue(this.value / (this.maxValue - 1.0));
+    }}

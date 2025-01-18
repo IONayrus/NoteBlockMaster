@@ -19,6 +19,7 @@ import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -42,7 +43,7 @@ public class CommonEvents {
                         if(!level.isClientSide) {
                             level.setBlock(pos, Registry.ADVANCED_NOTEBLOCK.get().defaultBlockState()
                                     .setValue(AdvancedNoteBlock.NOTE, state.getValue(NoteBlock.NOTE) + AdvancedNoteBlock.DEFAULT_NOTE), NoteBlock.UPDATE_ALL);
-                            level.playSound(null, pos, Registry.SMITHING.get(), SoundSource.BLOCKS, 0.5F, NoteBlock.getPitchFromNote(14) + RandomSource.create().nextFloat() / 10.0F);
+                            level.playSound(null, pos, SoundRegistry.SMITHING.get(), SoundSource.BLOCKS, 0.5F, NoteBlock.getPitchFromNote(14) + RandomSource.create().nextFloat() / 10.0F);
                             if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Items.GOLD_NUGGET, 3);
                         }else{
                             level.addDestroyBlockEffect(pos, Blocks.GOLD_BLOCK.defaultBlockState());

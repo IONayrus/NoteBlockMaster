@@ -65,7 +65,7 @@ public class CoreRender {
         }
         if(TuningCore.isSustaining(state)){
             int sustain = state.getValue(TuningCore.SUSTAIN);
-            int steps = (int)(100.0 * (5 - 4 * (1 / (200.0 / sustain))));
+            int steps = (int)(100.0 * (5 - 4 * (1 / ((float) TuningCore.SUSTAIN_MAXVAL / sustain))));
             float animation = (anime % steps) / (steps * 2.0F);
             float halfShift = (animation + 0.25F) % 0.5F;
             renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SUSTAIN_BASECOLOR, Color.BLUE, getAlphaFactor(animation) * 0.8F), pos, pos.getY() - animation + 0.1F, 0.5F, alpha * getAlphaFactor(animation), 0.65F, 0.05F);

@@ -3,8 +3,6 @@ package net.nayrus.noteblockmaster.setup;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -20,13 +18,12 @@ import net.nayrus.noteblockmaster.item.ComposersNote;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
+import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
 
 import static net.nayrus.noteblockmaster.NoteBlockMaster.MOD_ID;
 
@@ -37,8 +34,6 @@ public class Registry
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
     public static final DeferredRegister.DataComponents DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MOD_ID);
-    public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(Registries.SOUND_EVENT, MOD_ID);
-
 
     public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock",
             () -> new AdvancedNoteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK)));
@@ -56,41 +51,6 @@ public class Registry
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ComposeData>> COMPOSE_DATA = DATA_COMPONENT_TYPES.registerComponentType("compose_data",
             builder -> builder.persistent(ComposeData.CODEC));
 
-    public static final Supplier<SoundEvent> SMITHING = SOUND_EVENTS.register("noteblock_smithing", () ->
-        SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID,"noteblock_smithing")));
-    public static final Supplier<SoundEvent> SUSTAINED_PLING_SOUND = SOUND_EVENTS.register("sustained_pling", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_pling")));
-    public static final Supplier<SoundEvent> SUSTAINED_BANJO_SOUND = SOUND_EVENTS.register("sustained_banjo", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_banjo")));
-    public static final Supplier<SoundEvent> SUSTAINED_BIT_SOUND = SOUND_EVENTS.register("sustained_bit", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_bit")));
-    public static final Supplier<SoundEvent> SUSTAINED_DIDGERIDOO_SOUND = SOUND_EVENTS.register("sustained_didgeridoo", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_didgeridoo")));
-    public static final Supplier<SoundEvent> SUSTAINED_COW_BELL_SOUND = SOUND_EVENTS.register("sustained_cowbell", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_cowbell")));
-    public static final Supplier<SoundEvent> SUSTAINED_IRON_XYLOPHONE_SOUND = SOUND_EVENTS.register("sustained_ironxylophone", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_ironxylophone")));
-    public static final Supplier<SoundEvent> SUSTAINED_XYLOPHONE_SOUND = SOUND_EVENTS.register("sustained_xylophone", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_xylophone")));
-    public static final Supplier<SoundEvent> SUSTAINED_CHIME_SOUND = SOUND_EVENTS.register("sustained_chime", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_chime")));
-    public static final Supplier<SoundEvent> SUSTAINED_GUITAR_SOUND = SOUND_EVENTS.register("sustained_guitar", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_guitar")));
-    public static final Supplier<SoundEvent> SUSTAINED_BELL_SOUND = SOUND_EVENTS.register("sustained_bell", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_bell")));
-    public static final Supplier<SoundEvent> SUSTAINED_FLUTE_SOUND = SOUND_EVENTS.register("sustained_flute", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_flute")));
-    public static final Supplier<SoundEvent> SUSTAINED_BASS_SOUND = SOUND_EVENTS.register("sustained_bass", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_bass")));
-    public static final Supplier<SoundEvent> SUSTAINED_HAT_SOUND = SOUND_EVENTS.register("sustained_hat", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_hat")));
-    public static final Supplier<SoundEvent> SUSTAINED_SNARE_SOUND = SOUND_EVENTS.register("sustained_snare", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_snare")));
-    public static final Supplier<SoundEvent> SUSTAINED_BASEDRUM_SOUND = SOUND_EVENTS.register("sustained_basedrum", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_basedrum")));
-    public static final Supplier<SoundEvent> SUSTAINED_HARP_SOUND = SOUND_EVENTS.register("sustained_harp", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_harp")));
-
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
@@ -98,7 +58,7 @@ public class Registry
         ITEMS.register(eventBus);
         CREATIVE_MODE_TABS.register(eventBus);
         DATA_COMPONENT_TYPES.register(eventBus);
-        SOUND_EVENTS.register(eventBus);
+        SoundRegistry.SOUND_EVENTS.register(eventBus);
     }
 
     static{

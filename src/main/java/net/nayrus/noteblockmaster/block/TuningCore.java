@@ -40,9 +40,9 @@ import java.util.List;
 
 public class TuningCore extends TransparentBlock {
 
-    public static final int SUSTAIN_BASEVAL = 100;
+    public static int SUSTAIN_MAXVAL = 2;
     public static final IntegerProperty VOLUME = IntegerProperty.create("volume",1,20);
-    public static final IntegerProperty SUSTAIN = IntegerProperty.create("sustain",0,200);
+    public static final IntegerProperty SUSTAIN = IntegerProperty.create("sustain",0, SUSTAIN_MAXVAL);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DeferredSoundType CORE_SOUNDS = new DeferredSoundType(1.0F,1.0F,
             () -> SoundEvents.ENDER_EYE_DEATH , () -> SoundEvents.WOOD_STEP, () -> SoundEvents.ENDER_EYE_LAUNCH, () -> SoundEvents.WOOL_HIT, () -> SoundEvents.WOOD_FALL);

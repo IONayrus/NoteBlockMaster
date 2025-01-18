@@ -37,16 +37,16 @@ public class CoreScreen extends BaseCoreScreen {
             }
         });
 
-        this.sustainBox = new IntegerEditBox(this.font, getRelX() + 138, getRelY() + 28, 27, COMP_HEIGHT, 200,true);
+        this.sustainBox = new IntegerEditBox(this.font, getRelX() + 138, getRelY() + 28, 27, COMP_HEIGHT, TuningCore.SUSTAIN_MAXVAL,true);
         this.sustainBox.setEditable(isSustaining);
-        this.sustainBox.setValue(isSustaining ? Integer.toString(this.sustain) : Integer.toString(TuningCore.SUSTAIN_BASEVAL));
+        this.sustainBox.setValue(isSustaining ? Integer.toString(this.sustain) : Integer.toString(TuningCore.SUSTAIN_MAXVAL));
         this.sustainBox.setMaxLength(3);
         this.sustainBox.setResponder(s -> {
             if(!s.isEmpty()) {
                 int _new = Integer.parseInt(s);
                 if(_new < 1) _new = 1;
                 this.sustain = _new;
-                this.sustainSlider.setValue((_new - 1)/ 199.0);
+                this.sustainSlider.setValue((_new - 1)/ (TuningCore.SUSTAIN_MAXVAL - 1.0F));
             }
         });
 
@@ -65,8 +65,8 @@ public class CoreScreen extends BaseCoreScreen {
         this.volSlider.setMessage(Component.literal("Volume"));
 
         this.sustainSlider = new ValueSlider(getRelX() + 10, getRelY() + 28, 118, COMP_HEIGHT,
-                isSustaining ? (this.sustain - 1) / 199.0 : (TuningCore.SUSTAIN_BASEVAL - 1) / 199.0, !isSustaining ? null : (val) -> {
-            this.sustain = (int) (val * 199 + 1);
+                isSustaining ? (this.sustain - 1) / (TuningCore.SUSTAIN_MAXVAL - 1.0) : 1.0, !isSustaining ? null : (val) -> {
+            this.sustain = (int) (val * (TuningCore.SUSTAIN_MAXVAL - 1) + 1);
             this.sustainBox.setValue(Integer.toString(this.sustain));
         });
         this.sustainSlider.active = isSustaining;

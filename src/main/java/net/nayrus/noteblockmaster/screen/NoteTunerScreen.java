@@ -87,4 +87,17 @@ public class NoteTunerScreen extends BaseTunerScreen implements Button.OnPress{
             this.onClose();
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if(this.slider.isMouseOver(mouseX, mouseY) || this.input.isMouseOver(mouseX, mouseY))
+            changeValue((int)(this.value + scrollY));
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    public void changeValue(int new_val) {
+        this.value = Math.min(Math.max(0, new_val), this.maxValue);
+        this.input.setValue(setmode ? Utils.NOTE_STRING[this.value + AdvancedNoteBlock.MIN_NOTE_VAL] : Integer.toString(value));
+        this.slider.setValue(this.value / (double) this.maxValue);
+    }
 }
