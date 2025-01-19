@@ -5,22 +5,39 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.render.CoreRender;
 import net.nayrus.noteblockmaster.render.RenderUtils;
+import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
-import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.nayrus.noteblockmaster.sound.SustainingSound;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
+import net.nayrus.noteblockmaster.utils.KeyBindings;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundSourceEvent;
 
 import java.awt.*;
 
 public class ClientEvents {
+
+    @SubscribeEvent
+    public static void onClientTick(ClientTickEvent.Post event) {
+        while (KeyBindings.OPEN_GUI.get().consumeClick()) {
+            if(!(Minecraft.getInstance().player instanceof Player player)) return;
+            FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
+            if(items.contains(TunerItem.class)){
+                ItemStack A = items.getA();
+                boolean isTuner = A.is(NBMTags.Items.TUNERS);
+                TunerItem.openTunerGUI(isTuner ? A : items.getB(), isTuner ? items.getB() : A);
+            }
+        }
+    }
+
 
     @SubscribeEvent
     public static void renderBlockOverlays(RenderLevelStageEvent e){
@@ -51,7 +68,7 @@ public class ClientEvents {
     public static void playSoundSourceEvent(PlaySoundSourceEvent e){
         if(!(e.getSound() instanceof SustainingSound sound)) return;
         sound.addNoteParticle();
-        SubTickScheduler.scheduleStop(sound);
+        sound.setChannel(e.getChannel());
     }
 
 }

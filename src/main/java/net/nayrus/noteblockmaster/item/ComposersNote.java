@@ -42,6 +42,7 @@ public class ComposersNote extends Item {
             if(state.getBlock() instanceof AdvancedNoteBlock) return item.useOn(context, true);
             ItemStack tuner = player.getOffhandItem();
             Inventory inv = player.getInventory();
+            if(player.isShiftKeyDown()) return InteractionResult.PASS;
             if(tuner.is(Registry.TEMPOTUNER) && inv.contains(stack -> stack.is(Items.REPEATER))){
                 return placeRepeater(context, player, level, pos, inv);
             }

@@ -10,18 +10,20 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
-import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 public class SubTickScheduler {
 
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new SubtickThread());
-    public static HashMap<BlockPos, FinalTuple<SustainingSound, ScheduledFuture<?>>> SUSTAINED_SOUNDS = new HashMap<>();
+    public static HashMap<BlockPos, SustainingSound> SUSTAINED_SOUNDS = new HashMap<>();
 
     public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos, AdvancedInstrument instrument, float volume){
         executor.schedule(() -> {
@@ -43,7 +45,7 @@ public class SubTickScheduler {
     public static void delayedSustainedNoteBlockEvent(BlockState anb, BlockState core, Level level, BlockPos pos, AdvancedInstrument instrument){
         if(level.isClientSide()) {
             SustainingSound instance = new SustainingSound(
-                    instrument.getSustainedEvent(TuningCore.getSustain(core)), SoundSource.RECORDS, 3.0F * (TuningCore.getVolume(core) / 20.0F), AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb)),
+                    instrument.getSustainedEvent(TuningCore.getSustain(core)), SoundSource.RECORDS, (TuningCore.getVolume(core) / 20.0F), AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb)),
                     RandomSource.create(level.getRandom().nextLong()), pos, level,  TuningCore.getSustain(core) * 1000);
 
             executor.schedule(()-> playSustainingSound(instance),
@@ -56,16 +58,10 @@ public class SubTickScheduler {
         Minecraft.getInstance().getSoundManager().play(sound);
     }
 
-    public static void scheduleStop(SustainingSound sound){
-        SUSTAINED_SOUNDS.put(sound.getImmutablePos(), new FinalTuple<>(sound, executor.schedule(() ->
-                playbackStop(sound.getImmutablePos()), sound.getSustain(), TimeUnit.MILLISECONDS)));
-    }
-
     @OnlyIn(Dist.CLIENT)
     public static void playbackStop(BlockPos pos){
-        SUSTAINED_SOUNDS.computeIfPresent(pos.immutable(), (p, tuple) -> {
-            Minecraft.getInstance().getSoundManager().stop(tuple.getA());
-            tuple.getB().cancel(true);
+        SUSTAINED_SOUNDS.computeIfPresent(pos.immutable(), (p, sound) -> {
+            if(!sound.getChannel().stopped()) Minecraft.getInstance().getSoundManager().stop(sound);
             return null;
         });
     }

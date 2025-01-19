@@ -139,12 +139,14 @@ public class TunerItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         ItemStack itemstack = player.getItemInHand(usedHand);
-        if(level.isClientSide()){
-            if(itemstack.is(Registry.TEMPOTUNER))
-                Minecraft.getInstance().setScreen(new TempoTunerScreen(itemstack, player.getItemInHand(InteractionHand.values()[(usedHand.ordinal() + 1) % 2])));
-            if(itemstack.is(Registry.NOTETUNER))
-                Minecraft.getInstance().setScreen(new NoteTunerScreen(itemstack));
-        }
+        if(level.isClientSide()) openTunerGUI(itemstack, player.getItemInHand(InteractionHand.values()[(usedHand.ordinal() + 1) % 2]));
         return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemstack);
+    }
+
+    public static void openTunerGUI(ItemStack tuner, ItemStack second){
+        if(tuner.is(Registry.TEMPOTUNER))
+            Minecraft.getInstance().setScreen(new TempoTunerScreen(tuner, second));
+        if(tuner.is(Registry.NOTETUNER))
+            Minecraft.getInstance().setScreen(new NoteTunerScreen(tuner));
     }
 }

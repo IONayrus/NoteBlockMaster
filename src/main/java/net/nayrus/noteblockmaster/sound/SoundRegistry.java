@@ -27,10 +27,8 @@ public class SoundRegistry {
             SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_snare")));
     public static final Supplier<SoundEvent> SUSTAINED_HAT_SOUND = SOUND_EVENTS.register("sustained_hat", () ->
             SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_hat")));
-    public static final Supplier<SoundEvent> SUSTAINED_BASS_SOUND = SOUND_EVENTS.register("sustained_bass", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_bass")));
-    public static final Supplier<SoundEvent> SUSTAINED_FLUTE_SOUND = SOUND_EVENTS.register("sustained_flute", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_flute")));
+    public static final List<Supplier<SoundEvent>> SUSTAINED_BASS_SOUND = createSoundEvents("sustained_bass");
+    public static final List<Supplier<SoundEvent>> SUSTAINED_FLUTE_SOUND = createSoundEvents("sustained_flute");
     public static final Supplier<SoundEvent> SUSTAINED_BELL_SOUND = SOUND_EVENTS.register("sustained_bell", () ->
             SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_bell")));
     public static final Supplier<SoundEvent> SUSTAINED_GUITAR_SOUND = SOUND_EVENTS.register("sustained_guitar", () ->

@@ -13,6 +13,7 @@ import net.nayrus.noteblockmaster.event.ServerEvents;
 import net.nayrus.noteblockmaster.network.PacketHandler;
 import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.utils.KeyBindings;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -27,13 +28,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.server.command.ConfigCommand;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(NoteBlockMaster.MOD_ID)
 public class NoteBlockMaster
 {
-
     public static final String MOD_ID = "noteblockmaster";
-
     @SuppressWarnings("unused")
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -51,6 +49,7 @@ public class NoteBlockMaster
         RECIPE_SERIALIZERS.register(modEventBus);
 
         modEventBus.addListener(PacketHandler::registerNetwork);
+        modEventBus.addListener(KeyBindings::registerBindings);
 
         if(FMLEnvironment.dist == Dist.CLIENT){
             NeoForge.EVENT_BUS.register(ClientEvents.class);

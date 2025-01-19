@@ -25,10 +25,10 @@ public class NBMSoundProvider extends SoundDefinitionsProvider {
                 .subtitle("sounds.noteblockmaster.noteblock_smithing")
         );
         addBasicLocalSounds(SoundRegistry.SUSTAINED_HARP_SOUND, "sustained_harp");
-        addBasicLocalSound(SoundRegistry.SUSTAINED_BASS_SOUND, "sustained_bass");
+        addBasicLocalSounds(SoundRegistry.SUSTAINED_BASS_SOUND, "sustained_bass");
         addBasicLocalSound(SoundRegistry.SUSTAINED_BASEDRUM_SOUND, "sustained_basedrum");
         addBasicLocalSound(SoundRegistry.SUSTAINED_BANJO_SOUND, "sustained_banjo");
-        addBasicLocalSound(SoundRegistry.SUSTAINED_FLUTE_SOUND, "sustained_flute");
+        addBasicLocalSounds(SoundRegistry.SUSTAINED_FLUTE_SOUND, "sustained_flute");
         addBasicLocalSound(SoundRegistry.SUSTAINED_SNARE_SOUND, "sustained_snare");
         addBasicLocalSound(SoundRegistry.SUSTAINED_HAT_SOUND, "sustained_hat");
         addBasicLocalSound(SoundRegistry.SUSTAINED_CHIME_SOUND, "sustained_chime");
