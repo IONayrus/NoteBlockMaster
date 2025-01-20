@@ -50,10 +50,11 @@ public class ClientEvents {
         if(e.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER) {
             FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
 
-            if (items.contains(Registry.NOTETUNER.get()))
-                ANBInfoRender.renderNoteBlockInfo(e, level, Utils.PROPERTY.NOTE);
-            else if (items.contains(Registry.TEMPOTUNER.get()))
-                ANBInfoRender.renderNoteBlockInfo(e, level, Utils.PROPERTY.TEMPO);
+            if (items.getA().is(NBMTags.Items.TUNERS))
+                ANBInfoRender.renderNoteBlockInfo(e, level, items.getA().is(Registry.NOTETUNER) ? Utils.PROPERTY.NOTE : Utils.PROPERTY.TEMPO);
+            else if (items.getB().is(NBMTags.Items.TUNERS))
+                ANBInfoRender.renderNoteBlockInfo(e, level, items.getB().is(Registry.NOTETUNER) ? Utils.PROPERTY.NOTE : Utils.PROPERTY.TEMPO);
+
             if (items.contains(Registry.COMPOSER.get())) {
                 ItemStack composer = items.getFirst(Registry.COMPOSER.get());
                 ComposeData cData = ComposeData.getComposeData(composer);

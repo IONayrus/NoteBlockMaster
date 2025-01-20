@@ -81,9 +81,11 @@ public class TunerItem extends Item {
     private static void placeAdvancedNoteBlock(Level level, ItemStack tuner, BlockPos pos, TunerData data, ItemStack composer, Player player, Inventory inv) {
         if(!level.isClientSide()){
             Block block = Registry.ADVANCED_NOTEBLOCK.get();
-            if(tuner.is(Registry.NOTETUNER))
-                level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
-                        .setValue(AdvancedNoteBlock.NOTE, data.value() + AdvancedNoteBlock.MIN_NOTE_VAL));
+            if(tuner.is(Registry.NOTETUNER)) {
+                BlockState state = block.defaultBlockState().setValue(AdvancedNoteBlock.NOTE, data.value() + AdvancedNoteBlock.MIN_NOTE_VAL);
+                if(composer.is(Registry.TEMPOTUNER)) state = state.setValue(AdvancedNoteBlock.SUBTICK, getTunerData(composer).value());
+                level.setBlockAndUpdate(pos.above(), state);
+            }
             else{
                 if(composer.is(Registry.COMPOSER)){
                     ComposeData cData = ComposeData.getComposeData(composer);
@@ -94,7 +96,11 @@ public class TunerItem extends Item {
                         composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
                     }
                 }
-                else level.setBlockAndUpdate(pos.above(), block.defaultBlockState().setValue(AdvancedNoteBlock.SUBTICK, data.value()));
+                else{
+                    BlockState state = block.defaultBlockState().setValue(AdvancedNoteBlock.SUBTICK, data.value());
+                    if(composer.is(Registry.NOTETUNER)) state = state.setValue(AdvancedNoteBlock.NOTE, getTunerData(composer).value() + AdvancedNoteBlock.MIN_NOTE_VAL);
+                    level.setBlockAndUpdate(pos.above(), state);
+                }
             }
             level.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
             if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Registry.ADVANCED_NOTEBLOCK.asItem(), 1);
