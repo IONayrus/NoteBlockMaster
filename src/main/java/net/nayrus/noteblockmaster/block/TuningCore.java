@@ -41,7 +41,7 @@ import java.util.List;
 public class TuningCore extends TransparentBlock {
 
     public static int SUSTAIN_MAXVAL = 2;
-    public static final IntegerProperty VOLUME = IntegerProperty.create("volume",1,20);
+    public static final IntegerProperty VOLUME = IntegerProperty.create("volume",0,20);
     public static final IntegerProperty SUSTAIN = IntegerProperty.create("sustain",0, SUSTAIN_MAXVAL);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DeferredSoundType CORE_SOUNDS = new DeferredSoundType(1.0F,1.0F,
@@ -61,7 +61,7 @@ public class TuningCore extends TransparentBlock {
 
         this.registerDefaultState(this.getStateDefinition()
                 .any()
-                .setValue(VOLUME, 20)
+                .setValue(VOLUME, 0)
                 .setValue(SUSTAIN,0)
                 .setValue(POWERED, false));
     }
@@ -95,7 +95,7 @@ public class TuningCore extends TransparentBlock {
     @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         List<ItemStack> drops = new ArrayList<>();
-        if(isMuffling(state)) drops.add(new ItemStack(Registry.VOLUME.get()));
+        if(isMixing(state)) drops.add(new ItemStack(Registry.VOLUME.get()));
         if(isSustaining(state)) drops.add(new ItemStack(Registry.SUSTAIN.get()));
         return drops;
     }
@@ -104,8 +104,8 @@ public class TuningCore extends TransparentBlock {
         return getSustain(state) != 0;
     }
 
-    public static boolean isMuffling(BlockState state){
-        return getVolume(state) != 20;
+    public static boolean isMixing(BlockState state){
+        return getVolume(state) != 0;
     }
 
     public static int getSustain(BlockState state){

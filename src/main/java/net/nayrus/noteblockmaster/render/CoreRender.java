@@ -41,7 +41,7 @@ public class CoreRender {
                 return false;
             });
         }
-        if(stage == AFTER_TRANSLUCENT_BLOCKS || stage == AFTER_PARTICLES) {
+        if(stage == AFTER_TRANSLUCENT_BLOCKS || stage == AFTER_WEATHER) {
             RenderUtils.getBlocksInRange(range)
                     .filter(pos -> level.getBlockState(pos).is(Registry.TUNINGCORE))
                     .forEach(pos -> renderCore(level, pos, level.getBlockState(pos), e.getPoseStack(), stage, Utils.exponentialFloor(0.5F, range, (float) RenderUtils.distanceVecToBlock(camCenter, pos), 2)));
@@ -55,7 +55,7 @@ public class CoreRender {
         BlockPos immutablePos = pos.immutable();
         OFFSET_ON_POS.putIfAbsent(immutablePos, Math.abs(level.getRandom().nextFloat()));
         float anime = Util.getMillis()/6.0F + OFFSET_ON_POS.get(immutablePos);
-        if(TuningCore.isMuffling(state)){
+        if(TuningCore.isMixing(state)){
             int volume = state.getValue(TuningCore.VOLUME);
             int steps = (int)(100.0 * (5 - 4 * (1 / (18.0 / (19 - volume)))));
             float animation = (anime % steps) / (steps * 2.0F);
@@ -86,7 +86,7 @@ public class CoreRender {
         Matrix4f positionMatrix = matrix.last().pose();
 
         float offset = Utils.getRotationToX(pos.getCenter().subtract(RenderUtils.CURRENT_CAM_POS));
-        RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.QUADS), color, scale, radius, innerRadius, stage == AFTER_PARTICLES ? offset :(offset + Utils.PI), alpha);
+        RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.QUADS), color, scale, radius, innerRadius, stage == AFTER_WEATHER ? offset :(offset + Utils.PI), alpha);
 
         matrix.popPose();
     }

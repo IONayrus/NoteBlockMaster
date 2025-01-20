@@ -6,7 +6,7 @@
     "item.noteblockmaster.composer": "Composers Note",
     "item.noteblockmaster.core": "Composers Core",
     "item.noteblockmaster.sustain": "Sustaining Core",
-    "item.noteblockmaster.volume": "Muffling Core",
+    "item.noteblockmaster.volume": "Mixing Core",
     "sounds.noteblockmaster.noteblock_smithing": "Note block upgraded",
     "key.categories.noteblockmaster.nbm": "Note Block Master",
     "key.noteblockmaster.opengui": "Open GUI"

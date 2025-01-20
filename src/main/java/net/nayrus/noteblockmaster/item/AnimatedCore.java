@@ -38,7 +38,7 @@ public class AnimatedCore extends Item {
         if(!state.isAir()) return InteractionResult.PASS;
         if(!level.isClientSide()){
             state = Registry.TUNINGCORE.get().defaultBlockState();
-            level.setBlockAndUpdate(pos.above(), stack.is(Registry.SUSTAIN) ? state.setValue(TuningCore.SUSTAIN, TuningCore.SUSTAIN_MAXVAL) : state.setValue(TuningCore.VOLUME, 1));
+            level.setBlockAndUpdate(pos.above(), stack.is(Registry.SUSTAIN) ? state.setValue(TuningCore.SUSTAIN, TuningCore.SUSTAIN_MAXVAL) : state.setValue(TuningCore.VOLUME, 20));
             stack.shrink(1);
             level.playSound(null, pos, TuningCore.CORE_SOUNDS.getPlaceSound(), SoundSource.BLOCKS);
             if(hand.equals(InteractionHand.MAIN_HAND)) return InteractionResult.SUCCESS;
@@ -54,9 +54,9 @@ public class AnimatedCore extends Item {
             if(level.isClientSide()) return Utils.swingHelper(player, hand, true);
             level.setBlockAndUpdate(pos, state.setValue(TuningCore.SUSTAIN, TuningCore.SUSTAIN_MAXVAL));
         }else{
-            if(TuningCore.isMuffling(state)) return InteractionResult.PASS;
+            if(TuningCore.isMixing(state)) return InteractionResult.PASS;
             if(level.isClientSide()) return Utils.swingHelper(player, hand, true);
-            level.setBlockAndUpdate(pos, state.setValue(TuningCore.VOLUME, 19));
+            level.setBlockAndUpdate(pos, state.setValue(TuningCore.VOLUME, 20));
         }
         stack.shrink(1);
         level.playSound(null, pos, TuningCore.CORE_SOUNDS.getPlaceSound(), SoundSource.BLOCKS);

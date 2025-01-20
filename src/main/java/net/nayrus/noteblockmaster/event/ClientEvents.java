@@ -12,7 +12,7 @@ import net.nayrus.noteblockmaster.render.CoreRender;
 import net.nayrus.noteblockmaster.render.RenderUtils;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
-import net.nayrus.noteblockmaster.sound.SustainingSound;
+import net.nayrus.noteblockmaster.sound.CoreSound;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.KeyBindings;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -47,7 +47,7 @@ public class ClientEvents {
         if(player == null) return;
         Level level = player.level();
 
-        if(e.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+        if(e.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER) {
             FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
 
             if (items.contains(Registry.NOTETUNER.get()))
@@ -66,7 +66,7 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void playSoundSourceEvent(PlaySoundSourceEvent e){
-        if(!(e.getSound() instanceof SustainingSound sound)) return;
+        if(!(e.getSound() instanceof CoreSound sound)) return;
         sound.addNoteParticle();
         sound.setChannel(e.getChannel());
     }

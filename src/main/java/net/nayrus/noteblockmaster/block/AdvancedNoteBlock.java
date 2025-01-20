@@ -137,9 +137,7 @@ public class AdvancedNoteBlock extends Block
         BlockState stateAbove = level.getBlockState(pos.above());
         boolean isTuned = stateAbove.is(Registry.TUNINGCORE);
         if (!((isTuned || stateAbove.isAir()))) return;
-        int eventID = 0;
-        if(isTuned) eventID += TuningCore.isSustaining(stateAbove) ? 2 : 1;
-        level.blockEvent(pos, this, eventID, 0);
+        level.blockEvent(pos, this, isTuned ? 1 : 0, 0);
         level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, pos);
     }
 
@@ -205,8 +203,7 @@ public class AdvancedNoteBlock extends Block
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
         AdvancedInstrument instrument = state.getValue(INSTRUMENT);
         if(id == 0) SubTickScheduler.delayedNoteBlockEvent(state, level, pos, instrument, 3.0F);
-        if(id == 1) SubTickScheduler.delayedNoteBlockEvent(state, level, pos, instrument, 3.0F * (TuningCore.getVolume(level.getBlockState(pos.above())) / 20.0F));
-        if(id == 2) SubTickScheduler.delayedSustainedNoteBlockEvent(state, level.getBlockState(pos.above()), level, pos, instrument);
+        if(id >= 1) SubTickScheduler.delayedCoredNoteBlockEvent(state, level.getBlockState(pos.above()), level, pos, instrument);
         return true;
     }
 

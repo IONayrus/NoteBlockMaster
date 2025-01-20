@@ -22,7 +22,7 @@ public class BaseCoreScreen extends BaseScreen{
 
     protected BaseCoreScreen(BlockState state, BlockPos pos) {
         super(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png"), 176, 53);
-        if(TuningCore.isMuffling(state)) this.volume = TuningCore.getVolume(state);
+        if(TuningCore.isMixing(state)) this.volume = TuningCore.getVolume(state);
         if(TuningCore.isSustaining(state)) this.sustain = TuningCore.getSustain(state);
         this.pos = pos;
     }

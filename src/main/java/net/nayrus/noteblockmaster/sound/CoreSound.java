@@ -10,14 +10,14 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.nayrus.noteblockmaster.block.TuningCore;
 
-public class SustainingSound extends SimpleSoundInstance{
+public class CoreSound extends SimpleSoundInstance{
 
     private final BlockPos immutablePos;
     private final Level level;
     private Channel channel;
     private final int sustain;
 
-    public SustainingSound(SoundEvent soundEvent, SoundSource source, float volume, float pitch, RandomSource random, BlockPos pos, Level level, int sustain) {
+    public CoreSound(SoundEvent soundEvent, SoundSource source, float volume, float pitch, RandomSource random, BlockPos pos, Level level, int sustain) {
         super(soundEvent, source, volume, pitch, random, pos);
         this.immutablePos = pos.immutable();
         this.level = level;
