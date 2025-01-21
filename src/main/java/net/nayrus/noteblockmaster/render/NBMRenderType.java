@@ -2,6 +2,7 @@ package net.nayrus.noteblockmaster.render;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 
 public class NBMRenderType extends RenderType {
@@ -23,7 +24,7 @@ public class NBMRenderType extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false));
 
-    public static final RenderType QUADS = create("NBMQuads",
+    public static final RenderType TRANSLUCENT_QUADS = create("NBMTQuads",
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 256, false, false,
             RenderType.CompositeState.builder()
                     .setShaderState(ShaderStateShard.POSITION_COLOR_SHADER)
@@ -33,5 +34,18 @@ public class NBMRenderType extends RenderType {
                     .setCullState(NO_CULL)
                     .setLightmapState(NO_LIGHTMAP)
                     .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
+
+    public static final RenderType QUADS = create("NBMQuads",
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 256, false, false,
+            RenderType.CompositeState.builder()
+                    .setShaderState(ShaderStateShard.POSITION_COLOR_SHADER)
+                    .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+                    .setTextureState(NO_TEXTURE)
+                    .setCullState(NO_CULL)
+                    .setLightmapState(NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)
                     .createCompositeState(false));
 }

@@ -1,5 +1,6 @@
 package net.nayrus.noteblockmaster.item;
 
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -11,8 +12,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.TuningCore;
+import net.nayrus.noteblockmaster.render.item.BaseItemRender;
+import net.nayrus.noteblockmaster.render.item.SpinningCoreRender;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 public class AnimatedCore extends Item {
 
@@ -63,5 +67,13 @@ public class AnimatedCore extends Item {
         return Utils.swingHelper(player, hand, false);
     }
 
+    public static class Renderer implements IClientItemExtensions{
 
+        private final BaseItemRender baseItemRender = new SpinningCoreRender();
+
+        @Override
+        public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+            return baseItemRender;
+        }
+    }
 }

@@ -32,6 +32,26 @@ public class NBMRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern(" W ")
                 .define('N', Tags.Items.NUGGETS_GOLD).define('B', Items.NOTE_BLOCK).define('W', NBMTags.Items.TUNERS)
                 .unlockedBy("has_waker", has(Registry.TEMPOTUNER)).save(recipeOutput);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registry.CORE, 8)
+                .pattern("BIB")
+                .pattern("IEI")
+                .pattern("TIN")
+                .define('I', Tags.Items.NUGGETS_IRON).define('E', Items.ENDER_PEARL).define('B', Items.BLAZE_POWDER)
+                .define('T', Registry.TEMPOTUNER).define('N', Registry.NOTETUNER)
+                .unlockedBy("has_waker", has(Registry.TEMPOTUNER)).save(recipeOutput);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registry.SUSTAIN, 4)
+                .pattern(" R ")
+                .pattern("BCB")
+                .pattern(" R ")
+                .define('C', Registry.CORE).define('B', Items.BLUE_DYE).define('R', Items.REDSTONE)
+                .unlockedBy("has_core", has(Registry.CORE)).save(recipeOutput);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registry.VOLUME, 4)
+                .pattern(" W ")
+                .pattern("FCF")
+                .pattern(" W ")
+                .define('C', Registry.CORE).define('W', Items.WHITE_WOOL).define('F', Items.FEATHER)
+                .unlockedBy("has_core", has(Registry.CORE)).save(recipeOutput);
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Registry.COMPOSER)
                 .requires(NBMTags.Items.TUNERS)
                 .requires(Items.PAPER)

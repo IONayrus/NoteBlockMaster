@@ -20,6 +20,7 @@ import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -71,5 +72,9 @@ public class Registry
                 .displayItems((pars, output) -> ITEMS.getEntries()
                         .forEach(item -> output.accept(item.get())))
                 .build());
+    }
+
+    public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerItem(new AnimatedCore.Renderer(), VOLUME, SUSTAIN);
     }
 }

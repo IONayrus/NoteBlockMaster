@@ -46,6 +46,7 @@ public class NoteBlockMaster
         NeoForge.EVENT_BUS.register(this);
 
         Registry.register(modEventBus);
+        modEventBus.addListener(Registry::registerClientExtensions);
         RECIPE_SERIALIZERS.register(modEventBus);
 
         modEventBus.addListener(PacketHandler::registerNetwork);

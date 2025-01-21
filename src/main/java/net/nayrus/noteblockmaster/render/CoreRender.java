@@ -86,7 +86,7 @@ public class CoreRender {
         Matrix4f positionMatrix = matrix.last().pose();
 
         float offset = Utils.getRotationToX(pos.getCenter().subtract(RenderUtils.CURRENT_CAM_POS));
-        RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.QUADS), color, scale, radius, innerRadius, stage == AFTER_WEATHER ? offset :(offset + Utils.PI), alpha);
+        RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius, stage == AFTER_WEATHER ? offset :(offset + Utils.PI), alpha);
 
         matrix.popPose();
     }
