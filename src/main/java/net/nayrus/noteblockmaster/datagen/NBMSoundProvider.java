@@ -22,7 +22,7 @@ public class NBMSoundProvider extends SoundDefinitionsProvider {
     public void registerSounds() {
         add(SoundRegistry.SMITHING, SoundDefinition.definition()
                 .with(sound(ResourceLocation.withDefaultNamespace("block/smithing_table/smithing_table2")))
-                .subtitle("sounds.noteblockmaster.noteblock_smithing")
+                .subtitle("sounds.noteblockmaster.noteblock_upgrade")
         );
         addBasicLocalSounds(SoundRegistry.SUSTAINED_HARP_SOUND, "sustained_harp");
         addBasicLocalSounds(SoundRegistry.SUSTAINED_BASS_SOUND, "sustained_bass");

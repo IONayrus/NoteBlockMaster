@@ -38,5 +38,6 @@ public class DataGenerators {
         gen.addProvider(event.includeClient(), new NBMBlockStateProvider(output, helper));
 
         gen.addProvider(event.includeClient(), new NBMSoundProvider(output, helper));
+        gen.addProvider(event.includeClient(), new NBMLangProvider(output));
     }
 }

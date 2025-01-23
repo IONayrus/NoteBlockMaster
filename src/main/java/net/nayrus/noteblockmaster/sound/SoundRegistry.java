@@ -17,8 +17,8 @@ public class SoundRegistry {
 
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(Registries.SOUND_EVENT, MOD_ID);
 
-    public static final Supplier<SoundEvent> SMITHING = SOUND_EVENTS.register("noteblock_smithing", () ->
-            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID,"noteblock_smithing")));
+    public static final Supplier<SoundEvent> SMITHING = SOUND_EVENTS.register("noteblock_upgrade", () ->
+            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID,"noteblock_upgrade")));
 
     public static final List<Supplier<SoundEvent>> SUSTAINED_HARP_SOUND = createSoundEvents("sustained_harp");
     public static final Supplier<SoundEvent> SUSTAINED_BASEDRUM_SOUND = SOUND_EVENTS.register("sustained_basedrum", () ->
