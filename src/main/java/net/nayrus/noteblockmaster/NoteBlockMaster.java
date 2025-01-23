@@ -47,6 +47,7 @@ public class NoteBlockMaster
 
         Registry.register(modEventBus);
         modEventBus.addListener(Registry::registerClientExtensions);
+        modEventBus.addListener(Registry::registerParticles);
         RECIPE_SERIALIZERS.register(modEventBus);
 
         modEventBus.addListener(PacketHandler::registerNetwork);
