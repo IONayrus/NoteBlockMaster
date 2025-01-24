@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererPatch implements IInternalParticleAccessor {
 
-
     @Shadow @Nullable protected abstract Particle addParticleInternal(ParticleOptions options, boolean force, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed);
 
     @Override

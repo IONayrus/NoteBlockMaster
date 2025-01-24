@@ -20,15 +20,15 @@ public class SoundRegistry {
     public static final Supplier<SoundEvent> SMITHING = SOUND_EVENTS.register("noteblock_upgrade", () ->
             SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID,"noteblock_upgrade")));
 
-    public static final FinalTuple<List<Supplier<SoundEvent>>, int[]> SUSTAINED_HARP_SOUND = createSoundEvents("sustained_harp",200, 750);
+    public static final FinalTuple<List<Supplier<SoundEvent>>, int[]> SUSTAINED_HARP_SOUND = createSoundEvents("sustained_harp",815, 1555);
     public static final Supplier<SoundEvent> SUSTAINED_BASEDRUM_SOUND = SOUND_EVENTS.register("sustained_basedrum", () ->
             SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_basedrum")));
     public static final Supplier<SoundEvent> SUSTAINED_SNARE_SOUND = SOUND_EVENTS.register("sustained_snare", () ->
             SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_snare")));
     public static final Supplier<SoundEvent> SUSTAINED_HAT_SOUND = SOUND_EVENTS.register("sustained_hat", () ->
             SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_hat")));
-    public static final FinalTuple<List<Supplier<SoundEvent>>, int[]> SUSTAINED_BASS_SOUND = createSoundEvents("sustained_bass", 1000, 2000);
-    public static final FinalTuple<List<Supplier<SoundEvent>>, int[]> SUSTAINED_FLUTE_SOUND = createSoundEvents("sustained_flute", 1000, 2000);
+    public static final FinalTuple<List<Supplier<SoundEvent>>, int[]> SUSTAINED_BASS_SOUND = createSoundEvents("sustained_bass", 785, 1325);
+    public static final FinalTuple<List<Supplier<SoundEvent>>, int[]> SUSTAINED_FLUTE_SOUND = createSoundEvents("sustained_flute", 777, 1660);
     public static final Supplier<SoundEvent> SUSTAINED_BELL_SOUND = SOUND_EVENTS.register("sustained_bell", () ->
             SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "sustained_bell")));
     public static final Supplier<SoundEvent> SUSTAINED_GUITAR_SOUND = SOUND_EVENTS.register("sustained_guitar", () ->

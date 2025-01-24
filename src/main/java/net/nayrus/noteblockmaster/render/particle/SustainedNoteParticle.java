@@ -8,12 +8,12 @@ public class SustainedNoteParticle extends TextureSheetParticle {
 
     protected SustainedNoteParticle(ClientLevel level, double x, double y, double z, double color, int lifetimeTicks) {
         super(level, x, y, z, 0.0, 0.05, 0.0);
-        this.friction = 0.9F + (float)(0.1F/ (2000.0/(Math.pow(lifetimeTicks, 1.66))));
+        this.friction = Math.min(0.9F + (float)(0.1F/ (2000.0/(Math.pow(lifetimeTicks, 1.5)))), 1.0F);
         this.speedUpWhenYMotionIsBlocked = true;
-        this.xd *= 0.01F;
+        this.xd *= 0.005F;
         this.yd *= 0.01F;
-        this.zd *= 0.01F;
-        this.yd += 0.05 / (lifetimeTicks > 20 ? (lifetimeTicks / 20.0) : (lifetimeTicks / (10.0 + 10.0 * lifetimeTicks / 16)));
+        this.zd *= 0.005F;
+        this.yd += 0.05 / (lifetimeTicks > 20 ? (lifetimeTicks / 16.0) : (lifetimeTicks / (10.0 + 10.0 * lifetimeTicks / 16)));
         this.rCol = Math.max(0.0F, Mth.sin(((float)color + 0.0F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
         this.gCol = Math.max(0.0F, Mth.sin(((float)color + 0.33333334F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
         this.bCol = Math.max(0.0F, Mth.sin(((float)color + 0.6666667F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
