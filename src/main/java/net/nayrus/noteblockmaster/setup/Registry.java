@@ -86,8 +86,8 @@ public class Registry
     }
 
     public static void registerParticles(RegisterParticleProvidersEvent event) {
-        if(!(Minecraft.getInstance().particleEngine instanceof SpriteAccessor vanillaSprites)) return;
+        if(!(Minecraft.getInstance().particleEngine instanceof ISpriteAccessor vanillaSprites)) return;
 
-        event.registerSpecial(SUSTAINED_NOTE.get(), new SustainedNoteParticle.Provider(vanillaSprites.getRegisteredSprite(ParticleTypes.NOTE)));
+        event.registerSpecial(SUSTAINED_NOTE.get(), new SustainedNoteParticle.Provider(vanillaSprites.nbm$getRegisteredSprite(ParticleTypes.NOTE)));
     }
 }

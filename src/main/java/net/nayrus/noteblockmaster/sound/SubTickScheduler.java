@@ -47,7 +47,7 @@ public class SubTickScheduler {
             int tuningIndex = TuningCore.getSustain(core);
             CoreSound instance = new CoreSound(
                     instrument.getSustainedEvent(tuningIndex), SoundSource.RECORDS, (TuningCore.getVolume(core) / 20.0F), AdvancedNoteBlock.getNoteValue(anb),
-                    RandomSource.create(level.getRandom().nextLong()), pos, level, instrument.getSustainTime(tuningIndex), TuningCore.isMixing(core));
+                    RandomSource.create(level.getRandom().nextLong()), pos, instrument.getSustainTime(tuningIndex), TuningCore.isMixing(core));
 
             executor.schedule(()-> playSustainingSound(instance),
                     (long) anb.getValue(AdvancedNoteBlock.SUBTICK) * AdvancedNoteBlock.SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
@@ -63,6 +63,7 @@ public class SubTickScheduler {
     public static void playbackStop(BlockPos pos){
         SUSTAINED_SOUNDS.computeIfPresent(pos.immutable(), (p, sound) -> {
             if(!sound.getChannel().stopped()) Minecraft.getInstance().getSoundManager().stop(sound);
+            if(sound.getParticle().isAlive()) sound.getParticle().remove();
             return null;
         });
     }
