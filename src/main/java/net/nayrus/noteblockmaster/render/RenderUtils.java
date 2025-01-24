@@ -6,6 +6,8 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -71,6 +73,11 @@ public class RenderUtils {
         }
     }
 
+    public static void buildTorus(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float radius, float innerRadius, float alpha) {
+        buildHalfTorus(matrix, builder, color, scale, radius, innerRadius,0, alpha);
+        buildHalfTorus(matrix, builder, color, scale, radius, innerRadius, Utils.PI, alpha);
+    }
+
     public static Color shiftColor(Color base, Color target, float factor) {
         factor = Math.min(1, Math.max(-1, factor));
         if(factor >= 0)
@@ -118,6 +125,12 @@ public class RenderUtils {
     public static void pushAndTranslateRelativeToCam(PoseStack stack){
         stack.pushPose();
         stack.translate(-CURRENT_CAM_POS.x(), -CURRENT_CAM_POS.y(), -CURRENT_CAM_POS.z());
+    }
+
+    public static int getPackedLight(Level level, BlockPos pos) {
+        int blockLight = level.getBrightness(LightLayer.BLOCK, pos);
+        int skyLight = level.getBrightness(LightLayer.SKY, pos);
+        return (skyLight << 4) | blockLight;
     }
 
 }

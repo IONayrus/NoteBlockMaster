@@ -16,11 +16,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
-import net.nayrus.noteblockmaster.item.AnimatedCore;
+import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.ComposersNote;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
+import net.nayrus.noteblockmaster.render.item.CoreBaseRender;
+import net.nayrus.noteblockmaster.render.item.SpinningCoreRender;
 import net.nayrus.noteblockmaster.render.particle.SustainedNoteParticle;
 import net.nayrus.noteblockmaster.render.particle.SustainedNoteType;
 import net.neoforged.bus.api.IEventBus;
@@ -50,8 +52,8 @@ public class Registry
     public static final DeferredItem<Item> NOTETUNER = ITEMS.register("notetuner", TunerItem::new);
     public static final DeferredItem<Item> COMPOSER = ITEMS.register("composer", ComposersNote::new);
     public static final DeferredItem<Item> CORE = ITEMS.register("core", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> SUSTAIN = ITEMS.register("sustain", AnimatedCore::new);
-    public static final DeferredItem<Item> VOLUME = ITEMS.register("volume", AnimatedCore::new);
+    public static final DeferredItem<Item> SUSTAIN = ITEMS.register("sustain", SpinningCore::new);
+    public static final DeferredItem<Item> VOLUME = ITEMS.register("volume", SpinningCore::new);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<TunerData>> TUNER_DATA = DATA_COMPONENT_TYPES.registerComponentType("tuner_data",
             builder -> builder.persistent(TunerData.TUNER_CODEC));
@@ -82,7 +84,8 @@ public class Registry
     }
 
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new AnimatedCore.Renderer(), VOLUME, SUSTAIN);
+        event.registerItem(new SpinningCoreRender.Extension(), VOLUME, SUSTAIN);
+        event.registerItem(new CoreBaseRender.Extension(), CORE);
     }
 
     public static void registerParticles(RegisterParticleProvidersEvent event) {

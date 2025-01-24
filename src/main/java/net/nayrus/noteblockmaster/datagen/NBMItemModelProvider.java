@@ -21,10 +21,10 @@ public class NBMItemModelProvider extends ItemModelProvider {
         handheldItem(Registry.NOTETUNER);
 
         basicItem(Registry.COMPOSER.get());
-        basicItem(Registry.CORE.get());
 
         customRendered(Registry.SUSTAIN);
         customRendered(Registry.VOLUME);
+        customRendered(Registry.CORE);
     }
 
     private void handheldItem(DeferredItem<?> item) {
