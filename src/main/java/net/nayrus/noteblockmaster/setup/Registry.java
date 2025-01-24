@@ -23,7 +23,6 @@ import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.particle.SustainedNoteParticle;
 import net.nayrus.noteblockmaster.render.particle.SustainedNoteType;
-import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
@@ -68,7 +67,6 @@ public class Registry
         CREATIVE_MODE_TABS.register(eventBus);
         DATA_COMPONENT_TYPES.register(eventBus);
         PARTICLE_TYPES.register(eventBus);
-        SoundRegistry.SOUND_EVENTS.register(eventBus);
     }
 
     static{

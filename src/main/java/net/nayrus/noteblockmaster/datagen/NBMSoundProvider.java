@@ -24,11 +24,11 @@ public class NBMSoundProvider extends SoundDefinitionsProvider {
                 .with(sound(ResourceLocation.withDefaultNamespace("block/smithing_table/smithing_table2")))
                 .subtitle("sounds.noteblockmaster.noteblock_upgrade")
         );
-        addBasicLocalSounds(SoundRegistry.SUSTAINED_HARP_SOUND, "sustained_harp");
-        addBasicLocalSounds(SoundRegistry.SUSTAINED_BASS_SOUND, "sustained_bass");
+        addBasicLocalSounds(SoundRegistry.SUSTAINED_HARP_SOUND.getA(), "sustained_harp");
+        addBasicLocalSounds(SoundRegistry.SUSTAINED_BASS_SOUND.getA(), "sustained_bass");
         addBasicLocalSound(SoundRegistry.SUSTAINED_BASEDRUM_SOUND, "sustained_basedrum");
         addBasicLocalSound(SoundRegistry.SUSTAINED_BANJO_SOUND, "sustained_banjo");
-        addBasicLocalSounds(SoundRegistry.SUSTAINED_FLUTE_SOUND, "sustained_flute");
+        addBasicLocalSounds(SoundRegistry.SUSTAINED_FLUTE_SOUND.getA(), "sustained_flute");
         addBasicLocalSound(SoundRegistry.SUSTAINED_SNARE_SOUND, "sustained_snare");
         addBasicLocalSound(SoundRegistry.SUSTAINED_HAT_SOUND, "sustained_hat");
         addBasicLocalSound(SoundRegistry.SUSTAINED_CHIME_SOUND, "sustained_chime");

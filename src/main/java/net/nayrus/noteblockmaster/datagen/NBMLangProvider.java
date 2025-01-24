@@ -19,7 +19,7 @@ public class NBMLangProvider extends LanguageProvider {
         add(Registry.TEMPOTUNER.get(), "Tempo Tuner");
         add(Registry.NOTETUNER.get(), "Note Tuner");
         add(Registry.COMPOSER.get(), "Composers Note");
-        add(Registry.CORE.get(), "Composers Core");
+        add(Registry.CORE.get(), "Core Base");
         add(Registry.SUSTAIN.get(), "Sustaining Core");
         add(Registry.VOLUME.get(), "Mixing Core");
         //add("sounds.noteblockmaster.noteblock_smithing", "Note block upgraded");

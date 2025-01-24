@@ -17,17 +17,19 @@ public class CoreSound extends SimpleSoundInstance{
     private Channel channel;
     private final int sustain;
     private final int noteVal;
+    private final boolean mixing;
 
-    public CoreSound(SoundEvent soundEvent, SoundSource source, float volume, int noteVal, RandomSource random, BlockPos pos, Level level, int sustain) {
-        super(soundEvent, source, volume, AdvancedNoteBlock.getPitchFromNote(noteVal) , random, pos);
+    public CoreSound(SoundEvent soundEvent, SoundSource source, float volume, int noteVal, RandomSource random, BlockPos pos, Level level, int sustain, boolean mixing) {
+        super(soundEvent, source, mixing ? volume : 3.0F, AdvancedNoteBlock.getPitchFromNote(noteVal) , random, pos);
         this.immutablePos = pos.immutable();
         this.level = level;
         this.sustain = sustain;
         this.noteVal = noteVal;
+        this.mixing = mixing;
     }
 
     public void addNoteParticle(){
-        level.addParticle(new SustainedNoteOptions(sustain), this.getX(), this.getY() + 0.7, this.getZ(), (this.noteVal - 2) / 29.0F, 0.0, 0.0);
+        level.addParticle(new SustainedNoteOptions((int) (this.sustain * (1/getPitch()))), this.getX(), this.getY() + 0.7, this.getZ(), (this.noteVal - 2) / 29.0F, 0.0, 0.0);
     }
 
     public BlockPos getImmutablePos() {
@@ -36,7 +38,7 @@ public class CoreSound extends SimpleSoundInstance{
 
     @Override
     public Attenuation getAttenuation() {
-        return Attenuation.NONE;
+        return this.mixing ? Attenuation.NONE : Attenuation.LINEAR;
     }
 
     public void setChannel(Channel channel) {

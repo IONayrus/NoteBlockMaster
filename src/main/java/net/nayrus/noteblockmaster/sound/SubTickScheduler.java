@@ -44,9 +44,10 @@ public class SubTickScheduler {
 
     public static void delayedCoredNoteBlockEvent(BlockState anb, BlockState core, Level level, BlockPos pos, AdvancedInstrument instrument){
         if(level.isClientSide()) {
+            int tuningIndex = TuningCore.getSustain(core);
             CoreSound instance = new CoreSound(
-                    instrument.getSustainedEvent(TuningCore.getSustain(core)), SoundSource.RECORDS, (TuningCore.getVolume(core) / 20.0F), AdvancedNoteBlock.getNoteValue(anb),
-                    RandomSource.create(level.getRandom().nextLong()), pos, level, TuningCore.getSustain(core) * 20);
+                    instrument.getSustainedEvent(tuningIndex), SoundSource.RECORDS, (TuningCore.getVolume(core) / 20.0F), AdvancedNoteBlock.getNoteValue(anb),
+                    RandomSource.create(level.getRandom().nextLong()), pos, level, instrument.getSustainTime(tuningIndex), TuningCore.isMixing(core));
 
             executor.schedule(()-> playSustainingSound(instance),
                     (long) anb.getValue(AdvancedNoteBlock.SUBTICK) * AdvancedNoteBlock.SUBTICK_LENGTH, TimeUnit.MILLISECONDS);

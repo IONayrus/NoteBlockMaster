@@ -44,4 +44,9 @@ public enum AdvancedInstrument implements StringRepresentable {
         if(sustain == 0) return this.getSoundEvent().value();
         return SustainedInstrument.values()[this.ordinal()].getSoundEvent(sustain - 1);
     }
+
+    public int getSustainTime(int sustain){
+        if(sustain == 0) return 300;
+        return SustainedInstrument.values()[this.ordinal()].getSustainTime(sustain - 1);
+    }
 }

@@ -1,6 +1,7 @@
 package net.nayrus.noteblockmaster.sound;
 
 import net.minecraft.sounds.SoundEvent;
+import net.nayrus.noteblockmaster.utils.FinalTuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,19 +27,25 @@ public enum SustainedInstrument {
     SUSTAINED_PLING(SoundRegistry.SUSTAINED_PLING_SOUND);
 
     private final List<Supplier<SoundEvent>> soundEvents;
+    private final int[] durations;
 
     SustainedInstrument(Supplier<SoundEvent> soundEvent){
         List<Supplier<SoundEvent>> list = new ArrayList<>();
         list.add(soundEvent);
         this.soundEvents = list;
+        this.durations = new int[]{1000};
     }
 
-    SustainedInstrument(List<Supplier<SoundEvent>> soundEvents){
-        this.soundEvents = soundEvents;
+    SustainedInstrument(FinalTuple<List<Supplier<SoundEvent>>, int[]> soundsWithDuration){
+        this.soundEvents = soundsWithDuration.getA();
+        this.durations =soundsWithDuration.getB();
     }
 
     public SoundEvent getSoundEvent(int susIndex) {
         return this.soundEvents.get(susIndex < this.soundEvents.size() ? susIndex : this.soundEvents.size()-1).get();
     }
 
+    public int getSustainTime(int susIndex) {
+        return this.durations[(susIndex < this.soundEvents.size() ? susIndex : this.soundEvents.size()-1)];
+    }
 }

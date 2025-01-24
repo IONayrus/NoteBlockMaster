@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.block.TuningCore;
 import net.nayrus.noteblockmaster.command.BPMInfoCommand;
 import net.nayrus.noteblockmaster.command.MainCommand;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
@@ -13,6 +14,7 @@ import net.nayrus.noteblockmaster.event.ServerEvents;
 import net.nayrus.noteblockmaster.network.PacketHandler;
 import net.nayrus.noteblockmaster.setup.Config;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.nayrus.noteblockmaster.utils.KeyBindings;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -41,6 +43,8 @@ public class NoteBlockMaster
     public NoteBlockMaster(IEventBus modEventBus, ModContainer modContainer)
     {
         modContainer.registerConfig(ModConfig.Type.STARTUP, Config.START_UP);
+        SoundRegistry.SOUND_EVENTS.register(modEventBus);
+        TuningCore.loadSustainProperty();
 
         modEventBus.addListener(AdvancedNoteBlock::loadPropertiesFromConfig);
         NeoForge.EVENT_BUS.register(this);

@@ -13,6 +13,7 @@ import net.nayrus.noteblockmaster.render.RenderUtils;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.CoreSound;
+import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.KeyBindings;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -68,6 +69,7 @@ public class ClientEvents {
     @SubscribeEvent
     public static void playSoundSourceEvent(PlaySoundSourceEvent e){
         if(!(e.getSound() instanceof CoreSound sound)) return;
+        SubTickScheduler.SUSTAINED_SOUNDS.put(sound.getImmutablePos(), sound);
         sound.addNoteParticle();
         sound.setChannel(e.getChannel());
     }

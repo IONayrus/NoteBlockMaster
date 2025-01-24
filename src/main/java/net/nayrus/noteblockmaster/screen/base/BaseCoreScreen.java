@@ -31,7 +31,7 @@ public class BaseCoreScreen extends BaseScreen{
     public void onClose() {
         PacketDistributor.sendToServer(new CoreUpdate(this.pos,
                 this.sustain != -1 ? this.sustain : 0,
-                this.volume != -1 ? this.volume : 20));
+                this.volume != -1 ? this.volume : 0));
         super.onClose();
     }
 }
