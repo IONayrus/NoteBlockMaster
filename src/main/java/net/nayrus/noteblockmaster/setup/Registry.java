@@ -1,11 +1,9 @@
 package net.nayrus.noteblockmaster.setup;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
@@ -90,7 +88,8 @@ public class Registry
     }
 
     public static void registerParticles(RegisterParticleProvidersEvent event) {
-        SpriteSet vanillaNote = Minecraft.getInstance().particleEngine.spriteSets.get(BuiltInRegistries.PARTICLE_TYPE.getKey(ParticleTypes.NOTE));
-        event.registerSpecial(SUSTAINED_NOTE.get(), new SustainedNoteParticle.Provider(vanillaNote));
+        if(!(Minecraft.getInstance().particleEngine instanceof SpriteAccessor vanillaSprites)) return;
+
+        event.registerSpecial(SUSTAINED_NOTE.get(), new SustainedNoteParticle.Provider(vanillaSprites.getRegisteredSprite(ParticleTypes.NOTE)));
     }
 }
