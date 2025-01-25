@@ -59,7 +59,8 @@ public class ANBInfoRender {
         matrix.mulPose(Axis.YP.rotationDegrees(-90.0F));
         Matrix4f positionMatrix = matrix.last().pose();
 
-        RenderUtils.renderFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.SEE_THROUGH_TRIANGLES), color, scale, alpha);
+        int resolution = (Math.max(24 - (int) RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, pos) * 2, 8));
+        RenderUtils.renderFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.SEE_THROUGH_TRIANGLES), color, scale, alpha, resolution);
 
         matrix.popPose();
     }

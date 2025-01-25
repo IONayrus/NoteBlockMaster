@@ -18,7 +18,7 @@ public class NBMRenderType extends RenderType {
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTextureState(NO_TEXTURE)
                     .setDepthTestState(NO_DEPTH_TEST)
-                    .setCullState(CULL)
+                    .setCullState(NO_CULL)
                     .setLightmapState(NO_LIGHTMAP)
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false));

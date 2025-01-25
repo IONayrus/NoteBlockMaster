@@ -20,14 +20,12 @@ public class RenderUtils {
 
     public static Vec3 CURRENT_CAM_POS = Vec3.ZERO;
 
-    public static void renderFlippedCone(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float alpha) {
+    public static void renderFlippedCone(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float alpha, int resolution) {
         float red = color.getRed() / 255f, green = color.getGreen() / 255f, blue = color.getBlue() / 255f;
 
         float startX = 0 + (1 - scale) / 2, startY = 0 + (1 - scale) / 2, startZ = -1 + (1 - scale) / 2, endX = 1 - (1 - scale) / 2, endY = 1 - (1 - scale) / 2, endZ = 0 - (1 - scale) / 2;
         float midX = (startX + endX) / 2, midZ = (startZ + endZ) / 2;
         float dX = Math.abs(midX - startX), dZ = Math.abs(midX - startX);
-
-        int resolution = 32;
 
         for(int i = 0; i < resolution; i++){
             float w1 = (i / (float)resolution) * Utils.PI * 2;
