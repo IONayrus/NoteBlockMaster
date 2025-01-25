@@ -27,6 +27,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.screen.CoreScreen;
 import net.nayrus.noteblockmaster.setup.NBMTags;
@@ -79,7 +80,7 @@ public class TuningCore extends TransparentBlock {
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if(!(context instanceof EntityCollisionContext eCon) || eCon.equals(CollisionContext.empty())) return COLLISION;
         if(eCon.getEntity() instanceof Player player
-                && FinalTuple.getHeldItems(player).contains(TunerItem.class)) return COLLISION;
+                && FinalTuple.getHeldItems(player).contains(TunerItem.class, SpinningCore.class)) return COLLISION;
         return Shapes.empty();
     }
 
@@ -122,14 +123,15 @@ public class TuningCore extends TransparentBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(!stack.is(NBMTags.Items.TUNERS)) return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        if(!(stack.is(NBMTags.Items.TUNERS) || (stack.is(NBMTags.Items.CORES)))) return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         BlockState anb = level.getBlockState(pos.below());
         if(!anb.is(Registry.ADVANCED_NOTEBLOCK)){
             if(!level.isClientSide()) level.scheduleTick(pos, state.getBlock(), 0);
             return ItemInteractionResult.SUCCESS;
         }
         if(level.isClientSide()){
-            Minecraft.getInstance().setScreen(new CoreScreen(state, pos, anb.getValue(AdvancedNoteBlock.INSTRUMENT).getSustains()));
+            Minecraft.getInstance().setScreen(new CoreScreen(state, pos, anb.getValue(AdvancedNoteBlock.INSTRUMENT),
+                    AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb))));
         }
         return ItemInteractionResult.SUCCESS;
     }

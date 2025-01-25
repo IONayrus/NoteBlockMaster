@@ -2,20 +2,29 @@ package net.nayrus.noteblockmaster.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.screen.base.BaseCoreScreen;
 import net.nayrus.noteblockmaster.screen.widget.IntegerEditBox;
 import net.nayrus.noteblockmaster.screen.widget.ValueSlider;
+import net.nayrus.noteblockmaster.sound.AdvancedInstrument;
+
+import java.awt.*;
+import java.util.Locale;
 
 public class CoreScreen extends BaseCoreScreen {
 
+    protected final AdvancedInstrument instrument;
     protected final int maxSustain;
+    protected final float scale;
 
-    public CoreScreen(BlockState state, BlockPos pos, int maxSustain) {
+    public CoreScreen(BlockState state, BlockPos pos, AdvancedInstrument instrument, float pitch) {
         super(state, pos);
-        this.maxSustain = maxSustain;
+        this.instrument = instrument;
+        this.maxSustain = instrument.getSustains();
+        this.scale = 1/pitch;
     }
 
     private static final int COMP_HEIGHT = 19;
@@ -39,16 +48,17 @@ public class CoreScreen extends BaseCoreScreen {
             }
         });
 
-        this.sustainBox = new IntegerEditBox(this.font, getRelX() + 138, getRelY() + 28, 27, COMP_HEIGHT, this.maxSustain,true);
+        this.sustainBox = new IntegerEditBox(this.font, getRelX() + 138, getRelY() + 28, 27, COMP_HEIGHT, maxSustain,true);
         this.sustainBox.setEditable(isSustaining);
-        this.sustainBox.setValue(isSustaining ? Integer.toString(this.sustain) : Integer.toString(this.maxSustain));
+        this.sustainBox.setValue(isSustaining ? Integer.toString(this.sustain) : Integer.toString(maxSustain));
         this.sustainBox.setMaxLength(3);
         this.sustainBox.setResponder(s -> {
             if(!s.isEmpty()) {
                 int _new = Integer.parseInt(s);
                 if(_new < 1) _new = 1;
                 this.sustain = _new;
-                this.sustainSlider.setValue((_new - 1)/ (this.maxSustain > 1 ? (this.maxSustain - 1.0F) : 1.0F));
+                this.sustainSlider.setValue((_new - 1)/ (maxSustain > 1 ? (maxSustain - 1.0F) : 1.0F));
+                this.sustainSlider.setTooltip(getTooltip());
             }
         });
 
@@ -67,12 +77,13 @@ public class CoreScreen extends BaseCoreScreen {
         this.volSlider.setMessage(Component.literal("Volume"));
 
         this.sustainSlider = new ValueSlider(getRelX() + 10, getRelY() + 28, 118, COMP_HEIGHT,
-                isSustaining ? (this.sustain - 1) / (this.maxSustain - 1.0) : 1.0, !isSustaining ? null : (val) -> {
-            this.sustain = (int) (val * (this.maxSustain - 1) + 1);
+                isSustaining ? (this.sustain - 1) / (maxSustain - 1.0) : 1.0, !isSustaining ? null : (val) -> {
+            this.sustain = (int) (val * (maxSustain - 1) + 1);
             this.sustainBox.setValue(Integer.toString(this.sustain));
         });
         this.sustainSlider.active = isSustaining;
         this.sustainSlider.setMessage(Component.literal("Sustain"));
+        this.sustainSlider.setTooltip(getTooltip());
 
         addRenderableWidget(this.volBox);
         addRenderableWidget(this.volSlider);
@@ -91,5 +102,10 @@ public class CoreScreen extends BaseCoreScreen {
                 || op.keyJump.matches(keyCode, scanCode))
             this.onClose();
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    public Tooltip getTooltip(){
+        return Tooltip.create(Component.literal(String.format(Locale.US,"%.2f",
+                this.instrument.getSustainTime(this.sustain != -1 ? this.sustain : 1) * this.scale) + " ms").withColor(Color.LIGHT_GRAY.getRGB()));
     }
 }

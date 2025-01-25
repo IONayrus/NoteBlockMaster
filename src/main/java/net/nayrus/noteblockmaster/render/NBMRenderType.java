@@ -18,7 +18,7 @@ public class NBMRenderType extends RenderType {
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTextureState(NO_TEXTURE)
                     .setDepthTestState(NO_DEPTH_TEST)
-                    .setCullState(NO_CULL)
+                    .setCullState(CULL)
                     .setLightmapState(NO_LIGHTMAP)
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false));
@@ -30,7 +30,7 @@ public class NBMRenderType extends RenderType {
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTextureState(NO_TEXTURE)
-                    .setCullState(NO_CULL)
+                    .setCullState(CULL)
                     .setLightmapState(NO_LIGHTMAP)
                     .setWriteMaskState(COLOR_DEPTH_WRITE)
                     .createCompositeState(false));

@@ -47,16 +47,16 @@ public class SpinningCore extends Item {
             return InteractionResult.CONSUME;
         }
         if(hand.equals(InteractionHand.OFF_HAND)) player.swing(hand);
-        return InteractionResult.PASS;
+        return InteractionResult.CONSUME;
     }
 
     public InteractionResult addCoreToTuningCore(Level level, Player player, BlockPos pos, BlockState state, ItemStack stack, InteractionHand hand, AdvancedInstrument instrument){
         if(stack.is(Registry.SUSTAIN) ){
-            if(TuningCore.isSustaining(state)) return InteractionResult.PASS;
+            if(TuningCore.isSustaining(state)) return InteractionResult.SUCCESS;
             if(level.isClientSide()) return Utils.swingHelper(player, hand, true);
             level.setBlockAndUpdate(pos, state.setValue(TuningCore.SUSTAIN, instrument.getSustains()));
         }else{
-            if(TuningCore.isMixing(state)) return InteractionResult.PASS;
+            if(TuningCore.isMixing(state)) return InteractionResult.SUCCESS;
             if(level.isClientSide()) return Utils.swingHelper(player, hand, true);
             level.setBlockAndUpdate(pos, state.setValue(TuningCore.VOLUME, 20));
         }
