@@ -10,8 +10,8 @@ import org.lwjgl.glfw.GLFW;
 
 public class KeyBindings {
 
-    public static final Lazy<KeyMapping> OPEN_GUI = Lazy.of(() -> new KeyMapping(
-            "key.noteblockmaster.opengui",
+    public static final Lazy<KeyMapping> OPEN_OFFHAND_GUI = Lazy.of(() -> new KeyMapping(
+            "key.noteblockmaster.openoffhandgui",
             KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_R,
@@ -20,7 +20,7 @@ public class KeyBindings {
 
     @SubscribeEvent
     public static void registerBindings(RegisterKeyMappingsEvent event) {
-        event.register(OPEN_GUI.get());
+        event.register(OPEN_OFFHAND_GUI.get());
     }
 
 }

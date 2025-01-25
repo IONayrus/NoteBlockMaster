@@ -123,8 +123,13 @@ public class TuningCore extends TransparentBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(!stack.is(NBMTags.Items.TUNERS)) return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        BlockState anb = level.getBlockState(pos.below());
+        if(!anb.is(Registry.ADVANCED_NOTEBLOCK)){
+            if(!level.isClientSide()) level.scheduleTick(pos, state.getBlock(), 0);
+            return ItemInteractionResult.SUCCESS;
+        }
         if(level.isClientSide()){
-            Minecraft.getInstance().setScreen(new CoreScreen(state, pos));
+            Minecraft.getInstance().setScreen(new CoreScreen(state, pos, anb.getValue(AdvancedNoteBlock.INSTRUMENT).getSustains()));
         }
         return ItemInteractionResult.SUCCESS;
     }

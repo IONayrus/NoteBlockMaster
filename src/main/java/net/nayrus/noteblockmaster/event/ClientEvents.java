@@ -10,6 +10,7 @@ import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.render.CoreRender;
 import net.nayrus.noteblockmaster.render.RenderUtils;
+import net.nayrus.noteblockmaster.screen.ComposerScreen;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.CoreSound;
@@ -28,14 +29,11 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
-        while (KeyBindings.OPEN_GUI.get().consumeClick()) {
+        while (KeyBindings.OPEN_OFFHAND_GUI.get().consumeClick()) {
             if(!(Minecraft.getInstance().player instanceof Player player)) return;
-            FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
-            if(items.contains(TunerItem.class)){
-                ItemStack A = items.getA();
-                boolean isTuner = A.is(NBMTags.Items.TUNERS);
-                TunerItem.openTunerGUI(isTuner ? A : items.getB(), isTuner ? items.getB() : A);
-            }
+            ItemStack off = player.getOffhandItem();
+            if(off.is(NBMTags.Items.TUNERS)) TunerItem.openTunerGUI(off, player.getMainHandItem());
+            if(off.is(Registry.COMPOSER)) Minecraft.getInstance().setScreen(new ComposerScreen(off));
         }
     }
 

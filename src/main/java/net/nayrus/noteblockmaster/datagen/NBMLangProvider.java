@@ -24,7 +24,7 @@ public class NBMLangProvider extends LanguageProvider {
         add(Registry.VOLUME.get(), "Mixing Core");
         //add("sounds.noteblockmaster.noteblock_smithing", "Note block upgraded");
         add("key.categories.noteblockmaster.nbm", "Note Block Master");
-        add("key.noteblockmaster.opengui", "Open GUI");
+        add("key.noteblockmaster.openoffhandgui", "Open Offhand GUI");
         //add(SoundRegistry.SMITHING.get().getLocation().toLanguageKey("sounds"), "Note block upgraded");
         addSounds();
     }

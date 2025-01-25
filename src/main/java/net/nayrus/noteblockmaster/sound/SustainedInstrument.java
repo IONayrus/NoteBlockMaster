@@ -48,4 +48,8 @@ public enum SustainedInstrument {
     public int getSustainTime(int susIndex) {
         return this.durations[(susIndex < this.soundEvents.size() ? susIndex : this.soundEvents.size()-1)];
     }
+
+    public int getSize(){
+        return this.soundEvents.size();
+    }
 }

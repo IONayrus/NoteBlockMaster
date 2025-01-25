@@ -83,6 +83,8 @@ public class AdvancedNoteBlock extends Block
     private BlockState setInstrument(LevelAccessor level, BlockPos pos, BlockState state) {
         NoteBlockInstrument noteblockinstrument = level.getBlockState(pos.below()).instrument();
         AdvancedInstrument instrument = noteblockinstrument.worksAboveNoteBlock() ? AdvancedInstrument.HARP : AdvancedInstrument.values()[noteblockinstrument.ordinal()];
+        BlockState above = level.getBlockState(pos.above());
+        if(above.is(Registry.TUNINGCORE) && above.getValue(TuningCore.SUSTAIN) > instrument.getSustains()) level.setBlock(pos.above(), above.setValue(TuningCore.SUSTAIN, instrument.getSustains()), 3);
         return state.setValue(INSTRUMENT, instrument);
     }
 
