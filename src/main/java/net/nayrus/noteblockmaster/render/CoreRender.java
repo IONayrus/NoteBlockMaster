@@ -26,9 +26,11 @@ import static net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.*;
 public class CoreRender {
 
     public static Map<BlockPos, Float> OFFSET_ON_POS = new HashMap<>();
+    public static Map<BlockPos, Long> LAST_STAGE_TIME = new HashMap<>();
     private static final Color SUSTAIN_BASECOLOR = RenderUtils.shiftColor(Color.BLUE, Color.GREEN, 0.33F);
+    public static int RANGE = 20;
 
-    public static void renderCoresInRange(RenderLevelStageEvent e, Level level, int range){
+    public static void renderCoresInRange(RenderLevelStageEvent e, Level level){
         Vec3 camCenter = RenderUtils.getStableEyeCenter(Minecraft.getInstance().gameRenderer.getMainCamera());
         RenderLevelStageEvent.Stage stage = e.getStage();
         if(stage == AFTER_LEVEL){
@@ -42,19 +44,26 @@ public class CoreRender {
             });
         }
         if(stage == AFTER_TRANSLUCENT_BLOCKS || stage == AFTER_WEATHER) {
-            RenderUtils.getBlocksInRange(range)
+            RenderUtils.getBlocksInRange(RANGE)
                     .filter(pos -> level.getBlockState(pos).is(Registry.TUNINGCORE))
-                    .forEach(pos -> renderCore(level, pos, level.getBlockState(pos), e.getPoseStack(), stage, Utils.exponentialFloor(0.5F, range, (float) RenderUtils.distanceVecToBlock(camCenter, pos), 2)));
+                    .forEach(pos -> {
+                        long renderTime;
+                        if(stage == AFTER_TRANSLUCENT_BLOCKS){
+                            renderTime = Util.getMillis();
+                            LAST_STAGE_TIME.put(pos.immutable(), renderTime);
+                        }else renderTime = LAST_STAGE_TIME.getOrDefault(pos.immutable(), Util.getMillis());
+                        renderCore(level, pos, level.getBlockState(pos), e.getPoseStack(), stage, Utils.exponentialFloor(0.5F, RANGE, (float) RenderUtils.distanceVecToBlock(camCenter, pos), 2), renderTime);
+                    });
         }
 
     }
 
-    public static void renderCore(Level level, BlockPos pos, BlockState state, PoseStack stack, RenderLevelStageEvent.Stage stage, float alpha){
+    public static void renderCore(Level level, BlockPos pos, BlockState state, PoseStack stack, RenderLevelStageEvent.Stage stage, float alpha, long time){
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         RenderUtils.pushAndTranslateRelativeToCam(stack);
         BlockPos immutablePos = pos.immutable();
         OFFSET_ON_POS.putIfAbsent(immutablePos, Math.abs(level.getRandom().nextFloat()));
-        float anime = Util.getMillis()/6.0F + OFFSET_ON_POS.get(immutablePos);
+        float anime = time/6.0F + OFFSET_ON_POS.get(immutablePos);
         if(TuningCore.isMixing(state)){
             int volume = state.getValue(TuningCore.VOLUME);
             int steps = (int)(100.0 * (5 - 4 * (1 / (18.0 / (19 - volume)))));
@@ -86,9 +95,21 @@ public class CoreRender {
         Matrix4f positionMatrix = matrix.last().pose();
 
         float offset = Utils.getRotationToX(pos.getCenter().subtract(RenderUtils.CURRENT_CAM_POS));
-        RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius, stage == AFTER_WEATHER ? offset :(offset + Utils.PI), alpha);
+        int resolution = (Math.max(32 - (int) RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, pos) * 4, 16));
+        RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius,
+                stage == AFTER_WEATHER ? offset :(offset + Utils.PI), alpha, resolution%2==0 ? resolution : resolution-1);
 
         matrix.popPose();
+    }
+
+    public static void clearMaps(){
+        OFFSET_ON_POS.entrySet().removeIf(entry -> {
+            if(RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, entry.getKey()) > RANGE){
+                LAST_STAGE_TIME.remove(entry.getKey());
+                return true;
+            }
+            return false;
+        });
     }
 
 }

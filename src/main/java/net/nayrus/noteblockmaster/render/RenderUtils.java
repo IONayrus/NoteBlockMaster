@@ -43,15 +43,13 @@ public class RenderUtils {
         }
     }
 
-    public static void buildHalfTorus(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float radius, float innerRadius, float radialOffset, float alpha) {
+    public static void buildHalfTorus(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float radius, float innerRadius, float radialOffset, float alpha, int resolution) {
         float red = color.getRed() / 255f, green = color.getGreen() / 255f, blue = color.getBlue() / 255f;
 
         float startX = 0 + (1 - scale) / 2, startY = 0 + (1 - scale) / 2, startZ = -1 + (1 - scale) / 2, endX = 1 - (1 - scale) / 2, endY = 1 - (1 - scale) / 2, endZ = 0 - (1 - scale) / 2;
         float midY = (startY + endY) / 2, midX = (startX + endX) / 2, midZ = (startZ + endZ) / 2;
         float r = innerRadius * scale;
         float R = radius * scale;
-
-        int resolution = 32;
 
         for(int i = 0; i< resolution / 2; i++) {
             float w1 = (i / (float) resolution) * Utils.PI * 2 + radialOffset;
@@ -73,9 +71,9 @@ public class RenderUtils {
         }
     }
 
-    public static void buildTorus(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float radius, float innerRadius, float alpha) {
-        buildHalfTorus(matrix, builder, color, scale, radius, innerRadius,0, alpha);
-        buildHalfTorus(matrix, builder, color, scale, radius, innerRadius, Utils.PI, alpha);
+    public static void buildTorus(Matrix4f matrix, VertexConsumer builder, Color color, float scale, float radius, float innerRadius, float alpha, int resolution) {
+        buildHalfTorus(matrix, builder, color, scale, radius, innerRadius,0, alpha, resolution);
+        buildHalfTorus(matrix, builder, color, scale, radius, innerRadius, Utils.PI, alpha, resolution);
     }
 
     public static Color shiftColor(Color base, Color target, float factor) {

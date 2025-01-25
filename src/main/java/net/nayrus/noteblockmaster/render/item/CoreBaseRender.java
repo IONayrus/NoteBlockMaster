@@ -53,9 +53,9 @@ public class CoreBaseRender extends BaseItemRender {
 
     public static void renderBaseRings(PoseStack matrix, MultiBufferSource buffer, float scale, float alpha, int packedLight){
         matrix.pushPose();
-        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), new Color(52,153,136), scale, 0.5F, 0.03F, alpha);
-        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), Color.LIGHT_GRAY, scale, 0.6F, 0.07F, alpha);
-        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), Color.ORANGE, scale, 0.7F, 0.03F, alpha);
+        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), new Color(52,153,136), scale, 0.5F, 0.03F, alpha, 32);
+        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), Color.LIGHT_GRAY, scale, 0.6F, 0.07F, alpha, 32);
+        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), Color.ORANGE, scale, 0.7F, 0.03F, alpha, 32);
         matrix.popPose();
     }
 

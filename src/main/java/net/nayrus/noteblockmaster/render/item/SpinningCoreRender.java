@@ -52,13 +52,13 @@ public class SpinningCoreRender extends BaseItemRender{
         matrix.pushPose();
         matrix.rotateAround(Axis.YP.rotation(Util.getMillis()/1500F),0.5F,0F,-0.5F);
         matrix.rotateAround(Axis.XP.rotation(Util.getMillis()/700F),0F,0.5F,-0.5F);
-        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), baseColor, scale, 0.7F, 0.08F, alpha);
+        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), baseColor, scale, 0.7F, 0.08F, alpha, 32);
         matrix.popPose();
         matrix.pushPose();
         matrix.rotateAround(Axis.XP.rotation(Util.getMillis()/8000F),0F,0.5F,-0.5F);
         //matrix.rotateAround(Axis.YP.rotation(Util.getMillis()/8000F),0.5F,0F,-0.5F);
         matrix.rotateAround(Axis.ZP.rotation(Util.getMillis()/300F),0.5F,0.5F,0F);
-        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), baseColor, scale, 0.5F, 0.08F, alpha);
+        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), baseColor, scale, 0.5F, 0.08F, alpha, 32);
         matrix.popPose();
     }
 

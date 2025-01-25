@@ -27,6 +27,7 @@ import java.awt.*;
 
 public class ClientEvents {
 
+    public static long ticks = 0;
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         while (KeyBindings.OPEN_OFFHAND_GUI.get().consumeClick()) {
@@ -35,6 +36,8 @@ public class ClientEvents {
             if(off.is(NBMTags.Items.TUNERS)) TunerItem.openTunerGUI(off, player.getMainHandItem());
             if(off.is(Registry.COMPOSER)) Minecraft.getInstance().setScreen(new ComposerScreen(off));
         }
+        if(ticks%200==0) CoreRender.clearMaps();
+        ticks++;
     }
 
 
@@ -61,7 +64,7 @@ public class ClientEvents {
             }
         }
 
-        CoreRender.renderCoresInRange(e, level, 20);
+        CoreRender.renderCoresInRange(e, level);
     }
 
     @SubscribeEvent
