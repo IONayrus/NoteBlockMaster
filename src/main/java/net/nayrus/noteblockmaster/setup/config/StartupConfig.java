@@ -1,10 +1,10 @@
-package net.nayrus.noteblockmaster.setup;
+package net.nayrus.noteblockmaster.setup.config;
 
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-public class Config
+public class StartupConfig
 {
     public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
@@ -35,10 +35,10 @@ public class Config
 
     public static boolean UPDATED = false;
     public static void updateStartUpAndSave(){
-        Config.LOWER_NOTE_LIMIT.set(AdvancedNoteBlock.MIN_NOTE_VAL);
-        Config.HIGHER_NOTE_LIMIT.set(AdvancedNoteBlock.MAX_NOTE_VAL);
-        Config.SUBTICK_LENGTH.set(AdvancedNoteBlock.SUBTICK_LENGTH);
-        Config.START_UP.save();
+        StartupConfig.LOWER_NOTE_LIMIT.set(AdvancedNoteBlock.MIN_NOTE_VAL);
+        StartupConfig.HIGHER_NOTE_LIMIT.set(AdvancedNoteBlock.MAX_NOTE_VAL);
+        StartupConfig.SUBTICK_LENGTH.set(AdvancedNoteBlock.SUBTICK_LENGTH);
+        StartupConfig.START_UP.save();
         UPDATED = true;
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
@@ -28,8 +29,7 @@ public class ANBInfoRender {
 
     public static void renderNoteBlockInfo(RenderLevelStageEvent e, Level level, Utils.PROPERTY info){
         RenderSystem.disableDepthTest();
-        RenderUtils.getBlocksInRange(renderRadius)
-                .filter(pos -> level.getBlockState(pos).is(Registry.ADVANCED_NOTEBLOCK))
+        RenderUtils.getBlocksInRange(renderRadius, pos -> level.getBlockState(pos).is(Registry.ADVANCED_NOTEBLOCK))
                 .forEach(pos -> renderNoteBlockInfo(e, pos, level.getBlockState(pos), info));
         RenderSystem.enableDepthTest();
     }
@@ -59,7 +59,7 @@ public class ANBInfoRender {
         matrix.mulPose(Axis.YP.rotationDegrees(-90.0F));
         Matrix4f positionMatrix = matrix.last().pose();
 
-        int resolution = (Math.max(24 - (int) RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, pos) * 2, 8));
+        int resolution = ClientConfig.LOW_RESOLUTION_RENDER.get() ? 4 : (Math.max(24 - (int) RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, pos) * 2, 8));
         RenderUtils.renderFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.SEE_THROUGH_TRIANGLES), color, scale, alpha, resolution);
 
         matrix.popPose();

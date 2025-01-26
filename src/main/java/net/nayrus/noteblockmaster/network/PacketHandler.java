@@ -17,7 +17,8 @@ import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
 import net.nayrus.noteblockmaster.network.payload.CoreUpdate;
 import net.nayrus.noteblockmaster.network.payload.TickSchedule;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
-import net.nayrus.noteblockmaster.setup.Config;
+import net.nayrus.noteblockmaster.setup.config.ClientConfig;
+import net.nayrus.noteblockmaster.setup.config.StartupConfig;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -60,13 +61,26 @@ public class PacketHandler {
     }
 
     private static void handleActionPing(final ActionPing packet, final IPayloadContext context){
-        //noinspection SwitchStatementWithTooFewBranches
         switch(ActionPing.Action.values()[packet.action()]){
             case SAVE_STARTUP_CONFIG -> {
-                if(!Config.UPDATED) {
-                    Config.updateStartUpAndSave();
+                if(!StartupConfig.UPDATED) {
+                    StartupConfig.updateStartUpAndSave();
                     context.player().sendSystemMessage(Component.literal("Updated local configs. Restart your client to apply.")
                             .withColor(Color.GREEN.darker().getRGB()));
+                }
+            }
+            case ACTIVATE_LOW_RES_RENDER -> {
+                if(ClientConfig.LOW_RESOLUTION_RENDER.isFalse()) {
+                    ClientConfig.LOW_RESOLUTION_RENDER.set(true);
+                    context.player().sendSystemMessage(Component.literal("Activated low resolution render to save fps"));
+                    ClientConfig.CLIENT.save();
+                }
+            }
+            case DEACTIVATE_LOW_RES_RENDER -> {
+                if(ClientConfig.LOW_RESOLUTION_RENDER.isTrue()){
+                    ClientConfig.LOW_RESOLUTION_RENDER.set(false);
+                    context.player().sendSystemMessage(Component.literal("Low resolution render deactivated"));
+                    ClientConfig.CLIENT.save();
                 }
             }
         }

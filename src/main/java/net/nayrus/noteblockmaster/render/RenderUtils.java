@@ -11,9 +11,11 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.utils.Utils;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.awt.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class RenderUtils {
@@ -28,8 +30,8 @@ public class RenderUtils {
         float dX = Math.abs(midX - startX), dZ = Math.abs(midX - startX);
 
         for(int i = 0; i < resolution; i++){
-            float w1 = (i / (float)resolution) * Utils.PI * 2;
-            float w2 = ((i + 1) /(float)resolution) * Utils.PI * 2;
+            float w1 = (i / (float)resolution) * Utils.PI * 2 + Utils.PI * 0.25F;
+            float w2 = ((i + 1) /(float)resolution) * Utils.PI * 2 + Utils.PI * 0.25F;
             //Top
             builder.addVertex(matrix, midX, endY, midZ).setColor(red, green, blue, alpha);
             builder.addVertex(matrix, midX + dX * Mth.cos(w1), endY, midZ + dZ * Mth.sin(w1)).setColor(red, green, blue, alpha);
@@ -50,14 +52,14 @@ public class RenderUtils {
         float R = radius * scale;
 
         for(int i = 0; i< resolution / 2; i++) {
-            float w1 = (i / (float) resolution) * Utils.PI * 2 + radialOffset;
-            float w2 = ((i + 1) / (float) resolution) * Utils.PI * 2 + radialOffset;
+            float w1 = (i / (float) resolution) * Utils.PI * 2 + radialOffset + Utils.PI * 0.25F;
+            float w2 = ((i + 1) / (float) resolution) * Utils.PI * 2 + radialOffset + Utils.PI * 0.25F;
             float cos1 = Mth.cos(w1), cos2 = Mth.cos(w2);
             float sin1 = Mth.sin(w1), sin2 = Mth.sin(w2);
 
             for (int k = 0; k < resolution; k++) {
-                float w3 = (k / (float) resolution) * Utils.PI * 2;
-                float w4 = ((k + 1) / (float) resolution) * Utils.PI * 2;
+                float w3 = (k / (float) resolution) * Utils.PI * 2 + Utils.PI * 0.25F;
+                float w4 = ((k + 1) / (float) resolution) * Utils.PI * 2 + Utils.PI * 0.25F;
                 float cos3 = Mth.cos(w3), cos4 = Mth.cos(w4);
                 float sin3 = Mth.sin(w3), sin4 = Mth.sin(w4);
 
@@ -102,12 +104,12 @@ public class RenderUtils {
         return getStableEyeCenter(Minecraft.getInstance().gameRenderer.getMainCamera());
     }
 
-    public static Stream<BlockPos> getBlocksInRange(int renderRadius){
+    public static Stream<BlockPos> getBlocksInRange(int renderRadius, Predicate<BlockPos> additionalPredicate){
         Camera cam = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 lookVec = new Vec3(cam.getLookVector());
         Vec3 blockCenter = getStableEyeCenter(cam);
         return BlockPos.betweenClosedStream(new AABB(blockCenter.add(Utils.sphereVec(-renderRadius)), blockCenter.add(Utils.sphereVec(renderRadius))))
-                .filter(pos -> isInRenderRange(pos, blockCenter, lookVec, cam.isDetached(), renderRadius));
+                .filter(pos -> isInRenderRange(pos, blockCenter, lookVec, cam.isDetached(), renderRadius) && additionalPredicate.test(pos));
     }
 
     public static double distanceVecToBlock(Vec3 vPos, BlockPos pos){
@@ -129,4 +131,8 @@ public class RenderUtils {
         return (skyLight << 4) | blockLight;
     }
 
+    public static boolean eventOnRelevantStage(RenderLevelStageEvent e) {
+        RenderLevelStageEvent.Stage stage = e.getStage();
+        return stage == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS || stage == RenderLevelStageEvent.Stage.AFTER_WEATHER;
+    }
 }

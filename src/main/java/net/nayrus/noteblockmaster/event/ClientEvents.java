@@ -43,10 +43,10 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void renderBlockOverlays(RenderLevelStageEvent e){
-        RenderUtils.CURRENT_CAM_POS = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        if(!(RenderUtils.eventOnRelevantStage(e))) return;
+        if(!(Minecraft.getInstance().player instanceof Player player)) return;
 
-        Player player = Minecraft.getInstance().player;
-        if(player == null) return;
+        RenderUtils.CURRENT_CAM_POS = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         Level level = player.level();
 
         if(e.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER) {
@@ -63,7 +63,6 @@ public class ClientEvents {
                 player.displayClientMessage(Component.literal("Repeater delay: " + cData.preDelay()).withColor(Color.RED.darker().getRGB()), true);
             }
         }
-
         CoreRender.renderCoresInRange(e, level);
     }
 

@@ -31,7 +31,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
-import net.nayrus.noteblockmaster.setup.Config;
+import net.nayrus.noteblockmaster.setup.config.StartupConfig;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.AdvancedInstrument;
@@ -70,11 +70,11 @@ public class AdvancedNoteBlock extends Block
     }
 
     public static void loadPropertiesFromConfig(final NewRegistryEvent ignoredEvent){
-        SUBTICK_LENGTH = Config.SUBTICK_LENGTH.get();
+        SUBTICK_LENGTH = StartupConfig.SUBTICK_LENGTH.get();
         SUBTICKS = (int) (100.0F / SUBTICK_LENGTH);
         SUBTICK = IntegerProperty.create("subtick",0, SUBTICKS - 1);
-        MIN_NOTE_VAL = Config.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.LOWER_NOTE_LIMIT.get(), false) : (int) Config.LOWER_NOTE_LIMIT.get();
-        MAX_NOTE_VAL = Config.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) Config.HIGHER_NOTE_LIMIT.get(), false) : (int) Config.HIGHER_NOTE_LIMIT.get();
+        MIN_NOTE_VAL = StartupConfig.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) StartupConfig.LOWER_NOTE_LIMIT.get(), false) : (int) StartupConfig.LOWER_NOTE_LIMIT.get();
+        MAX_NOTE_VAL = StartupConfig.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) StartupConfig.HIGHER_NOTE_LIMIT.get(), false) : (int) StartupConfig.HIGHER_NOTE_LIMIT.get();
         NOTE = IntegerProperty.create("note", MIN_NOTE_VAL, MAX_NOTE_VAL);
 
         TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;

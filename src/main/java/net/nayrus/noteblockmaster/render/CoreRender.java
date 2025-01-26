@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.TuningCore;
 import net.nayrus.noteblockmaster.network.payload.TickSchedule;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -33,19 +34,8 @@ public class CoreRender {
     public static void renderCoresInRange(RenderLevelStageEvent e, Level level){
         Vec3 camCenter = RenderUtils.getStableEyeCenter(Minecraft.getInstance().gameRenderer.getMainCamera());
         RenderLevelStageEvent.Stage stage = e.getStage();
-        if(stage == AFTER_LEVEL){
-            OFFSET_ON_POS.entrySet().removeIf(entry -> {
-                BlockPos pos = entry.getKey();
-                if (!level.getBlockState(pos).is(Registry.TUNINGCORE)){
-                    PacketDistributor.sendToServer(new TickSchedule(pos, 0));
-                    return true;
-                }
-                return false;
-            });
-        }
-        if(stage == AFTER_TRANSLUCENT_BLOCKS || stage == AFTER_WEATHER) {
-            RenderUtils.getBlocksInRange(RANGE)
-                    .filter(pos -> level.getBlockState(pos).is(Registry.TUNINGCORE))
+        if(stage == AFTER_TRANSLUCENT_BLOCKS || (stage == AFTER_WEATHER && !ClientConfig.LOW_RESOLUTION_RENDER.get())) {
+            RenderUtils.getBlocksInRange(RANGE, pos -> level.getBlockState(pos).is(Registry.TUNINGCORE))
                     .forEach(pos -> {
                         long renderTime;
                         if(stage == AFTER_TRANSLUCENT_BLOCKS){
@@ -55,7 +45,16 @@ public class CoreRender {
                         renderCore(level, pos, level.getBlockState(pos), e.getPoseStack(), stage, Utils.exponentialFloor(0.5F, RANGE, (float) RenderUtils.distanceVecToBlock(camCenter, pos), 2), renderTime);
                     });
         }
-
+        if(stage == AFTER_WEATHER){
+            OFFSET_ON_POS.entrySet().removeIf(entry -> {
+                BlockPos pos = entry.getKey();
+                if (!level.getBlockState(pos).is(Registry.TUNINGCORE)){
+                    PacketDistributor.sendToServer(new TickSchedule(pos, 0));
+                    return true;
+                }
+                return false;
+            });
+        }
     }
 
     public static void renderCore(Level level, BlockPos pos, BlockState state, PoseStack stack, RenderLevelStageEvent.Stage stage, float alpha, long time){
@@ -94,10 +93,14 @@ public class CoreRender {
         matrix.mulPose(Axis.YP.rotationDegrees(-90.0F));
         Matrix4f positionMatrix = matrix.last().pose();
 
-        float offset = Utils.getRotationToX(pos.getCenter().subtract(RenderUtils.CURRENT_CAM_POS));
-        int resolution = (Math.max(32 - (int) RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, pos) * 4, 16));
-        RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius,
-                stage == AFTER_WEATHER ? offset :(offset + Utils.PI), alpha, resolution%2==0 ? resolution : resolution-1);
+        if(!ClientConfig.LOW_RESOLUTION_RENDER.get()) {
+            float offset = Utils.getRotationToX(pos.getCenter().subtract(RenderUtils.CURRENT_CAM_POS));
+            int resolution = (Math.max(32 - (int) RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, pos) * 4, 16));
+            RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius,
+                    stage == AFTER_WEATHER ? offset : (offset + Utils.PI), alpha, resolution % 2 == 0 ? resolution : resolution - 1);
+        }else{
+            RenderUtils.buildTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius, alpha, 4);
+        }
 
         matrix.popPose();
     }

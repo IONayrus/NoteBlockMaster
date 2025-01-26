@@ -12,7 +12,8 @@ import net.nayrus.noteblockmaster.event.ClientEvents;
 import net.nayrus.noteblockmaster.event.CommonEvents;
 import net.nayrus.noteblockmaster.event.ServerEvents;
 import net.nayrus.noteblockmaster.network.PacketHandler;
-import net.nayrus.noteblockmaster.setup.Config;
+import net.nayrus.noteblockmaster.setup.config.ClientConfig;
+import net.nayrus.noteblockmaster.setup.config.StartupConfig;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.nayrus.noteblockmaster.utils.KeyBindings;
@@ -42,7 +43,8 @@ public class NoteBlockMaster
 
     public NoteBlockMaster(IEventBus modEventBus, ModContainer modContainer)
     {
-        modContainer.registerConfig(ModConfig.Type.STARTUP, Config.START_UP);
+        modContainer.registerConfig(ModConfig.Type.STARTUP, StartupConfig.START_UP);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT);
         SoundRegistry.SOUND_EVENTS.register(modEventBus);
         TuningCore.loadSustainProperty();
 
