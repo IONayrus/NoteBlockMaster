@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.TuningCore;
 import net.nayrus.noteblockmaster.network.payload.TickSchedule;
+import net.nayrus.noteblockmaster.render.utils.GeometryBuilder;
+import net.nayrus.noteblockmaster.render.utils.RenderUtils;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -96,10 +98,10 @@ public class CoreRender {
         if(!ClientConfig.LOW_RESOLUTION_RENDER.get()) {
             float offset = Utils.getRotationToX(pos.getCenter().subtract(RenderUtils.CURRENT_CAM_POS));
             int resolution = (Math.max(32 - (int) RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, pos) * 4, 16));
-            RenderUtils.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius,
+            GeometryBuilder.buildHalfTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius,
                     stage == AFTER_WEATHER ? offset : (offset + Utils.PI), alpha, resolution % 2 == 0 ? resolution : resolution - 1);
         }else{
-            RenderUtils.buildTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius, alpha, 4);
+            GeometryBuilder.buildTorus(positionMatrix, buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), color, scale, radius, innerRadius, alpha, 4);
         }
 
         matrix.popPose();

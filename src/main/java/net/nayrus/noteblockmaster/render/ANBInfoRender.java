@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.render.utils.GeometryBuilder;
+import net.nayrus.noteblockmaster.render.utils.RenderUtils;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -60,7 +62,7 @@ public class ANBInfoRender {
         Matrix4f positionMatrix = matrix.last().pose();
 
         int resolution = ClientConfig.LOW_RESOLUTION_RENDER.get() ? 4 : (Math.max(24 - (int) RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, pos) * 2, 8));
-        RenderUtils.renderFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.SEE_THROUGH_TRIANGLES), color, scale, alpha, resolution);
+        GeometryBuilder.buildFlippedCone(positionMatrix, buffer.getBuffer(NBMRenderType.SEE_THROUGH_TRIANGLES), color, scale, alpha, resolution);
 
         matrix.popPose();
     }

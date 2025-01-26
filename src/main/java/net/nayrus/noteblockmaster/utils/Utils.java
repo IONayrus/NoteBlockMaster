@@ -89,4 +89,8 @@ public class Utils {
         if(hand.equals(InteractionHand.MAIN_HAND)) return InteractionResult.SUCCESS;
         if(client) player.swing(hand); return  InteractionResult.CONSUME;
     }
+
+    public static float normalizeAngle(float angle) {
+        return (angle % (2 * (float) Math.PI) + (2 * (float) Math.PI)) % (2 * (float) Math.PI);
+    }
 }

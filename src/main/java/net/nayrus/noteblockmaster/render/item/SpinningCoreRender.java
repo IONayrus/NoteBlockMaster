@@ -7,8 +7,9 @@ import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.nayrus.noteblockmaster.render.utils.GeometryBuilder;
 import net.nayrus.noteblockmaster.render.NBMRenderType;
-import net.nayrus.noteblockmaster.render.RenderUtils;
+import net.nayrus.noteblockmaster.render.utils.RenderUtils;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
@@ -52,13 +53,13 @@ public class SpinningCoreRender extends BaseItemRender{
         matrix.pushPose();
         matrix.rotateAround(Axis.YP.rotation(Util.getMillis()/1500F),0.5F,0F,-0.5F);
         matrix.rotateAround(Axis.XP.rotation(Util.getMillis()/700F),0F,0.5F,-0.5F);
-        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), baseColor, scale, 0.7F, 0.08F, alpha, 32);
+        GeometryBuilder.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), baseColor, scale, 0.7F, 0.08F, alpha, 32);
         matrix.popPose();
         matrix.pushPose();
         matrix.rotateAround(Axis.XP.rotation(Util.getMillis()/8000F),0F,0.5F,-0.5F);
         //matrix.rotateAround(Axis.YP.rotation(Util.getMillis()/8000F),0.5F,0F,-0.5F);
         matrix.rotateAround(Axis.ZP.rotation(Util.getMillis()/300F),0.5F,0.5F,0F);
-        RenderUtils.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), baseColor, scale, 0.5F, 0.08F, alpha, 32);
+        GeometryBuilder.buildTorus(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), baseColor, scale, 0.5F, 0.08F, alpha, 32);
         matrix.popPose();
     }
 
