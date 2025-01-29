@@ -36,7 +36,7 @@ public class MainCommand {
                     if(FMLEnvironment.dist != Dist.DEDICATED_SERVER){
                         if(!StartupConfig.UPDATED) {
                             StartupConfig.updateStartUpAndSave();
-                            context.getSource().sendSuccess(() -> Component.literal("Updated local configs. Restart your client to apply.")
+                            context.getSource().sendSuccess(() -> Component.translatable("text.config.updated")
                                     .withColor(Color.GREEN.darker().getRGB()), true);
                         }
                     }else{
@@ -54,7 +54,7 @@ public class MainCommand {
                                 boolean activate = BoolArgumentType.getBool(context, "activate");
                                 if(ClientConfig.LOW_RESOLUTION_RENDER.get() != activate) {
                                     ClientConfig.LOW_RESOLUTION_RENDER.set(activate);
-                                    context.getSource().sendSuccess(() -> Component.literal(activate ? "Activated low resolution render to save fps" : "Low resolution render deactivated"), true);
+                                    context.getSource().sendSuccess(() -> Component.translatable(activate ? "text.lowres.enable" : "text.lowres.disable"), true);
                                     ClientConfig.CLIENT.save();
                                 }
                             }else{
@@ -67,7 +67,7 @@ public class MainCommand {
                     if(FMLEnvironment.dist != Dist.DEDICATED_SERVER){
                         if(ClientConfig.LOW_RESOLUTION_RENDER.isFalse()) {
                             ClientConfig.LOW_RESOLUTION_RENDER.set(true);
-                            context.getSource().sendSuccess(() -> Component.literal("Activated low resolution render to save fps"), true);
+                            context.getSource().sendSuccess(() -> Component.translatable("text.lowres.enable"), true);
                             ClientConfig.CLIENT.save();
                         } else{
                             if(context.getSource().getPlayer() instanceof ServerPlayer player) ActionPing.sendActionPing(player, ActionPing.Action.ACTIVATE_LOW_RES_RENDER);

@@ -65,21 +65,21 @@ public class PacketHandler {
             case SAVE_STARTUP_CONFIG -> {
                 if(!StartupConfig.UPDATED) {
                     StartupConfig.updateStartUpAndSave();
-                    context.player().sendSystemMessage(Component.literal("Updated local configs. Restart your client to apply.")
+                    context.player().sendSystemMessage(Component.translatable("text.config.updated")
                             .withColor(Color.GREEN.darker().getRGB()));
                 }
             }
             case ACTIVATE_LOW_RES_RENDER -> {
                 if(ClientConfig.LOW_RESOLUTION_RENDER.isFalse()) {
                     ClientConfig.LOW_RESOLUTION_RENDER.set(true);
-                    context.player().sendSystemMessage(Component.literal("Activated low resolution render to save fps"));
+                    context.player().sendSystemMessage(Component.translatable("text.lowres.enable"));
                     ClientConfig.CLIENT.save();
                 }
             }
             case DEACTIVATE_LOW_RES_RENDER -> {
                 if(ClientConfig.LOW_RESOLUTION_RENDER.isTrue()){
                     ClientConfig.LOW_RESOLUTION_RENDER.set(false);
-                    context.player().sendSystemMessage(Component.literal("Low resolution render deactivated"));
+                    context.player().sendSystemMessage(Component.translatable("text.lowres.disable"));
                     ClientConfig.CLIENT.save();
                 }
             }

@@ -27,6 +27,11 @@ public class NBMLangProvider extends LanguageProvider {
         add("key.noteblockmaster.openoffhandgui", "Open Offhand GUI");
         //add(SoundRegistry.SMITHING.get().getLocation().toLanguageKey("sounds"), "Note block upgraded");
         addSounds();
+        add("text.config.updated", "Updated local configs. Restart your client to apply");
+        add("text.lowres.enable", "Activated low resolution render to save fps");
+        add("text.lowres.disable", "Low resolution render deactivated");
+        add("text.config.desync_warning", "[WARNING] Advanced Note Block info render may be partially disabled. Click here to synchronize your local config with the server.");
+        add("text.config.save_sync_hovertext", "Synchronize & Safe conig");
     }
 
     public void addSounds(){
