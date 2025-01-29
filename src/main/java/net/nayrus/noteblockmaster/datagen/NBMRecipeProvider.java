@@ -32,11 +32,11 @@ public class NBMRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern(" W ")
                 .define('N', Tags.Items.NUGGETS_GOLD).define('B', Items.NOTE_BLOCK).define('W', NBMTags.Items.TUNERS)
                 .unlockedBy("has_waker", has(Registry.TEMPOTUNER)).save(recipeOutput);
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registry.CORE, 8)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registry.CORE, 9)
                 .pattern("BIB")
                 .pattern("IEI")
                 .pattern("TIN")
-                .define('I', Tags.Items.NUGGETS_IRON).define('E', Items.ENDER_PEARL).define('B', Items.BLAZE_POWDER)
+                .define('I', Tags.Items.INGOTS_IRON).define('E', Items.ENDER_PEARL).define('B', Items.BLAZE_POWDER)
                 .define('T', Registry.TEMPOTUNER).define('N', Registry.NOTETUNER)
                 .unlockedBy("has_waker", has(Registry.TEMPOTUNER)).save(recipeOutput);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registry.SUSTAIN, 4)

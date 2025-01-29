@@ -64,24 +64,24 @@ public class CoreBaseRender extends BaseItemRender {
         renderBaseRings(matrix, buffer, 0.45F, packedLight, 32);
     }
 
-    private static final CircularColorGradient innerGradient;
-    private static final CircularColorGradient middleGradient;
-    private static final CircularColorGradient outerGradient;
+    public static final CircularColorGradient ENDER_GRADIENT;
+    public static final CircularColorGradient IRON_GRADIENT;
+    public static final CircularColorGradient BLAZE_GRADIENT;
 
     public static void renderBaseRings(PoseStack matrix, MultiBufferSource buffer, float scale, int packedLight, int resolution){
         matrix.pushPose();
         matrix.rotateAround(Axis.YP.rotation(Util.getMillis()/600F), 0.5F,0,-0.5F);
         matrix.rotateAround(Axis.ZP.rotation(Mth.sin(Util.getMillis()/600F)*Mth.cos(Util.getMillis()/-600F)/10), 0.5F,0.5F,0);
-        GeometryBuilder.buildTorusWithGradient(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), scale, 0.45F, 0.045F, 0, resolution, innerGradient);
+        GeometryBuilder.buildTorusWithGradient(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), scale, 0.45F, 0.045F, 0, resolution, ENDER_GRADIENT);
         matrix.popPose();
         matrix.pushPose();
         matrix.rotateAround(Axis.YP.rotation(Util.getMillis()/-3000F), 0.5F,0,-0.5F);
-        GeometryBuilder.buildTorusWithGradient(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), scale, 0.6F, 0.11F, 0, resolution, middleGradient);
+        GeometryBuilder.buildTorusWithGradient(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), scale, 0.6F, 0.11F, 0, resolution, IRON_GRADIENT);
         matrix.popPose();
         matrix.pushPose();
         matrix.rotateAround(Axis.YP.rotation(Util.getMillis()/-700F), 0.5F,0,-0.5F);
         matrix.rotateAround(Axis.ZP.rotation(Mth.sin(Util.getMillis()/-700F)*Mth.cos(Util.getMillis()/700F)/10), 0.5F,0.5F,0);
-        GeometryBuilder.buildTorusWithGradient(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), scale, 0.75F, 0.045F, 0, resolution, outerGradient);
+        GeometryBuilder.buildTorusWithGradient(matrix.last().pose(), buffer.getBuffer(NBMRenderType.TRANSLUCENT_QUADS), scale, 0.75F, 0.045F, 0, resolution, BLAZE_GRADIENT);
         matrix.popPose();
     }
 
@@ -103,7 +103,7 @@ public class CoreBaseRender extends BaseItemRender {
         Color blazeGold = new Color(255, 224,0, alpha);
         Color blazeYellow = new Color(255,254, 49, alpha);
         Color blazeWhite = new Color(255,255,181, alpha);
-        innerGradient = new CircularColorGradient.Builder()
+        ENDER_GRADIENT = new CircularColorGradient.Builder()
                 .addColor(point[0], ender)
                 .addColor(point[2], enderDarker)
                 .addColor(point[5], enderDark)
@@ -123,7 +123,7 @@ public class CoreBaseRender extends BaseItemRender {
                 .addColor(point[29], enderWhite)
                 .addColor(point[31], enderDark)
                 .build();
-        middleGradient = new CircularColorGradient.Builder()
+        IRON_GRADIENT = new CircularColorGradient.Builder()
                 .addColor(point[0], iron)
                 .addColor(point[6], iron)
                 .addColor(point[8], ironWhite)
@@ -139,7 +139,7 @@ public class CoreBaseRender extends BaseItemRender {
                 .addColor(point[29], ironGray)
                 .addColor(point[31], ironGray)
                 .build();
-        outerGradient = new CircularColorGradient.Builder()
+        BLAZE_GRADIENT = new CircularColorGradient.Builder()
                 .addColor(point[1], blazeWhite)
                 .addColor(point[2], blazeOrange)
                 .addColor(point[4], blazeYellow)

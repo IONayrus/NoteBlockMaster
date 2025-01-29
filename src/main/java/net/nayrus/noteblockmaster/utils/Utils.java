@@ -55,8 +55,9 @@ public class Utils {
     }
 
     public static void removeItemsFromInventory(Inventory inv, Item item, int amount){
+        if(amount<=0) return;
         int removed = 0;
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = inv.getContainerSize() - 1; i >=0 ; i--) {
             ItemStack itemstack = inv.getItem(i);
             if (itemstack.getItem().equals(item)) {
                 removed += inv.removeItem(i, amount - removed).getCount();

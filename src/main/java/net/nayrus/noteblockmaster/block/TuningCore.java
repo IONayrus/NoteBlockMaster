@@ -4,11 +4,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -21,13 +24,14 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.screen.CoreScreen;
 import net.nayrus.noteblockmaster.setup.NBMTags;
@@ -77,10 +81,35 @@ public class TuningCore extends TransparentBlock {
     }
 
     @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        ItemStack weapon = player.getWeaponItem();
+        if(weapon.is(NBMTags.Items.TUNERS) || weapon.is(Items.IRON_NUGGET)){
+            if(!player.getInventory().contains(item ->{
+                if(!item.is(Items.IRON_NUGGET)) return false;
+                if(isMixing(state) && isSustaining(state)) {
+                    if(item.getCount() >= 2) return true;
+                    this.attack(state, level, pos, player); //TODO Code better hit logic
+                    return false;
+                }
+                return item.getCount() >= 1;
+            })) return false;
+        }
+        //TODO Cancel block break sounds,
+        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+    }
+
+    @Override
+    protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
+        super.attack(state, level, pos, player);
+    }
+
+    @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if(!(context instanceof EntityCollisionContext eCon) || eCon.equals(CollisionContext.empty())) return COLLISION;
-        if(eCon.getEntity() instanceof Player player
-                && FinalTuple.getHeldItems(player).contains(TunerItem.class, SpinningCore.class)) return COLLISION;
+        if(eCon.getEntity() instanceof Player player) {
+            FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
+            if (items.contains(TunerItem.class) || items.contains(Items.IRON_NUGGET)) return COLLISION;
+        }
         return Shapes.empty();
     }
 
@@ -93,15 +122,28 @@ public class TuningCore extends TransparentBlock {
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if(!level.getBlockState(pos.below()).is(Registry.ADVANCED_NOTEBLOCK))
-            level.destroyBlock(pos, true);
+        if(!level.getBlockState(pos.below()).is(Registry.ADVANCED_NOTEBLOCK)){
+            if(!(level.getNearestPlayer(pos.getX(), pos.getY(), pos.getZ(), 8, true) instanceof Player player)) level.destroyBlock(pos, false);
+            else level.destroyBlock(pos, true, player);
+        }
     }
 
     @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
-        List<ItemStack> drops = new ArrayList<>();
-        if(isMixing(state)) drops.add(new ItemStack(Registry.VOLUME.get()));
-        if(isSustaining(state)) drops.add(new ItemStack(Registry.SUSTAIN.get()));
+        final List<ItemStack> drops = new ArrayList<>();
+        final List<ItemStack> cores = List.of(new ItemStack(Registry.VOLUME.get()), new ItemStack(Registry.SUSTAIN.get()));
+        boolean mixing = isMixing(state);
+        boolean sustaining = isSustaining(state);
+        if(params.getOptionalParameter(LootContextParams.THIS_ENTITY) instanceof Player player){
+            Inventory inv = player.getInventory();
+            int nugCount = inv.countItem(Items.IRON_NUGGET);
+            if((mixing && sustaining) && nugCount >= 2) drops.addAll(cores);
+            else if(nugCount >= 1) drops.add(mixing ? cores.getFirst() : cores.getLast());
+            Utils.removeItemsFromInventory(inv, Items.IRON_NUGGET, drops.size());
+        }else {
+            if (mixing) drops.add(cores.getFirst());
+            if (sustaining) drops.add(cores.getLast());
+        }
         return drops;
     }
 
@@ -123,6 +165,21 @@ public class TuningCore extends TransparentBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if(stack.is(Items.IRON_NUGGET)){
+            if (!level.isClientSide()) return ItemInteractionResult.SUCCESS;
+            if(stack.getCount() >= 2) level.destroyBlock(pos, !player.isCreative(), player);
+            else if(!(isSustaining(state) && isMixing(state))) level.destroyBlock(pos, !player.isCreative(), player);
+            else {
+                boolean sus = isSustaining(state) && hand == InteractionHand.MAIN_HAND;
+                level.setBlockAndUpdate(pos, state.setValue(sus ? SUSTAIN : VOLUME, 0));
+                if(!player.isCreative()){
+                    Block.popResource(level, pos, sus ? new ItemStack(Registry.SUSTAIN.get()) : new ItemStack(Registry.VOLUME.get()));
+                    level.playSound(null, pos, CORE_SOUNDS.getBreakSound(), SoundSource.BLOCKS, 1,0.8F);
+                    Utils.removeItemsFromInventory(player.getInventory(), Items.IRON_NUGGET, 1);
+                }
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
         if(!(stack.is(NBMTags.Items.TUNERS) || (stack.is(NBMTags.Items.CORES)))) return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         BlockState anb = level.getBlockState(pos.below());
         if(!anb.is(Registry.ADVANCED_NOTEBLOCK)){

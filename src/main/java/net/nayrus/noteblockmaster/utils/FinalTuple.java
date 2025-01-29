@@ -40,6 +40,11 @@ public class FinalTuple<A, B> {
             return false;
         }
 
+        public final boolean contains(Item... items){
+            for(Item i : items) if(getA().is(i) || getB().is(i)) return true;
+            return false;
+        }
+
         public ItemStack getFirst(Item item){
             if(getA().is(item)) return getA();
             if(getB().is(item)) return getB();

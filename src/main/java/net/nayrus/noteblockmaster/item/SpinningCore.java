@@ -4,9 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,6 +44,7 @@ public class SpinningCore extends Item {
             state = Registry.TUNINGCORE.get().defaultBlockState();
             level.setBlockAndUpdate(pos.above(), stack.is(Registry.SUSTAIN) ? state.setValue(TuningCore.SUSTAIN, instrument.getSustains()) : state.setValue(TuningCore.VOLUME, 20));
             stack.shrink(1);
+            addIronNugget(player);
             level.playSound(null, pos, TuningCore.CORE_SOUNDS.getPlaceSound(), SoundSource.BLOCKS);
             if(hand.equals(InteractionHand.MAIN_HAND)) return InteractionResult.SUCCESS;
             return InteractionResult.CONSUME;
@@ -61,7 +64,16 @@ public class SpinningCore extends Item {
             level.setBlockAndUpdate(pos, state.setValue(TuningCore.VOLUME, 20));
         }
         stack.shrink(1);
+        addIronNugget(player);
         level.playSound(null, pos, TuningCore.CORE_SOUNDS.getPlaceSound(), SoundSource.BLOCKS);
         return Utils.swingHelper(player, hand, false);
+    }
+
+    private static void addIronNugget(Player player){
+        if(player.isCreative()) return;
+        Inventory inv = player.getInventory();
+        ItemStack nugget = new ItemStack(Items.IRON_NUGGET);
+        if(inv.getFreeSlot() == -1 && inv.getSlotWithRemainingSpace(nugget) == -1) player.drop(nugget, false, false);
+        else player.getInventory().add(new ItemStack(Items.IRON_NUGGET));
     }
 }
