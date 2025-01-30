@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,7 +44,7 @@ import net.neoforged.neoforge.common.util.DeferredSoundType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TuningCore extends TransparentBlock {
+public class TuningCore extends TransparentBlock{
 
     public static int SUSTAIN_MAXVAL = 1;
     public static final IntegerProperty VOLUME = IntegerProperty.create("volume",0,20);
@@ -55,7 +56,7 @@ public class TuningCore extends TransparentBlock {
 
     public TuningCore() {
         super(BlockBehaviour.Properties.of()
-                .instabreak()
+                .destroyTime(0.04F) //TODO maybe try this instabreak without breaking drops
                 .noCollission()
                 .noOcclusion()
                 .sound(CORE_SOUNDS)
@@ -73,6 +74,11 @@ public class TuningCore extends TransparentBlock {
 
     public static void loadSustainProperty(){
         SUSTAIN = IntegerProperty.create("sustain",0, SUSTAIN_MAXVAL);
+    }
+
+    @Override
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
     }
 
     @Override
@@ -97,7 +103,7 @@ public class TuningCore extends TransparentBlock {
             if(hasStackEnoughIronToDestroy(weapon, state)) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
             if(player.getInventory().countItem(Items.IRON_NUGGET) > 0) {
                 if (!level.isClientSide()) removeOneCore(state, level, pos, player, false);
-                return false;       //TODO If hit with one ingot, it will stil remove the block/both cores
+                return false;
             }
             return false;
         }
@@ -123,7 +129,7 @@ public class TuningCore extends TransparentBlock {
     protected boolean hasStackEnoughIronToDestroy(ItemStack item, BlockState state){
         if(!item.is(Items.IRON_NUGGET)) return false;
         if(item.getCount() >= 2) return true;
-        return !(isMixing(state) && isSustaining(state));
+        return !(isMixing(state) && isSustaining(state)) && item.getCount() == 1;
     }
 
     @Override

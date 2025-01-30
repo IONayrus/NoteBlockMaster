@@ -9,23 +9,14 @@ import net.minecraft.world.level.block.Block;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 
 public class NBMTags {
+
     public static class Blocks {
-
-        public static final TagKey<Block> NBM_BLOCKS = createTag("nbmaster_noteblock");
-
-        private static TagKey<Block> createTag(String name) {
-            return BlockTags.create(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, name));
-        }
+        public static final TagKey<Block> NBM_BLOCKS = BlockTags.create(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "nbmaster_noteblock"));
     }
 
     public static class Items {
-        public static final TagKey<Item> TUNERS = createTag("noteblocktuners");
-        public static final TagKey<Item> CORES = createTag("noteblockcores");
-        public static final TagKey<Item> CORE_DESTROY = createTag("core_destroy");
-
-
-        private static TagKey<Item> createTag(String name) {
-            return ItemTags.create(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, name));
-        }
+        public static final TagKey<Item> TUNERS = ItemTags.create(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "noteblocktuners"));
+        public static final TagKey<Item> CORES = ItemTags.create(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "noteblockcores"));
+        public static final TagKey<Item> CORE_DESTROY = ItemTags.create(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "core_destroy"));
     }
 }
