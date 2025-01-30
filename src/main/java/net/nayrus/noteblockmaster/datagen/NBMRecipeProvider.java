@@ -40,10 +40,10 @@ public class NBMRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('T', Registry.TEMPOTUNER).define('N', Registry.NOTETUNER)
                 .unlockedBy("has_waker", has(Registry.TEMPOTUNER)).save(recipeOutput);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registry.SUSTAIN, 4)
-                .pattern(" R ")
+                .pattern(" L ")
                 .pattern("BCB")
-                .pattern(" R ")
-                .define('C', Registry.CORE).define('B', Items.BLUE_DYE).define('R', Items.REDSTONE)
+                .pattern(" L ")
+                .define('C', Registry.CORE).define('B', Items.BLUE_DYE).define('L', Items.LAPIS_LAZULI)
                 .unlockedBy("has_core", has(Registry.CORE)).save(recipeOutput);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registry.VOLUME, 4)
                 .pattern(" W ")

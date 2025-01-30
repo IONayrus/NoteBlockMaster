@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.TuningCore;
 import net.nayrus.noteblockmaster.network.payload.TickSchedule;
+import net.nayrus.noteblockmaster.render.item.SpinningCoreRender;
 import net.nayrus.noteblockmaster.render.utils.GeometryBuilder;
 import net.nayrus.noteblockmaster.render.utils.RenderUtils;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -30,7 +31,6 @@ public class CoreRender {
 
     public static Map<BlockPos, Float> OFFSET_ON_POS = new HashMap<>();
     public static Map<BlockPos, Long> LAST_STAGE_TIME = new HashMap<>();
-    private static final Color SUSTAIN_BASECOLOR = RenderUtils.shiftColor(Color.BLUE, Color.GREEN, 0.33F);
     public static int RANGE = 20;
 
     public static void renderCoresInRange(RenderLevelStageEvent e, Level level){
@@ -70,16 +70,16 @@ public class CoreRender {
             int steps = (int)(100.0 * (5 - 4 * (1 / (18.0 / (19 - volume)))));
             float animation = (anime % steps) / (steps * 2.0F);
             float halfShift = (animation + 0.25F) % 0.5F;
-            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(Color.DARK_GRAY, Color.WHITE, getAlphaFactor(animation)), pos, pos.getY() - 0.45F, 0.5F, alpha * getAlphaFactor(animation), 1 - animation * 1.8F, 0.05F);
-            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(Color.DARK_GRAY, Color.WHITE, getAlphaFactor(halfShift)), pos, pos.getY() - 0.45F, 0.5F, alpha * getAlphaFactor(halfShift), 1 - halfShift * 1.8F, 0.05F);
+            renderTorus(buffer, stack, stage, RenderUtils.applyAlpha(SpinningCoreRender.WOOL_COLOR, 1), pos, pos.getY() - 0.45F, 0.5F, alpha * getAlphaFactor(animation), 1 - animation * 1.8F, 0.05F);
+            renderTorus(buffer, stack, stage, RenderUtils.applyAlpha(SpinningCoreRender.WOOL_COLOR, 1), pos, pos.getY() - 0.45F, 0.5F, alpha * getAlphaFactor(halfShift), 1 - halfShift * 1.8F, 0.05F);
         }
         if(TuningCore.isSustaining(state)){
             int sustain = state.getValue(TuningCore.SUSTAIN);
             int steps = (int)(100.0 * (5 - 4 * (1 / ((float) TuningCore.SUSTAIN_MAXVAL / sustain))));
             float animation = (anime % steps) / (steps * 2.0F);
             float halfShift = (animation + 0.25F) % 0.5F;
-            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SUSTAIN_BASECOLOR, Color.BLUE, getAlphaFactor(animation) * 0.8F), pos, pos.getY() - animation + 0.1F, 0.5F, alpha * getAlphaFactor(animation), 0.65F, 0.05F);
-            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SUSTAIN_BASECOLOR, Color.BLUE, getAlphaFactor(halfShift) * 0.8F), pos, pos.getY() - halfShift + 0.1F, 0.5F, alpha * getAlphaFactor(halfShift), 0.65F, 0.05F);
+            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SpinningCoreRender.LAPIS_COLOR, Color.BLUE,0.3F), pos, pos.getY() - animation + 0.1F, 0.5F, alpha * getAlphaFactor(animation), 0.65F, 0.05F);
+            renderTorus(buffer, stack, stage, RenderUtils.shiftColor(SpinningCoreRender.LAPIS_COLOR, Color.BLUE,0.3F), pos, pos.getY() - halfShift + 0.1F, 0.5F, alpha * getAlphaFactor(halfShift), 0.65F, 0.05F);
         }
         stack.popPose();
     }
