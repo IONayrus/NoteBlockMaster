@@ -53,10 +53,11 @@ public class TuningCore extends TransparentBlock{
     public static final DeferredSoundType CORE_SOUNDS = new DeferredSoundType(1.0F,1.0F,
             () -> SoundEvents.ENDER_EYE_DEATH , () -> SoundEvents.WOOD_STEP, () -> SoundEvents.ENDER_EYE_LAUNCH, () -> SoundEvents.WOOL_HIT, () -> SoundEvents.WOOD_FALL);
     public static final VoxelShape COLLISION = Block.box(3.0,0.0,3.0,13.0,10.0,13.0);
+    public static final List<BlockPos> BREAK_DELAY = new ArrayList<>();
 
     public TuningCore() {
         super(BlockBehaviour.Properties.of()
-                .destroyTime(0.04F) //TODO maybe try this instabreak without breaking drops
+                .instabreak()
                 .noCollission()
                 .noOcclusion()
                 .sound(CORE_SOUNDS)
@@ -89,8 +90,8 @@ public class TuningCore extends TransparentBlock{
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         ItemStack weapon = player.getWeaponItem();
-        if(!weapon.is(NBMTags.Items.CORE_DESTROY)) return state;
-        if(hasStackEnoughIronToDestroy(weapon, state)) return super.playerWillDestroy(level, pos, state, player);
+        if(!weapon.is(NBMTags.Items.CORE_DESTROY) || BREAK_DELAY.contains(pos.immutable())) return state;
+        if(hasStackEnoughIronToDestroy(weapon, state) || player.isCreative()) return super.playerWillDestroy(level, pos, state, player);
         if(weapon.is(NBMTags.Items.TUNERS) && hasPlayerEnoughIronToDestroy(player, state)) return super.playerWillDestroy(level, pos, state, player);
         return state;
     }
@@ -98,19 +99,19 @@ public class TuningCore extends TransparentBlock{
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
         ItemStack weapon = player.getWeaponItem();
-        if(!weapon.is(NBMTags.Items.CORE_DESTROY)) return false;
+        if(!weapon.is(NBMTags.Items.CORE_DESTROY) || BREAK_DELAY.contains(pos.immutable())) return false;
         if(weapon.is(Items.IRON_NUGGET)){
             if(hasStackEnoughIronToDestroy(weapon, state)) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
             if(player.getInventory().countItem(Items.IRON_NUGGET) > 0) {
-                if (!level.isClientSide()) removeOneCore(state, level, pos, player, false);
+                if (!level.isClientSide()) removeOneCore(state, level, pos, player, player.isShiftKeyDown());
                 return false;
             }
             return false;
         }
         if(weapon.is(NBMTags.Items.TUNERS)) {
-            if(hasPlayerEnoughIronToDestroy(player, state)) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+            if(hasPlayerEnoughIronToDestroy(player, state) || player.isCreative()) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
             if(player.getInventory().countItem(Items.IRON_NUGGET) > 0){
-                if(!level.isClientSide()) removeOneCore(state, level, pos, player, false);
+                if(!level.isClientSide()) removeOneCore(state, level, pos, player, player.isShiftKeyDown());
                 return false;
             }
             return false;
@@ -155,6 +156,7 @@ public class TuningCore extends TransparentBlock{
             if(!(level.getNearestPlayer(pos.getX(), pos.getY(), pos.getZ(), 8, true) instanceof Player player)) level.destroyBlock(pos, false);
             else level.destroyBlock(pos, true, player);
         }
+        BREAK_DELAY.clear();
     }
 
     @Override
@@ -223,5 +225,7 @@ public class TuningCore extends TransparentBlock{
             level.playSound(null, pos, CORE_SOUNDS.getBreakSound(), SoundSource.BLOCKS, 1,0.8F);
             Utils.removeItemsFromInventory(player.getInventory(), Items.IRON_NUGGET, 1);
         }
+        BREAK_DELAY.add(pos.immutable());
+        level.scheduleTick(pos, state.getBlock(), 1);
     }
 }

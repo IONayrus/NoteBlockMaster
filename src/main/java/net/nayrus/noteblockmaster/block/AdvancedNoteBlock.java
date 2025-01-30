@@ -101,6 +101,11 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
+    protected void spawnDestroyParticles(Level level, Player player, BlockPos pos, BlockState state) {
+        if(!player.getWeaponItem().is(NBMTags.Items.TUNERS)) super.spawnDestroyParticles(level, player, pos, state);
+    }
+
+    @Override
     protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
         return player.getWeaponItem().is(NBMTags.Items.TUNERS) ? 0.0f : super.getDestroyProgress(state, player, level, pos);
     }
