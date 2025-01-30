@@ -21,6 +21,8 @@ public class NBMTags {
     public static class Items {
         public static final TagKey<Item> TUNERS = createTag("noteblocktuners");
         public static final TagKey<Item> CORES = createTag("noteblockcores");
+        public static final TagKey<Item> CORE_DESTROY = createTag("core_destroy");
+
 
         private static TagKey<Item> createTag(String name) {
             return ItemTags.create(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, name));

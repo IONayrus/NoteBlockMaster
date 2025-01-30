@@ -3,6 +3,7 @@ package net.nayrus.noteblockmaster.datagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.setup.NBMTags;
@@ -25,5 +26,9 @@ public class NBMItemTagProvider extends ItemTagsProvider {
         tag(NBMTags.Items.CORES).add(
                 Registry.SUSTAIN.get(),
                 Registry.VOLUME.get());
+        tag(NBMTags.Items.CORE_DESTROY).add(
+                Registry.NOTETUNER.get(),
+                Registry.TEMPOTUNER.get(),
+                Items.IRON_NUGGET);
     }
 }

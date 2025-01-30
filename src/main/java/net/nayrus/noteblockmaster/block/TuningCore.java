@@ -81,26 +81,49 @@ public class TuningCore extends TransparentBlock {
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         ItemStack weapon = player.getWeaponItem();
-        if(weapon.is(NBMTags.Items.TUNERS) || weapon.is(Items.IRON_NUGGET)){
-            if(!player.getInventory().contains(item ->{
-                if(!item.is(Items.IRON_NUGGET)) return false;
-                if(isMixing(state) && isSustaining(state)) {
-                    if(item.getCount() >= 2) return true;
-                    this.attack(state, level, pos, player); //TODO Code better hit logic
-                    return false;
-                }
-                return item.getCount() >= 1;
-            })) return false;
-        }
-        //TODO Cancel block break sounds,
-        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+        if(!weapon.is(NBMTags.Items.CORE_DESTROY)) return state;
+        if(hasStackEnoughIronToDestroy(weapon, state)) return super.playerWillDestroy(level, pos, state, player);
+        if(weapon.is(NBMTags.Items.TUNERS) && hasPlayerEnoughIronToDestroy(player, state)) return super.playerWillDestroy(level, pos, state, player);
+        return state;
     }
 
     @Override
-    protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
-        super.attack(state, level, pos, player);
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        ItemStack weapon = player.getWeaponItem();
+        if(!weapon.is(NBMTags.Items.CORE_DESTROY)) return false;
+        if(weapon.is(Items.IRON_NUGGET)){
+            if(hasStackEnoughIronToDestroy(weapon, state)) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+            if(player.getInventory().countItem(Items.IRON_NUGGET) > 0) {
+                if (!level.isClientSide()) removeOneCore(state, level, pos, player, false);
+                return false;       //TODO If hit with one ingot, it will stil remove the block/both cores
+            }
+            return false;
+        }
+        if(weapon.is(NBMTags.Items.TUNERS)) {
+            if(hasPlayerEnoughIronToDestroy(player, state)) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+            if(player.getInventory().countItem(Items.IRON_NUGGET) > 0){
+                if(!level.isClientSide()) removeOneCore(state, level, pos, player, false);
+                return false;
+            }
+            return false;
+        }
+        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+    }
+
+    protected boolean hasPlayerEnoughIronToDestroy(Player player, BlockState state){
+        return player.getInventory().contains(item ->{
+                if(!item.is(Items.IRON_NUGGET)) return false;
+                if(isMixing(state) && isSustaining(state)) return item.getCount() >= 2;
+                return item.getCount() >= 1;
+        });
+    }
+
+    protected boolean hasStackEnoughIronToDestroy(ItemStack item, BlockState state){
+        if(!item.is(Items.IRON_NUGGET)) return false;
+        if(item.getCount() >= 2) return true;
+        return !(isMixing(state) && isSustaining(state));
     }
 
     @Override
@@ -166,18 +189,10 @@ public class TuningCore extends TransparentBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(stack.is(Items.IRON_NUGGET)){
-            if (!level.isClientSide()) return ItemInteractionResult.SUCCESS;
+            if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
             if(stack.getCount() >= 2) level.destroyBlock(pos, !player.isCreative(), player);
-            else if(!(isSustaining(state) && isMixing(state))) level.destroyBlock(pos, !player.isCreative(), player);
-            else {
-                boolean sus = isSustaining(state) && hand == InteractionHand.MAIN_HAND;
-                level.setBlockAndUpdate(pos, state.setValue(sus ? SUSTAIN : VOLUME, 0));
-                if(!player.isCreative()){
-                    Block.popResource(level, pos, sus ? new ItemStack(Registry.SUSTAIN.get()) : new ItemStack(Registry.VOLUME.get()));
-                    level.playSound(null, pos, CORE_SOUNDS.getBreakSound(), SoundSource.BLOCKS, 1,0.8F);
-                    Utils.removeItemsFromInventory(player.getInventory(), Items.IRON_NUGGET, 1);
-                }
-            }
+            else if(!(isSustaining(state) && isMixing(state))) level.destroyBlock(pos, !player.isCreative(), player); //Here I know its only 1 nugget
+            else removeOneCore(state, level, pos,  player, hand == InteractionHand.MAIN_HAND);
             return ItemInteractionResult.SUCCESS;
         }
         if(!(stack.is(NBMTags.Items.TUNERS) || (stack.is(NBMTags.Items.CORES)))) return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
@@ -191,5 +206,16 @@ public class TuningCore extends TransparentBlock {
                     AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb))));
         }
         return ItemInteractionResult.SUCCESS;
+    }
+
+    protected void removeOneCore(BlockState state, Level level, BlockPos pos, Player player, boolean sustainFirst){
+        if(level.isClientSide()) return;
+        boolean sus = isSustaining(state) && sustainFirst;
+        level.setBlock(pos, state.setValue(sus ? SUSTAIN : VOLUME, 0), Block.UPDATE_ALL_IMMEDIATE);
+        if(!player.isCreative()){
+            Block.popResource(level, pos, sus ? new ItemStack(Registry.SUSTAIN.get()) : new ItemStack(Registry.VOLUME.get()));
+            level.playSound(null, pos, CORE_SOUNDS.getBreakSound(), SoundSource.BLOCKS, 1,0.8F);
+            Utils.removeItemsFromInventory(player.getInventory(), Items.IRON_NUGGET, 1);
+        }
     }
 }
