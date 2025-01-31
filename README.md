@@ -8,5 +8,5 @@ Currently in Beta.
 Upcoming features:
 - Song item for song composing. Editing, saving and loading of composed songs
 - Note Block Studio integration (have not checked if possible)
-- Pattern item for copy/pasting your builds
+  - Not possible, maybe recode Note Block Studio ingame as that item/block :)
 
