@@ -87,7 +87,7 @@ public class ANBInfoRender {
         rotateTextToPlayer(matrix,textRender.width(text) * scale / 2.0F, viewVec, offset);
         matrix.scale(scale, scale, scale);
 
-        textRender.drawInBatch(text, 0.0F, 0.0F, color.getRGB(), false, matrix.last().pose(), buffer, Font.DisplayMode.SEE_THROUGH, background, 15728880, false);
+        textRender.drawInBatch(text, 0.0F, 0.0F, color.getRGB(), false, matrix.last().pose(), buffer, Font.DisplayMode.SEE_THROUGH, background, 15728880);
         matrix.popPose();
     }
 

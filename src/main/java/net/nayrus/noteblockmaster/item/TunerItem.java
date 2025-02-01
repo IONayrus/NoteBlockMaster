@@ -2,11 +2,13 @@ package net.nayrus.noteblockmaster.item;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -26,17 +28,15 @@ import net.nayrus.noteblockmaster.utils.Utils;
 
 
 public class TunerItem extends Item {
-    public TunerItem() {
-        super(new Item.Properties().stacksTo(1));
+
+    public TunerItem(ResourceLocation key) {
+        super(new Item.Properties()
+                .stacksTo(1)
+                .setId(ResourceKey.create(Registries.ITEM, key)));
     }
 
     @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack) {
-        return true;
-    }
-
-    @Override
-    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+    public ItemStack getCraftingRemainder(ItemStack itemStack) {
         return itemStack.copy();
     }
 
@@ -112,7 +112,7 @@ public class TunerItem extends Item {
             int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
             return block.onNoteChange(level, player, state, pos, new_val);
         }
-        return InteractionResult.CONSUME;
+        return InteractionResult.SUCCESS;
     }
 
     private static InteractionResult changeSubtickOn(Level level, AdvancedNoteBlock block, ItemStack composer, TunerData data, BlockState state, Player player, BlockPos pos, boolean doOffHandSwing) {
@@ -134,7 +134,7 @@ public class TunerItem extends Item {
             }
         }
         if(doOffHandSwing) player.swing(InteractionHand.OFF_HAND);
-        return InteractionResult.CONSUME;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -143,10 +143,10 @@ public class TunerItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         ItemStack itemstack = player.getItemInHand(usedHand);
         if(level.isClientSide()) openTunerGUI(itemstack, player.getItemInHand(InteractionHand.values()[(usedHand.ordinal() + 1) % 2]));
-        return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemstack);
+        return InteractionResult.SUCCESS;
     }
 
     public static void openTunerGUI(ItemStack tuner, ItemStack second){

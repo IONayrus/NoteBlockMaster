@@ -65,21 +65,21 @@ public class PacketHandler {
             case SAVE_STARTUP_CONFIG -> {
                 if(!StartupConfig.UPDATED) {
                     StartupConfig.updateStartUpAndSave();
-                    context.player().sendSystemMessage(Component.translatable("text.config.updated")
-                            .withColor(Color.GREEN.darker().getRGB()));
+                    context.player().displayClientMessage(Component.translatable("text.config.updated")
+                            .withColor(Color.GREEN.darker().getRGB()), false);
                 }
             }
             case ACTIVATE_LOW_RES_RENDER -> {
                 if(ClientConfig.LOW_RESOLUTION_RENDER.isFalse()) {
                     ClientConfig.LOW_RESOLUTION_RENDER.set(true);
-                    context.player().sendSystemMessage(Component.translatable("text.lowres.enable"));
+                    context.player().displayClientMessage(Component.translatable("text.lowres.enable"), false);
                     ClientConfig.CLIENT.save();
                 }
             }
             case DEACTIVATE_LOW_RES_RENDER -> {
                 if(ClientConfig.LOW_RESOLUTION_RENDER.isTrue()){
                     ClientConfig.LOW_RESOLUTION_RENDER.set(false);
-                    context.player().sendSystemMessage(Component.translatable("text.lowres.disable"));
+                    context.player().displayClientMessage(Component.translatable("text.lowres.disable"), false);
                     ClientConfig.CLIENT.save();
                 }
             }

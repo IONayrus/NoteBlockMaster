@@ -10,11 +10,11 @@ import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.level.ItemLike;
 
@@ -27,23 +27,20 @@ import java.util.Objects;
 public class TunerRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category;
     private final Item result;
-    private final int count;
     private final ItemStack resultStack; // Neo: add stack result support
     private final List<String> rows = Lists.newArrayList();
     private final Map<Character, Ingredient> key = Maps.newLinkedHashMap();
     private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
     @Nullable
     private String group;
-    private boolean showNotification = true;
 
-    public TunerRecipeBuilder(RecipeCategory category, ItemLike result, int count) {
+    private TunerRecipeBuilder(RecipeCategory category, ItemLike result, int count) {
         this(category, new ItemStack(result, count));
     }
 
-    public TunerRecipeBuilder(RecipeCategory p_249996_, ItemStack result) {
+    private TunerRecipeBuilder(RecipeCategory p_249996_, ItemStack result) {
         this.category = p_249996_;
         this.result = result.getItem();
-        this.count = result.getCount();
         this.resultStack = result;
     }
 
@@ -56,17 +53,19 @@ public class TunerRecipeBuilder implements RecipeBuilder {
     }
 
     public static TunerRecipeBuilder shaped(RecipeCategory p_251325_, ItemStack result) {
-        return new TunerRecipeBuilder(p_251325_, result);
+        return new TunerRecipeBuilder( p_251325_, result);
     }
 
-    public TunerRecipeBuilder define(Character symbol, TagKey<Item> tag) {
-        return this.define(symbol, Ingredient.of(tag));
-    }
-
+    /**
+     * Adds a key to the recipe pattern.
+     */
     public TunerRecipeBuilder define(Character symbol, ItemLike item) {
         return this.define(symbol, Ingredient.of(item));
     }
 
+    /**
+     * Adds a key to the recipe pattern.
+     */
     public TunerRecipeBuilder define(Character symbol, Ingredient ingredient) {
         if (this.key.containsKey(symbol)) {
             throw new IllegalArgumentException("Symbol '" + symbol + "' is already defined!");
@@ -78,8 +77,11 @@ public class TunerRecipeBuilder implements RecipeBuilder {
         }
     }
 
+    /**
+     * Adds a new entry to the patterns for this recipe.
+     */
     public TunerRecipeBuilder pattern(String pattern) {
-        if (!this.rows.isEmpty() && pattern.length() != this.rows.get(0).length()) {
+        if (!this.rows.isEmpty() && pattern.length() != this.rows.getFirst().length()) {
             throw new IllegalArgumentException("Pattern must be the same width on every line!");
         } else {
             this.rows.add(pattern);
@@ -97,22 +99,17 @@ public class TunerRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
-    public TunerRecipeBuilder showNotification(boolean showNotification) {
-        this.showNotification = showNotification;
-        return this;
-    }
-
     @Override
     public Item getResult() {
         return this.result;
     }
 
     @Override
-    public void save(RecipeOutput recipeOutput, ResourceLocation id) {
-        ShapedRecipePattern shapedrecipepattern = this.ensureValid(id);
-        Advancement.Builder advancement$builder = recipeOutput.advancement()
-                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-                .rewards(AdvancementRewards.Builder.recipe(id))
+    public void save(RecipeOutput output, ResourceKey<Recipe<?>> resourceKey) {
+        ShapedRecipePattern shapedrecipepattern = this.ensureValid(resourceKey);
+        Advancement.Builder advancement$builder = output.advancement()
+                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(resourceKey))
+                .rewards(AdvancementRewards.Builder.recipe(resourceKey))
                 .requirements(AdvancementRequirements.Strategy.OR);
         this.criteria.forEach(advancement$builder::addCriterion);
         TunerRecipe shapedrecipe = new TunerRecipe(
@@ -120,14 +117,14 @@ public class TunerRecipeBuilder implements RecipeBuilder {
                 RecipeBuilder.determineBookCategory(this.category),
                 shapedrecipepattern,
                 this.resultStack,
-                this.showNotification
+                true
         );
-        recipeOutput.accept(id, shapedrecipe, advancement$builder.build(id.withPrefix("recipes/" + this.category.getFolderName() + "/")));
+        output.accept(resourceKey, shapedrecipe, advancement$builder.build(resourceKey.location().withPrefix("recipes/" + this.category.getFolderName() + "/")));
     }
 
-    private ShapedRecipePattern ensureValid(ResourceLocation loaction) {
+    private ShapedRecipePattern ensureValid(ResourceKey<Recipe<?>> recipe) {
         if (this.criteria.isEmpty()) {
-            throw new IllegalStateException("No way of obtaining recipe " + loaction);
+            throw new IllegalStateException("No way of obtaining recipe " + recipe.location());
         } else {
             return ShapedRecipePattern.of(this.key, this.rows);
         }

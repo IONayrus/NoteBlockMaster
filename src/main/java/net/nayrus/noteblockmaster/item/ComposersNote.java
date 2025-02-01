@@ -2,11 +2,13 @@ package net.nayrus.noteblockmaster.item;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -27,9 +29,10 @@ import net.nayrus.noteblockmaster.utils.Utils;
 
 public class ComposersNote extends Item {
 
-    public ComposersNote() {
+    public ComposersNote(ResourceLocation key) {
         super(new Item.Properties()
-                .stacksTo(1));
+                .stacksTo(1)
+                .setId(ResourceKey.create(Registries.ITEM, key)));
     }
 
     @Override
@@ -93,11 +96,11 @@ public class ComposersNote extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         ItemStack item = player.getItemInHand(usedHand);
         if(level.isClientSide()){
             Minecraft.getInstance().setScreen(new ComposerScreen(item));
         }
-        return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
+        return InteractionResult.SUCCESS;
     }
 }

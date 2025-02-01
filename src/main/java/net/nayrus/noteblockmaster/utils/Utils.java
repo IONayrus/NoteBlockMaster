@@ -48,10 +48,10 @@ public class Utils {
     public enum PROPERTY {NOTE, TEMPO}
 
     public static void sendDesyncWarning(Player player){
-        player.sendSystemMessage(Component.translatable("text.config.desync_warning")
+        player.displayClientMessage(Component.translatable("text.config.desync_warning")
                 .withColor(Color.ORANGE.getRGB())
                 .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nbm saveconfig"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("text.config.sync_save_hovertext").withColor(Color.LIGHT_GRAY.getRGB())))));
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("text.config.sync_save_hovertext").withColor(Color.LIGHT_GRAY.getRGB())))), false);
     }
 
     public static void removeItemsFromInventory(Inventory inv, Item item, int amount){

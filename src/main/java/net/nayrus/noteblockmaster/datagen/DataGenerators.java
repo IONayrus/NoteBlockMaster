@@ -28,7 +28,7 @@ public class DataGenerators {
 
         gen.addProvider(event.includeServer(), new LootTableProvider(output, Collections.emptySet(),
                 List.of(new LootTableProvider.SubProviderEntry(NBMBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
-        gen.addProvider(event.includeServer(), new NBMRecipeProvider(output, lookupProvider));
+        gen.addProvider(event.includeServer(), new NBMRecipeProvider.Runner(output, lookupProvider));
 
         BlockTagsProvider blockTagsProvider = new NBMBlockTagProvider(output, lookupProvider, helper);
         gen.addProvider(event.includeServer(), blockTagsProvider);

@@ -3,6 +3,7 @@ package net.nayrus.noteblockmaster.screen.base;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
@@ -26,7 +27,7 @@ public class BaseTunerScreen extends BaseScreen implements Button.OnPress{
     protected final int maxValue;
 
     protected BaseTunerScreen(ItemStack item, int maxValue) {
-        super(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png"), 176, 53);
+        super(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png"), 176, 53, 256, 256);
         this.tuner = item;
         this.maxValue = maxValue;
         TunerData data = TunerItem.getTunerData(item);
@@ -38,11 +39,11 @@ public class BaseTunerScreen extends BaseScreen implements Button.OnPress{
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         RenderSystem.setShaderTexture(0, GUI);
         int extend = getExtension();
-        guiGraphics.blit(GUI, getRelX() - extend/2, getRelY(), 0, 0, this.guiWidth /2, this.guiHeight);
-        guiGraphics.blit(GUI, getRelX() + this.guiWidth /2 - extend/2, getRelY(), 5, 0, extend > (this.guiWidth - 5) ? extend/2 : extend, this.guiHeight);
+        guiGraphics.blit(RenderType::guiTextured, GUI, getRelX() - extend/2, getRelY(), 0, 0, this.guiWidth /2, this.guiHeight, this.guiFileWidth, this.guiFileHeight);
+        guiGraphics.blit(RenderType::guiTextured, GUI, getRelX() + this.guiWidth /2 - extend/2, getRelY(), 5, 0, extend > (this.guiWidth - 5) ? extend/2 : extend, this.guiHeight, this.guiFileWidth, this.guiFileHeight);
         if(extend > this.guiWidth - 5)
-            guiGraphics.blit(GUI, getRelX() + this.guiWidth /2, getRelY(), 5, 0, extend/2, this.guiHeight);
-        guiGraphics.blit(GUI, getRelX() + this.guiWidth /2 + extend/2, getRelY(), this.guiWidth /2, 0, this.guiWidth /2, this.guiHeight);
+            guiGraphics.blit(RenderType::guiTextured, GUI, getRelX() + this.guiWidth /2, getRelY(), 5, 0, extend/2, this.guiHeight, this.guiFileWidth, this.guiFileHeight);
+        guiGraphics.blit(RenderType::guiTextured, GUI, getRelX() + this.guiWidth /2 + extend/2, getRelY(), this.guiWidth /2, 0, this.guiWidth /2, this.guiHeight, this.guiFileWidth, this.guiFileHeight);
     }
 
     public int getExtension(){

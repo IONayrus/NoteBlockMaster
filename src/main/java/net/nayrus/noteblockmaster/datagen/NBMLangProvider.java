@@ -1,10 +1,12 @@
 package net.nayrus.noteblockmaster.datagen;
 
 import net.minecraft.data.PackOutput;
+import net.minecraft.world.level.block.Block;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.registries.DeferredBlock;
 
 public class NBMLangProvider extends LanguageProvider {
 
@@ -14,7 +16,7 @@ public class NBMLangProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        add(Registry.ADVANCED_NOTEBLOCK.get(), "Advanced Note Block");
+        addBlockWithItem(Registry.ADVANCED_NOTEBLOCK, "Advanced Note Block");
         add(Registry.TUNINGCORE.get(), "Tuning Core");
         add(Registry.TEMPOTUNER.get(), "Tempo Tuner");
         add(Registry.NOTETUNER.get(), "Note Tuner");
@@ -34,8 +36,13 @@ public class NBMLangProvider extends LanguageProvider {
         add("text.config.save_sync_hovertext", "Synchronize & Safe conig");
     }
 
+    public void addBlockWithItem(DeferredBlock<Block> block, String name) {
+        add(block.get(), name);
+        add(Registry.BLOCK_ITEMS.get(block).get(), name);
+    }
+
     public void addSounds(){
         SoundRegistry.SOUND_EVENTS.getEntries().forEach((sound) ->
-                add(sound.get().getLocation().toLanguageKey("sounds"), sound.get().getLocation().getPath() + " sound"));
+                add(sound.get().location().toLanguageKey("sounds"), sound.get().location().getPath() + " sound"));
     }
 }

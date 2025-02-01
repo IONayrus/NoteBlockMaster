@@ -2,24 +2,27 @@ package net.nayrus.noteblockmaster.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.NoteBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -27,13 +30,14 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
-import net.nayrus.noteblockmaster.setup.config.StartupConfig;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.setup.config.StartupConfig;
 import net.nayrus.noteblockmaster.sound.AdvancedInstrument;
 import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -57,8 +61,9 @@ public class AdvancedNoteBlock extends Block
     public static int TOTAL_NOTES;
     public static final int DEFAULT_NOTE = noteStringAsInt("F#3", false);
 
-    public AdvancedNoteBlock(Properties properties) {
-        super(properties);
+    public AdvancedNoteBlock(ResourceLocation key) {
+        super(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK)
+                .setId(ResourceKey.create(Registries.BLOCK, key)));
         this.registerDefaultState(
                 this.stateDefinition
                         .any()
@@ -80,11 +85,12 @@ public class AdvancedNoteBlock extends Block
         TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
     }
 
-    private BlockState setInstrument(LevelAccessor level, BlockPos pos, BlockState state) {
-        NoteBlockInstrument noteblockinstrument = level.getBlockState(pos.below()).instrument();
+    private BlockState setInstrument(LevelReader reader, BlockPos pos, BlockState state) {
+        NoteBlockInstrument noteblockinstrument = reader.getBlockState(pos.below()).instrument();
         AdvancedInstrument instrument = noteblockinstrument.worksAboveNoteBlock() ? AdvancedInstrument.HARP : AdvancedInstrument.values()[noteblockinstrument.ordinal()];
-        BlockState above = level.getBlockState(pos.above());
-        if(above.is(Registry.TUNINGCORE) && above.getValue(TuningCore.SUSTAIN) > instrument.getSustains()) level.setBlock(pos.above(), above.setValue(TuningCore.SUSTAIN, instrument.getSustains()), 3);
+        BlockState above = reader.getBlockState(pos.above());
+        if(!reader.isClientSide() && above.is(Registry.TUNINGCORE) && above.getValue(TuningCore.SUSTAIN) > instrument.getSustains() && reader instanceof LevelAccessor level)
+            level.setBlock(pos.above(), above.setValue(TuningCore.SUSTAIN, instrument.getSustains()), 3);
         return state.setValue(INSTRUMENT, instrument);
     }
 
@@ -111,10 +117,10 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(!stack.is(NBMTags.Items.TUNERS) && !stack.is(Registry.COMPOSER) && !stack.is(NBMTags.Items.CORES))
             return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
-        return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -129,14 +135,14 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
         boolean flag = level.hasNeighborSignal(pos);
         if (flag != state.getValue(NoteBlock.POWERED)) {
             if (flag) {
                 this.playNote(null, level, pos);
             }
 
-            level.setBlockAndUpdate(pos, state.setValue(NoteBlock.POWERED, flag));
+            level.setBlock(pos, state.setValue(NoteBlock.POWERED, flag), 3);
         }
     }
 
@@ -194,9 +200,20 @@ public class AdvancedNoteBlock extends Block
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
-        boolean flag = facing.getAxis() == Direction.Axis.Y;
-        return flag ? this.setInstrument(level, currentPos, state) : super.updateShape(state, facing, facingState, level, currentPos, facingPos);
+    protected BlockState updateShape(
+            BlockState state,
+            LevelReader level,
+            ScheduledTickAccess scheduledTickAccess,
+            BlockPos pos,
+            Direction direction,
+            BlockPos neighborPos,
+            BlockState neighborState,
+            RandomSource random
+    ) {
+        boolean flag = direction.getAxis() == Direction.Axis.Y;
+        return flag
+                ? this.setInstrument(level, pos, state)
+                : super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override

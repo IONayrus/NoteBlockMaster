@@ -2,12 +2,15 @@ package net.nayrus.noteblockmaster.block;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -55,7 +58,7 @@ public class TuningCore extends TransparentBlock{
     public static final VoxelShape COLLISION = Block.box(3.0,0.0,3.0,13.0,10.0,13.0);
     public static final List<BlockPos> BREAK_DELAY = new ArrayList<>();
 
-    public TuningCore() {
+    public TuningCore(ResourceLocation key) {
         super(BlockBehaviour.Properties.of()
                 .instabreak()
                 .noCollission()
@@ -64,7 +67,8 @@ public class TuningCore extends TransparentBlock{
                 .isValidSpawn(Blocks::never)
                 .isSuffocating((a,b,c) -> false)
                 .isViewBlocking((a,b,c) -> false)
-                .dynamicShape());
+                .dynamicShape()
+                .setId(ResourceKey.create(Registries.BLOCK, key)));
 
         this.registerDefaultState(this.getStateDefinition()
                 .any()
@@ -195,25 +199,25 @@ public class TuningCore extends TransparentBlock{
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(stack.is(Items.IRON_NUGGET)){
-            if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
+            if (level.isClientSide()) return InteractionResult.SUCCESS;
             if(stack.getCount() >= 2) level.destroyBlock(pos, !player.isCreative(), player);
             else if(!(isSustaining(state) && isMixing(state))) level.destroyBlock(pos, !player.isCreative(), player); //Here I know its only 1 nugget
             else removeOneCore(state, level, pos,  player, hand == InteractionHand.MAIN_HAND);
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         if(!(stack.is(NBMTags.Items.TUNERS) || (stack.is(NBMTags.Items.CORES)))) return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         BlockState anb = level.getBlockState(pos.below());
         if(!anb.is(Registry.ADVANCED_NOTEBLOCK)){
             if(!level.isClientSide()) level.scheduleTick(pos, state.getBlock(), 0);
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         if(level.isClientSide()){
             Minecraft.getInstance().setScreen(new CoreScreen(state, pos, anb.getValue(AdvancedNoteBlock.INSTRUMENT),
                     AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb))));
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     protected void removeOneCore(BlockState state, Level level, BlockPos pos, Player player, boolean sustainFirst){

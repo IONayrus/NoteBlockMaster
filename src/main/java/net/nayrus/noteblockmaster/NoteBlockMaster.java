@@ -7,14 +7,14 @@ import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
 import net.nayrus.noteblockmaster.command.BPMInfoCommand;
 import net.nayrus.noteblockmaster.command.MainCommand;
-import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
+import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipe;
 import net.nayrus.noteblockmaster.event.ClientEvents;
 import net.nayrus.noteblockmaster.event.CommonEvents;
 import net.nayrus.noteblockmaster.event.ServerEvents;
 import net.nayrus.noteblockmaster.network.PacketHandler;
+import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.setup.config.StartupConfig;
-import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.nayrus.noteblockmaster.utils.KeyBindings;
 import net.neoforged.api.distmarker.Dist;
@@ -39,7 +39,7 @@ public class NoteBlockMaster
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, MOD_ID);
-    public static final DeferredHolder<RecipeSerializer<?>, TunerRecipeSerializer> TUNER_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("tunerrecipe", () -> TunerRecipeSerializer.INSTANCE);
+    public static final DeferredHolder<RecipeSerializer<?>, TunerRecipe.Serializer> TUNER_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("tunerrecipe", TunerRecipe.Serializer::new);
 
     public NoteBlockMaster(IEventBus modEventBus, ModContainer modContainer)
     {

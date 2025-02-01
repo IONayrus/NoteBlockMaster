@@ -1,8 +1,8 @@
 package net.nayrus.noteblockmaster.screen.base;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -12,18 +12,21 @@ public class BaseScreen extends Screen {
     protected final ResourceLocation GUI;
     protected final int guiWidth;
     protected final int guiHeight;
+    protected final int guiFileWidth;
+    protected final int guiFileHeight;
 
-    protected BaseScreen(ResourceLocation background, int guiWidth, int guiHeight) {
+    protected BaseScreen(ResourceLocation background, int guiWidth, int guiHeight, int guiFileWidth, int guiFileHeight) {
         super(Component.literal(""));
         this.GUI = background;
         this.guiWidth = guiWidth;
         this.guiHeight = guiHeight;
+        this.guiFileWidth = guiFileWidth;
+        this.guiFileHeight = guiFileHeight;
     }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        RenderSystem.setShaderTexture(0, GUI);
-        guiGraphics.blit(GUI, getRelX() , getRelY(), 0, 0, this.guiWidth, this.guiHeight);
+        guiGraphics.blit(RenderType::guiTextured, GUI, getRelX() , getRelY(), 0, 0, this.guiWidth, this.guiHeight, guiFileWidth, guiFileHeight);
     }
 
     public int getRelX(){

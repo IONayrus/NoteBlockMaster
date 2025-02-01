@@ -6,18 +6,18 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
-import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.ComposersNote;
+import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
@@ -33,6 +33,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static net.nayrus.noteblockmaster.NoteBlockMaster.MOD_ID;
 
 public class Registry
@@ -44,14 +47,15 @@ public class Registry
     public static final DeferredRegister.DataComponents DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MOD_ID);
     public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES = DeferredRegister.create(Registries.PARTICLE_TYPE, MOD_ID);
 
-    public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock",
-            () -> new AdvancedNoteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NOTE_BLOCK)));
+    public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock", AdvancedNoteBlock::new);
     public static final DeferredBlock<Block> TUNINGCORE = Registry.BLOCKS.register("tuningcore", TuningCore::new);
+    public static final Map<DeferredBlock<Block>, DeferredItem<Item>> BLOCK_ITEMS;
 
     public static final DeferredItem<Item> TEMPOTUNER = ITEMS.register("tempotuner", TunerItem::new);
     public static final DeferredItem<Item> NOTETUNER = ITEMS.register("notetuner", TunerItem::new);
     public static final DeferredItem<Item> COMPOSER = ITEMS.register("composer", ComposersNote::new);
-    public static final DeferredItem<Item> CORE = ITEMS.register("core", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CORE = ITEMS.register("core", () -> new Item(new Item.Properties()
+            .setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "core")))));
     public static final DeferredItem<Item> SUSTAIN = ITEMS.register("sustain", SpinningCore::new);
     public static final DeferredItem<Item> VOLUME = ITEMS.register("volume", SpinningCore::new);
 
@@ -72,8 +76,9 @@ public class Registry
     }
 
     static{
-        Registry.ITEMS.register("advanced_noteblock",
-                ()-> new BlockItem(Registry.ADVANCED_NOTEBLOCK.get(), new Item.Properties()));
+        Map<DeferredBlock<Block>,DeferredItem<Item>> block_items = new HashMap<>();
+        block_items.put(ADVANCED_NOTEBLOCK, createBlockItem(ADVANCED_NOTEBLOCK));
+        BLOCK_ITEMS = block_items;
 
         CREATIVE_MODE_TABS.register("noteblockmaster", ()-> CreativeModeTab.builder()
                 .title(Component.literal("Note Block Master"))
@@ -81,6 +86,12 @@ public class Registry
                 .displayItems((pars, output) -> ITEMS.getEntries()
                         .forEach(item -> output.accept(item.get())))
                 .build());
+    }
+
+    public static DeferredItem<Item> createBlockItem(DeferredBlock<Block> block){
+        return Registry.ITEMS.register(block.getId().getPath(),
+                ()-> new BlockItem(Registry.ADVANCED_NOTEBLOCK.get(), new Item.Properties()
+                        .setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, block.getId().getPath())))));
     }
 
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {

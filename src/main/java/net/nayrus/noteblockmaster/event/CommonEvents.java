@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -49,10 +49,10 @@ public class CommonEvents {
                             level.addDestroyBlockEffect(pos, Blocks.GOLD_BLOCK.defaultBlockState());
                         }
                         if (items.getA().getItem() instanceof TunerItem)
-                            event.cancelWithResult(ItemInteractionResult.SUCCESS);
+                            event.cancelWithResult(InteractionResult.SUCCESS);
                         else {
                             player.swing(InteractionHand.OFF_HAND);
-                            event.cancelWithResult(ItemInteractionResult.CONSUME);
+                            event.cancelWithResult(InteractionResult.CONSUME);
                         }
                     }
                 }
@@ -69,14 +69,14 @@ public class CommonEvents {
                         level.setBlock(pos, state.setValue(RepeaterBlock.DELAY, set), NoteBlock.UPDATE_ALL);
                         composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat(), cData.subtick(), target, cData.bpm()));
                     }
-                    if(items.getA().is(Registry.COMPOSER)) event.cancelWithResult(ItemInteractionResult.SUCCESS);
+                    if(items.getA().is(Registry.COMPOSER)) event.cancelWithResult(InteractionResult.SUCCESS);
                     else{
-                        event.cancelWithResult(ItemInteractionResult.CONSUME);
+                        event.cancelWithResult(InteractionResult.CONSUME);
                         player.swing(InteractionHand.OFF_HAND);
                     }
                 }
                 else{
-                    event.cancelWithResult(ItemInteractionResult.FAIL);
+                    event.cancelWithResult(InteractionResult.FAIL);
                     if(level.isClientSide()) Utils.playFailUse(level, player, pos);
                 }
             }

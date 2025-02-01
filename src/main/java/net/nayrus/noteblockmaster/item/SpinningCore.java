@@ -1,6 +1,9 @@
 package net.nayrus.noteblockmaster.item;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -20,8 +23,9 @@ import net.nayrus.noteblockmaster.utils.Utils;
 
 public class SpinningCore extends Item {
 
-    public SpinningCore() {
-        super(new Item.Properties());
+    public SpinningCore(ResourceLocation key) {
+        super(new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, key)));
     }
 
     @Override

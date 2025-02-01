@@ -23,7 +23,7 @@ public class BaseComposerScreen extends BaseScreen implements Button.OnPress{
     public int beat_val;
 
     protected BaseComposerScreen(ItemStack composer) {
-        super(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png"), 176, 53);
+        super(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png"), 176, 53, 256, 256);
         this.composer = composer;
         ComposeData data = ComposeData.getComposeData(composer);
         bpm_val = data.bpm();
