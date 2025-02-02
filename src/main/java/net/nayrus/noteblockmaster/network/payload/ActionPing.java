@@ -9,8 +9,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.Objects;
-
 public record ActionPing(byte action) implements CustomPacketPayload {
 
     public static final Type<ActionPing> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "actionping"));
@@ -32,6 +30,6 @@ public record ActionPing(byte action) implements CustomPacketPayload {
     );
 
     public static void sendActionPing(ServerPlayer player, Action action){
-        PacketDistributor.sendToPlayer(Objects.requireNonNull(player), new ActionPing(ActionPing.toByte(action)));
+        PacketDistributor.sendToPlayer(player, new ActionPing(ActionPing.toByte(action)));
     }
 }

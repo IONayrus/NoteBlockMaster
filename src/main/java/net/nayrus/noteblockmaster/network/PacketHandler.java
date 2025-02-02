@@ -12,14 +12,13 @@ import net.nayrus.noteblockmaster.block.TuningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
-import net.nayrus.noteblockmaster.network.payload.ActionPing;
-import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
-import net.nayrus.noteblockmaster.network.payload.CoreUpdate;
-import net.nayrus.noteblockmaster.network.payload.TickSchedule;
+import net.nayrus.noteblockmaster.network.payload.*;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
+import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.setup.config.StartupConfig;
-import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.sound.AdvancedInstrument;
+import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -36,6 +35,7 @@ public class PacketHandler {
 
         reg.playToClient(ConfigCheck.TYPE, ConfigCheck.STREAM_CODEC, PacketHandler::handleStartUpSync);
         reg.playToClient(ActionPing.TYPE, ActionPing.STREAM_CODEC, PacketHandler::handleActionPing);
+        reg.playToClient(ScheduleCoreSound.TYPE, ScheduleCoreSound.STREAM_CODEC, PacketHandler::handleScheduleCoreSound);
 
         reg.playToServer(TunerData.TYPE, TunerData.TUNER_STREAM_CODEC, PacketHandler::handleTunerData);
         reg.playToServer(ComposeData.TYPE, ComposeData.STREAM_CODEC, PacketHandler::handleComposeData);
@@ -86,6 +86,18 @@ public class PacketHandler {
         }
     }
 
+    private static void handleScheduleCoreSound(final ScheduleCoreSound sound, final IPayloadContext context){
+        int data = sound.data();
+        int sustainIndex = data & 0xFF;                 // Extract 8 bits (0-7)
+        int noteVal = (data >> 8) & 0xFF;               // Extract 8 bits (8-15)
+        int instrumentOrdinal = (data >> 16) & 0xFF;    // Extract 8 bits (16-23)
+        boolean noDecay = ((data >> 24) & 1) == 1;      // Extract 1 bit (24)
+        int delay = (data >> 25) & 0x1F;                // Extract 5 bits (25-29)
+
+        AdvancedInstrument instrument = AdvancedInstrument.values()[instrumentOrdinal];
+        SubTickScheduler.delayedCoredNoteBlockEvent(sound.pos(), sustainIndex, noteVal, sound.volume(), instrument, noDecay, delay);
+    }
+
     private static void handleTunerData(final TunerData data, final IPayloadContext context){
         Player player = context.player();
         FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
@@ -102,13 +114,13 @@ public class PacketHandler {
         stack.set(Registry.COMPOSE_DATA, data);
     }
 
-    public static void handleTickSchedule(final TickSchedule tickSchedule, final IPayloadContext context) {
+    private static void handleTickSchedule(final TickSchedule tickSchedule, final IPayloadContext context) {
         ServerLevel level = (ServerLevel) context.player().level();
         BlockPos pos = tickSchedule.pos();
         Utils.scheduleTick(level, pos, level.getBlockState(pos).getBlock(), tickSchedule.delay());
     }
 
-    public static void handleCoreUpdate(final CoreUpdate coreUpdate, final IPayloadContext context) {
+    private static void handleCoreUpdate(final CoreUpdate coreUpdate, final IPayloadContext context) {
         Level level = context.player().level();
         BlockPos pos = coreUpdate.pos();
         level.setBlockAndUpdate(pos, level.getBlockState(pos)

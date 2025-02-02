@@ -23,6 +23,8 @@ import net.nayrus.noteblockmaster.screen.NoteTunerScreen;
 import net.nayrus.noteblockmaster.screen.TempoTunerScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 
 public class TunerItem extends Item {
@@ -149,6 +151,7 @@ public class TunerItem extends Item {
         return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemstack);
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static void openTunerGUI(ItemStack tuner, ItemStack second){
         if(tuner.is(Registry.TEMPOTUNER))
             Minecraft.getInstance().setScreen(new TempoTunerScreen(tuner, second));

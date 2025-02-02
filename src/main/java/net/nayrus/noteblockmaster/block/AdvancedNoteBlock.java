@@ -78,6 +78,8 @@ public class AdvancedNoteBlock extends Block
         NOTE = IntegerProperty.create("note", MIN_NOTE_VAL, MAX_NOTE_VAL);
 
         TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
+
+        TuningCore.loadSustainProperty();
     }
 
     private BlockState setInstrument(LevelAccessor level, BlockPos pos, BlockState state) {

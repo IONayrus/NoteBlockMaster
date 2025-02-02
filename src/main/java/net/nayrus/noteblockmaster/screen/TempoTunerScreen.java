@@ -67,7 +67,6 @@ public class TempoTunerScreen extends BaseTunerScreen implements Button.OnPress 
                 || op.keyDown.matches(keyCode, scanCode)
                 || op.keyRight.matches(keyCode, scanCode)
                 || op.keyLeft.matches(keyCode, scanCode)
-                || op.keyShift.matches(keyCode, scanCode)
                 || op.keyJump.matches(keyCode, scanCode))
             this.onClose();
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -81,7 +80,7 @@ public class TempoTunerScreen extends BaseTunerScreen implements Button.OnPress 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if(this.slider.isMouseOver(mouseX, mouseY) || this.input.isMouseOver(mouseX, mouseY))
-            changeValue((int)(this.value + scrollY));
+            changeValue((int)(this.value + scrollY * (hasShiftDown() ? 2 : 1)));
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 

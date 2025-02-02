@@ -39,6 +39,8 @@ import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.util.DeferredSoundType;
 
 import java.util.ArrayList;
@@ -205,15 +207,21 @@ public class TuningCore extends TransparentBlock{
         }
         if(!(stack.is(NBMTags.Items.TUNERS) || (stack.is(NBMTags.Items.CORES)))) return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         BlockState anb = level.getBlockState(pos.below());
+
         if(!anb.is(Registry.ADVANCED_NOTEBLOCK)){
             if(!level.isClientSide()) level.scheduleTick(pos, state.getBlock(), 0);
             return ItemInteractionResult.SUCCESS;
         }
-        if(level.isClientSide()){
-            Minecraft.getInstance().setScreen(new CoreScreen(state, pos, anb.getValue(AdvancedNoteBlock.INSTRUMENT),
-                    AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb))));
-        }
+
+        if(level.isClientSide()) openCoreScreen(state, anb, pos);
+
         return ItemInteractionResult.SUCCESS;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void openCoreScreen(BlockState state, BlockState anb, BlockPos pos){
+        Minecraft.getInstance().setScreen(new CoreScreen(state, pos, anb.getValue(AdvancedNoteBlock.INSTRUMENT),
+                AdvancedNoteBlock.getPitchFromNote(AdvancedNoteBlock.getNoteValue(anb))));
     }
 
     protected void removeOneCore(BlockState state, Level level, BlockPos pos, Player player, boolean sustainFirst){

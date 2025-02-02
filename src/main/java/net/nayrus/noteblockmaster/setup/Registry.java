@@ -25,6 +25,8 @@ import net.nayrus.noteblockmaster.render.item.CoreBaseRender;
 import net.nayrus.noteblockmaster.render.item.SpinningCoreRender;
 import net.nayrus.noteblockmaster.render.particle.SustainedNoteParticle;
 import net.nayrus.noteblockmaster.render.particle.SustainedNoteType;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
@@ -83,11 +85,13 @@ public class Registry
                 .build());
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerItem(new SpinningCoreRender.Extension(), VOLUME, SUSTAIN);
         event.registerItem(new CoreBaseRender.Extension(), CORE);
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static void registerParticles(RegisterParticleProvidersEvent event) {
         if(!(Minecraft.getInstance().particleEngine instanceof ISpriteAccessor vanillaSprites)) return;
 

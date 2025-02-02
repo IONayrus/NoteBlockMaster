@@ -2,6 +2,8 @@ package net.nayrus.noteblockmaster.utils;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
@@ -18,6 +20,7 @@ public class KeyBindings {
             "key.categories.noteblockmaster.nbm" // Mapping will be in the new example category
     ));
 
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void registerBindings(RegisterKeyMappingsEvent event) {
         event.register(OPEN_OFFHAND_GUI.get());
