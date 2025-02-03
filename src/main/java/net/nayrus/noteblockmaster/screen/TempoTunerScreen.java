@@ -16,8 +16,8 @@ public class TempoTunerScreen extends BaseTunerScreen implements Button.OnPress 
 
     private boolean disableButtons;
 
-    public TempoTunerScreen(ItemStack item, ItemStack composer) {
-        super(item, AdvancedNoteBlock.SUBTICKS);
+    public TempoTunerScreen(ItemStack item, ItemStack composer, boolean offhand) {
+        super(item, AdvancedNoteBlock.SUBTICKS, offhand);
         if(!composer.is(Registry.COMPOSER)) return;
         this.setmode = true;
         this.value = ComposeData.getComposeData(composer).subtick();

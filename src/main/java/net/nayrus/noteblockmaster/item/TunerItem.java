@@ -45,7 +45,7 @@ public class TunerItem extends Item {
     public static TunerData getTunerData(ItemStack stack){
         TunerData data = stack.get(Registry.TUNER_DATA);
         if(data == null) {
-            data = new TunerData(1, false);
+            data = TunerData.of(1, false, false);
             stack.set(Registry.TUNER_DATA, data);
         }
         return data;
@@ -65,7 +65,7 @@ public class TunerItem extends Item {
         }
         TunerData data = getTunerData(tuner);
         if(!(state.getBlock() instanceof AdvancedNoteBlock block)){
-            if(!data.setmode() && !composer.is(Registry.COMPOSER)) return InteractionResult.PASS;
+            if(!data.isSetmode() && !composer.is(Registry.COMPOSER)) return InteractionResult.PASS;
             Inventory inv = player.getInventory();
             if(inv.contains(item -> item.is(Registry.ADVANCED_NOTEBLOCK.asItem())) && !doOffHandSwing){
                 placeAdvancedNoteBlock(level, tuner, pos, data, composer, player, inv);
@@ -111,7 +111,7 @@ public class TunerItem extends Item {
 
     private static InteractionResult changeNoteOn(Level level, BlockState state, AdvancedNoteBlock block, TunerData data, Player player, BlockPos pos) {
         if(!level.isClientSide()) {
-            int new_val = data.setmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
+            int new_val = data.isSetmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
             return block.onNoteChange(level, player, state, pos, new_val);
         }
         return InteractionResult.CONSUME;
@@ -121,7 +121,7 @@ public class TunerItem extends Item {
         if(!level.isClientSide()) {
             int new_val;
             if (!composer.is(Registry.COMPOSER))
-                new_val = (data.setmode() ? data.value() : state.getValue(AdvancedNoteBlock.SUBTICK) + data.value()) % AdvancedNoteBlock.SUBTICKS;
+                new_val = (data.isSetmode() ? data.value() : state.getValue(AdvancedNoteBlock.SUBTICK) + data.value()) % AdvancedNoteBlock.SUBTICKS;
             else {
                 ComposeData cData = ComposeData.getComposeData(composer);
                 new_val = cData.subtick();
@@ -147,15 +147,18 @@ public class TunerItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         ItemStack itemstack = player.getItemInHand(usedHand);
-        if(level.isClientSide()) openTunerGUI(itemstack, player.getItemInHand(InteractionHand.values()[(usedHand.ordinal() + 1) % 2]));
+        if(level.isClientSide()) openTunerGUI(
+                itemstack,
+                player.getItemInHand(InteractionHand.values()[(usedHand.ordinal() + 1) % 2]),
+                usedHand == InteractionHand.OFF_HAND);
         return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemstack);
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static void openTunerGUI(ItemStack tuner, ItemStack second){
+    public static void openTunerGUI(ItemStack tuner, ItemStack second, boolean tunerInOffhand){
         if(tuner.is(Registry.TEMPOTUNER))
-            Minecraft.getInstance().setScreen(new TempoTunerScreen(tuner, second));
+            Minecraft.getInstance().setScreen(new TempoTunerScreen(tuner, second, tunerInOffhand));
         if(tuner.is(Registry.NOTETUNER))
-            Minecraft.getInstance().setScreen(new NoteTunerScreen(tuner));
+            Minecraft.getInstance().setScreen(new NoteTunerScreen(tuner, tunerInOffhand));
     }
 }

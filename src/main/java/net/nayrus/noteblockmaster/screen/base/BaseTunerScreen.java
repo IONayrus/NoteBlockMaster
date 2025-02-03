@@ -24,14 +24,16 @@ public class BaseTunerScreen extends BaseScreen implements Button.OnPress{
     public int value;
     protected boolean setmode;
     protected final int maxValue;
+    protected final boolean itemInOffhand;
 
-    protected BaseTunerScreen(ItemStack item, int maxValue) {
+    protected BaseTunerScreen(ItemStack item, int maxValue, boolean itemInOffhand) {
         super(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png"), 176, 53);
         this.tuner = item;
         this.maxValue = maxValue;
+        this.itemInOffhand = itemInOffhand;
         TunerData data = TunerItem.getTunerData(item);
         value = data.value();
-        setmode = data.setmode();
+        setmode = data.isSetmode();
     }
 
     @Override
@@ -63,7 +65,7 @@ public class BaseTunerScreen extends BaseScreen implements Button.OnPress{
 
     @Override
     public void onClose() {
-        TunerData _new = new TunerData(value, setmode);
+        TunerData _new = TunerData.of(value, setmode, itemInOffhand);
         tuner.set(Registry.TUNER_DATA, _new);
         PacketDistributor.sendToServer(_new);
         super.onClose();

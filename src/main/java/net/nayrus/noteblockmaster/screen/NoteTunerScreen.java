@@ -13,8 +13,8 @@ import net.nayrus.noteblockmaster.utils.Utils;
 
 public class NoteTunerScreen extends BaseTunerScreen implements Button.OnPress{
 
-    public NoteTunerScreen(ItemStack item) {
-        super(item, AdvancedNoteBlock.TOTAL_NOTES);
+    public NoteTunerScreen(ItemStack item, boolean offhand) {
+        super(item, AdvancedNoteBlock.TOTAL_NOTES, offhand);
     }
 
     @Override

@@ -102,7 +102,7 @@ public class PacketHandler {
         Player player = context.player();
         FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
         if(!(items.contains(TunerItem.class))) return;
-        ItemStack stack = items.getFirst(TunerItem.class);
+        ItemStack stack = data.isInOffhand() ? items.getB() : items.getA();
         stack.set(Registry.TUNER_DATA, data);
     }
 
