@@ -71,8 +71,8 @@ public class ANBInfoRender {
         matrix.pushPose();
         matrix.translate(pos.getX() + 0.5, pos.getY() + 1.6F, pos.getZ() + 0.5);
 
-        renderInfoText(buffer, matrix, pos, text, RenderUtils.applyAlpha(RenderUtils.shiftColor(Color.LIGHT_GRAY, color, 0.8F), alpha), scale, new Vector3f(),0);
         renderInfoText(buffer, matrix, pos, text, RenderUtils.applyAlpha(RenderUtils.shiftColor(color, Color.BLACK, 0.5F), alpha / 1.25F), scale, new Vector3f(-0.008F),0);
+        renderInfoText(buffer, matrix, pos, text, RenderUtils.applyAlpha(RenderUtils.shiftColor(Color.LIGHT_GRAY, color, 0.8F), alpha), scale, new Vector3f(),0);
         renderInfoText(buffer, matrix, pos, " ".repeat(text.length() + 2), Color.BLACK, scale - 0.003F, new Vector3f(0.0F,0F,-0.02F), RenderUtils.applyAlpha(RenderUtils.shiftColor(Color.WHITE, color, 0.33F), alpha / 3.0F).getRGB());
 
         matrix.popPose();

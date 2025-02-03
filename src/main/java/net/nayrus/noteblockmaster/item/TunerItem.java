@@ -15,7 +15,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
@@ -82,16 +81,16 @@ public class TunerItem extends Item {
 
     private static void placeAdvancedNoteBlock(Level level, ItemStack tuner, BlockPos pos, TunerData data, ItemStack composer, Player player, Inventory inv) {
         if(!level.isClientSide()){
-            Block block = Registry.ADVANCED_NOTEBLOCK.get();
+            AdvancedNoteBlock block = (AdvancedNoteBlock) Registry.ADVANCED_NOTEBLOCK.get();
             if(tuner.is(Registry.NOTETUNER)) {
                 BlockState state = block.defaultBlockState().setValue(AdvancedNoteBlock.NOTE, data.value() + AdvancedNoteBlock.MIN_NOTE_VAL);
                 if(composer.is(Registry.TEMPOTUNER)) state = state.setValue(AdvancedNoteBlock.SUBTICK, getTunerData(composer).value());
-                level.setBlockAndUpdate(pos.above(), state);
+                level.setBlockAndUpdate(pos.above(), block.setInstrument(level, pos.above(), state));
             }
             else{
                 if(composer.is(Registry.COMPOSER)){
                     ComposeData cData = ComposeData.getComposeData(composer);
-                    level.setBlockAndUpdate(pos.above(), block.defaultBlockState()
+                    level.setBlockAndUpdate(pos.above(), block.setInstrument(level, pos.above(), block.defaultBlockState())
                             .setValue(AdvancedNoteBlock.SUBTICK, cData.subtick()));
                     if(!player.isShiftKeyDown()){
                         Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
@@ -101,7 +100,7 @@ public class TunerItem extends Item {
                 else{
                     BlockState state = block.defaultBlockState().setValue(AdvancedNoteBlock.SUBTICK, data.value());
                     if(composer.is(Registry.NOTETUNER)) state = state.setValue(AdvancedNoteBlock.NOTE, getTunerData(composer).value() + AdvancedNoteBlock.MIN_NOTE_VAL);
-                    level.setBlockAndUpdate(pos.above(), state);
+                    level.setBlockAndUpdate(pos.above(), block.setInstrument(level, pos.above(), state));
                 }
             }
             level.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);

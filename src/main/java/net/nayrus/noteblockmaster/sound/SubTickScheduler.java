@@ -47,23 +47,14 @@ public class SubTickScheduler {
     }
 
     public static void delayedCoredNoteBlockEvent(BlockState anb, BlockState core, Level level, BlockPos pos, AdvancedInstrument instrument){
-        if(!(level instanceof ServerLevel serverLevel)) {
-            delayedCoredNoteBlockEvent(
-                    pos,
-                    TuningCore.getSustain(core),
-                    AdvancedNoteBlock.getNoteValue(anb),
-                    (TuningCore.getVolume(core) / 20.0F),
-                    instrument, TuningCore.isMixing(core),
-                    anb.getValue(AdvancedNoteBlock.SUBTICK));
-        }else{
-            NetworkUtil.broadcastCoreSound(serverLevel, ScheduleCoreSound.of(
-                    pos,
-                    TuningCore.getSustain(core),
-                    AdvancedNoteBlock.getNoteValue(anb),
-                    (TuningCore.getVolume(core) / 20.0F),
-                    instrument, TuningCore.isMixing(core),
-                    anb.getValue(AdvancedNoteBlock.SUBTICK)));
-        }
+        if(!(level instanceof ServerLevel serverLevel)) return;
+        NetworkUtil.broadcastCoreSound(serverLevel, ScheduleCoreSound.of(
+                pos,
+                TuningCore.getSustain(core),
+                AdvancedNoteBlock.getNoteValue(anb),
+                (TuningCore.getVolume(core) / 20.0F),
+                instrument, TuningCore.isMixing(core),
+                anb.getValue(AdvancedNoteBlock.SUBTICK)));
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -87,7 +87,7 @@ public class AdvancedNoteBlock extends Block
         TuningCore.loadSustainProperty();
     }
 
-    private BlockState setInstrument(LevelReader reader, BlockPos pos, BlockState state) {
+    public BlockState setInstrument(LevelReader reader, BlockPos pos, BlockState state) {
         NoteBlockInstrument noteblockinstrument = reader.getBlockState(pos.below()).instrument();
         AdvancedInstrument instrument = noteblockinstrument.worksAboveNoteBlock() ? AdvancedInstrument.HARP : AdvancedInstrument.values()[noteblockinstrument.ordinal()];
         BlockState above = reader.getBlockState(pos.above());
