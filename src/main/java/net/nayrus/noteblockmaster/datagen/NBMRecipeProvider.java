@@ -75,7 +75,6 @@ public class NBMRecipeProvider extends RecipeProvider implements IConditionBuild
                 .requires(Items.LAPIS_LAZULI)
                 .unlockedBy("has_waker", has(NBMTags.Items.TUNERS)).save(this.output);
 
-        //TODO fix notetuner recipe
         TunerRecipeBuilder.shaped(RecipeCategory.MISC, Registry.NOTETUNER.get())
                 .pattern("PG")
                 .pattern("WP")

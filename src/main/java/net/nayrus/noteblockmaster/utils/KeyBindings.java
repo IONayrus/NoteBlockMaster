@@ -17,7 +17,7 @@ public class KeyBindings {
             KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_R,
-            "key.categories.noteblockmaster.nbm" // Mapping will be in the new example category
+            "key.categories.noteblockmaster.nbm"
     ));
 
     @OnlyIn(Dist.CLIENT)

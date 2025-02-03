@@ -33,7 +33,6 @@ public class ANBInfoRender {
         RenderSystem.disableDepthTest();
         RenderUtils.getBlocksInRange(renderRadius, pos -> level.getBlockState(pos).is(Registry.ADVANCED_NOTEBLOCK))
                 .forEach(pos -> renderNoteBlockInfo(e, pos, level.getBlockState(pos), info));
-        RenderSystem.enableDepthTest();
     }
 
     public static void renderNoteBlockInfo(RenderLevelStageEvent e, BlockPos pos, BlockState state, Utils.PROPERTY info){
