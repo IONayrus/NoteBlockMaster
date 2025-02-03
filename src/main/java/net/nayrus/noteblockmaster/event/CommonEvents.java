@@ -16,6 +16,8 @@ import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.command.BPMInfoCommand;
+import net.nayrus.noteblockmaster.command.MainCommand;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -23,9 +25,18 @@ import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
+import net.neoforged.neoforge.server.command.ConfigCommand;
 
 public class CommonEvents {
+
+    @SubscribeEvent
+    public static void onCommandRegister(RegisterCommandsEvent event){
+        new BPMInfoCommand(event.getDispatcher());
+        MainCommand.mainCommand(event.getDispatcher());
+        ConfigCommand.register(event.getDispatcher());
+    }
 
     @SubscribeEvent
     public static void useItemOnBlockEvent(UseItemOnBlockEvent event){

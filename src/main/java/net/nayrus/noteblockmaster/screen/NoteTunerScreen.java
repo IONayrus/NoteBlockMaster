@@ -13,8 +13,8 @@ import net.nayrus.noteblockmaster.utils.Utils;
 
 public class NoteTunerScreen extends BaseTunerScreen implements Button.OnPress{
 
-    public NoteTunerScreen(ItemStack item) {
-        super(item, AdvancedNoteBlock.TOTAL_NOTES);
+    public NoteTunerScreen(ItemStack item, boolean offhand) {
+        super(item, AdvancedNoteBlock.TOTAL_NOTES, offhand);
     }
 
     @Override
@@ -81,7 +81,6 @@ public class NoteTunerScreen extends BaseTunerScreen implements Button.OnPress{
                 || op.keyDown.matches(keyCode, scanCode)
                 || op.keyRight.matches(keyCode, scanCode)
                 || op.keyLeft.matches(keyCode, scanCode)
-                || op.keyShift.matches(keyCode, scanCode)
                 || op.keyJump.matches(keyCode, scanCode))
                 && !(Utils.isIntInRange(keyCode, 'A', 'G') && setmode))
             this.onClose();
@@ -91,7 +90,7 @@ public class NoteTunerScreen extends BaseTunerScreen implements Button.OnPress{
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if(this.slider.isMouseOver(mouseX, mouseY) || this.input.isMouseOver(mouseX, mouseY))
-            changeValue((int)(this.value + scrollY));
+            changeValue((int)(this.value + scrollY * (hasShiftDown() ? 2 : 1)));
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 

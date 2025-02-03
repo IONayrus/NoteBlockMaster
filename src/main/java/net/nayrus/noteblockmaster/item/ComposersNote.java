@@ -26,6 +26,8 @@ import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.screen.ComposerScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 public class ComposersNote extends Item {
 
@@ -98,9 +100,12 @@ public class ComposersNote extends Item {
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         ItemStack item = player.getItemInHand(usedHand);
-        if(level.isClientSide()){
-            Minecraft.getInstance().setScreen(new ComposerScreen(item));
-        }
+        if(level.isClientSide()) openComposer(item);
         return InteractionResult.SUCCESS;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void openComposer(ItemStack item){
+        Minecraft.getInstance().setScreen(new ComposerScreen(item));
     }
 }

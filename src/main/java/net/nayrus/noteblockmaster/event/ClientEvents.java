@@ -33,7 +33,7 @@ public class ClientEvents {
         while (KeyBindings.OPEN_OFFHAND_GUI.get().consumeClick()) {
             if(!(Minecraft.getInstance().player instanceof Player player)) return;
             ItemStack off = player.getOffhandItem();
-            if(off.is(NBMTags.Items.TUNERS)) TunerItem.openTunerGUI(off, player.getMainHandItem());
+            if(off.is(NBMTags.Items.TUNERS)) TunerItem.openTunerGUI(off, player.getMainHandItem(), true);
             if(off.is(Registry.COMPOSER)) Minecraft.getInstance().setScreen(new ComposerScreen(off));
         }
         if(ticks%200==0) CoreRender.clearMaps();

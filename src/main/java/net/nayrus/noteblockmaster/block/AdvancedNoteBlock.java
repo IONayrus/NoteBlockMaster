@@ -83,6 +83,8 @@ public class AdvancedNoteBlock extends Block
         NOTE = IntegerProperty.create("note", MIN_NOTE_VAL, MAX_NOTE_VAL);
 
         TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
+
+        TuningCore.loadSustainProperty();
     }
 
     private BlockState setInstrument(LevelReader reader, BlockPos pos, BlockState state) {
@@ -172,7 +174,7 @@ public class AdvancedNoteBlock extends Block
                         player.awardStat(Stats.PLAY_NOTEBLOCK);
                     }
                     else{
-                        int new_val = data.setmode() ? data.value() + MIN_NOTE_VAL : this.changeNoteValueBy(state, -data.value());
+                        int new_val = data.isSetmode() ? data.value() + MIN_NOTE_VAL : this.changeNoteValueBy(state, -data.value());
                         this.onNoteChange(level, player, state, pos, new_val);
                     }
                 }
@@ -182,7 +184,7 @@ public class AdvancedNoteBlock extends Block
                             .withColor(AdvancedNoteBlock.getColor(state, Utils.PROPERTY.TEMPO).getRGB()), true);
                     else{
                         int new_val;
-                        if(data.setmode()) new_val = data.value();
+                        if(data.isSetmode()) new_val = data.value();
                         else{
                             int diff = state.getValue(SUBTICK) - data.value();
                             new_val = diff < 0 ? (diff + SUBTICKS) : diff;

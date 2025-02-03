@@ -4,12 +4,15 @@ package net.nayrus.noteblockmaster.sound;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
+import net.nayrus.noteblockmaster.network.NetworkUtil;
+import net.nayrus.noteblockmaster.network.payload.ScheduleCoreSound;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +27,7 @@ public class SubTickScheduler {
 
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new SubtickThread());
     public static HashMap<BlockPos, CoreSound> SUSTAINED_SOUNDS = new HashMap<>();
+    public static final RandomSource RANDOM = RandomSource.create();
 
     public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos, AdvancedInstrument instrument, float volume){
         executor.schedule(() -> {
@@ -43,17 +47,44 @@ public class SubTickScheduler {
     }
 
     public static void delayedCoredNoteBlockEvent(BlockState anb, BlockState core, Level level, BlockPos pos, AdvancedInstrument instrument){
-        if(level.isClientSide()) {
-            int tuningIndex = TuningCore.getSustain(core);
-            CoreSound instance = new CoreSound(
-                    instrument.getSustainedEvent(tuningIndex), SoundSource.RECORDS, (TuningCore.getVolume(core) / 20.0F), AdvancedNoteBlock.getNoteValue(anb),
-                    RandomSource.create(level.getRandom().nextLong()), pos, instrument.getSustainTime(tuningIndex), TuningCore.isMixing(core));
-
-            executor.schedule(()-> playSustainingSound(instance),
-                    (long) anb.getValue(AdvancedNoteBlock.SUBTICK) * AdvancedNoteBlock.SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
+        if(!(level instanceof ServerLevel serverLevel)) {
+            delayedCoredNoteBlockEvent(
+                    pos,
+                    TuningCore.getSustain(core),
+                    AdvancedNoteBlock.getNoteValue(anb),
+                    (TuningCore.getVolume(core) / 20.0F),
+                    instrument, TuningCore.isMixing(core),
+                    anb.getValue(AdvancedNoteBlock.SUBTICK));
+        }else{
+            NetworkUtil.broadcastCoreSound(serverLevel, ScheduleCoreSound.of(
+                    pos,
+                    TuningCore.getSustain(core),
+                    AdvancedNoteBlock.getNoteValue(anb),
+                    (TuningCore.getVolume(core) / 20.0F),
+                    instrument, TuningCore.isMixing(core),
+                    anb.getValue(AdvancedNoteBlock.SUBTICK)));
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public static void delayedCoredNoteBlockEvent(
+            BlockPos pos,
+            int sustainIndex,
+            int noteVal,
+            float volume,
+            AdvancedInstrument instrument,
+            boolean noDecay,
+            int delay
+    ){
+        CoreSound instance = new CoreSound(
+                instrument.getSustainedEvent(sustainIndex), SoundSource.RECORDS, volume, noteVal,
+                RandomSource.create(RANDOM.nextLong()), pos, instrument.getSustainTime(sustainIndex), noDecay);
+
+        executor.schedule(()-> playSustainingSound(instance),
+                (long) delay * AdvancedNoteBlock.SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
+    }
+
+    @OnlyIn(Dist.CLIENT)
     public static void playSustainingSound(CoreSound sound) {
         playbackStop(sound.getImmutablePos());
         Minecraft.getInstance().getSoundManager().play(sound);
