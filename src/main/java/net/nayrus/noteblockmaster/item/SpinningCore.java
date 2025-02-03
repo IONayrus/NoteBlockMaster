@@ -50,7 +50,7 @@ public class SpinningCore extends Item {
             return InteractionResult.CONSUME;
         }
         if(hand.equals(InteractionHand.OFF_HAND)) player.swing(hand);
-        return InteractionResult.CONSUME;
+        return InteractionResult.SUCCESS;
     }
 
     public InteractionResult addCoreToTuningCore(Level level, Player player, BlockPos pos, BlockState state, ItemStack stack, InteractionHand hand, AdvancedInstrument instrument){
