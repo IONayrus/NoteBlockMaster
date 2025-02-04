@@ -21,13 +21,15 @@ public class BaseComposerScreen extends BaseScreen implements Button.OnPress{
     protected final ItemStack composer;
     public float bpm_val;
     public int beat_val;
+    private final float init_bpm;
+    private final int init_beat;
 
     protected BaseComposerScreen(ItemStack composer) {
         super(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png"), 176, 53);
         this.composer = composer;
         ComposeData data = ComposeData.getComposeData(composer);
-        bpm_val = data.bpm();
-        beat_val = data.beat();
+        init_bpm = data.bpm(); bpm_val = data.bpm();
+        init_beat = data.beat(); beat_val = data.beat();
     }
 
     @Override
@@ -37,21 +39,23 @@ public class BaseComposerScreen extends BaseScreen implements Button.OnPress{
 
     @Override
     public void onClose() {
-        Tuple<Integer, Integer> calc = ComposersNote.subtickAndPauseOnBeat(this.beat_val, this.bpm_val);
-        ComposeData _new = new ComposeData(this.beat_val, calc.getA(), calc.getB(), this.bpm_val);
-        composer.set(Registry.COMPOSE_DATA, _new);
-        PacketDistributor.sendToServer(_new);
+        if(init_bpm != bpm_val || init_beat != beat_val){
+            Tuple<Integer, Integer> calc = ComposersNote.subtickAndPauseOnBeat(this.beat_val, this.bpm_val);
+            ComposeData _new = new ComposeData(this.beat_val, calc.getA(), calc.getB(), this.bpm_val);
+            composer.set(Registry.COMPOSE_DATA, _new);
+            PacketDistributor.sendToServer(_new);
+        }
         super.onClose();
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if(this.bpm.isMouseOver(mouseX, mouseY))
-            changeBPMVal(this.bpm_val + (float) scrollY);
+            changeBPMVal(this.bpm_val + (float) scrollY * (hasShiftDown() ? 2 : 1 ));
         if(this.beat.isMouseOver(mouseX, mouseY))
-            changeBeatVal((int)(this.beat_val + scrollY));
+            changeBeatVal((int)(this.beat_val + scrollY * (hasShiftDown() ? 2 : 1 )));
         else if(this.decrease.isMouseOver(mouseX, mouseY)) {
-            changeBeatVal((int)(this.beat_val + scrollY));
+            changeBeatVal((int)(this.beat_val + scrollY * (hasShiftDown() ? 2 : 1 )));
             this.decrease.playDownSound(Minecraft.getInstance().getSoundManager());
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
