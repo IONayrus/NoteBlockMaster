@@ -13,6 +13,9 @@ import net.nayrus.noteblockmaster.screen.widget.IntegerEditBox;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class BaseComposerScreen extends BaseScreen implements Button.OnPress{
 
     protected IntegerEditBox beat;
@@ -51,11 +54,13 @@ public class BaseComposerScreen extends BaseScreen implements Button.OnPress{
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if(this.bpm.isMouseOver(mouseX, mouseY))
-            changeBPMVal(this.bpm_val + (float) scrollY * (hasShiftDown() ? 2 : 1 ));
+            changeBPMVal(BigDecimal.valueOf(this.bpm_val)
+                    .add(getScrollFactor().multiply(BigDecimal.valueOf(scrollY)))
+                    .setScale(4, RoundingMode.HALF_UP).floatValue());
         if(this.beat.isMouseOver(mouseX, mouseY))
-            changeBeatVal((int)(this.beat_val + scrollY * (hasShiftDown() ? 2 : 1 )));
+            changeBeatVal((int)(this.beat_val + scrollY * getScrollFactor().floatValue()));
         else if(this.decrease.isMouseOver(mouseX, mouseY)) {
-            changeBeatVal((int)(this.beat_val + scrollY * (hasShiftDown() ? 2 : 1 )));
+            changeBeatVal((int)(this.beat_val + scrollY * getScrollFactor().floatValue()));
             this.decrease.playDownSound(Minecraft.getInstance().getSoundManager());
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);

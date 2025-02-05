@@ -7,6 +7,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.nayrus.noteblockmaster.utils.Utils;
 
+import java.math.BigDecimal;
+
 public class BaseScreen extends Screen {
 
     protected final ResourceLocation GUI;
@@ -48,5 +50,17 @@ public class BaseScreen extends Screen {
         if(!Utils.isIntInRange((int)mouseX, getRelX() , getRelX() + this.guiWidth)
                 || !Utils.isIntInRange((int)mouseY, getRelY(), getRelY() + this.guiHeight))
             onClose();
+    }
+
+    public BigDecimal getScrollFactor(boolean reduceOnAlt){
+        BigDecimal factor = BigDecimal.ONE;
+        if (hasShiftDown()) factor = factor.multiply(BigDecimal.valueOf(2));
+        if (hasControlDown()) factor = factor.multiply(BigDecimal.valueOf(5));
+        if (hasAltDown()) factor = factor.multiply(BigDecimal.valueOf(reduceOnAlt ? 0.1 : 3));
+        return factor;
+    }
+
+    public BigDecimal getScrollFactor(){
+        return getScrollFactor(true);
     }
 }

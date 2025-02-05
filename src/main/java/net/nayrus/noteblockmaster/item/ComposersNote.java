@@ -58,7 +58,7 @@ public class ComposersNote extends Item {
     private static InteractionResult placeRepeater(UseOnContext context, Player player, Level level, BlockPos pos, Inventory inv) {
         ItemStack composer = context.getItemInHand();
         ComposeData cData = ComposeData.getComposeData(composer);
-        int target = cData.preDelay();
+        int target = cData.postDelay();
         int set = Math.min(target, 4);
         if(target>0) {
             target -= set;
@@ -80,9 +80,9 @@ public class ComposersNote extends Item {
     public static Tuple<Integer, Integer> subtickAndPauseOnBeat(int beat, float bpm){
         float tPB = 60000 / bpm;
         int current_subtick = 0;
-        int pre_delay = 0;
+        int post_delay = 0;
         int lastTime = 0;
-        for(int i = (beat - 1); i <= beat; i++){
+        for(int i = beat; i <= beat + 1; i++){
             int noteTimeMs = (int) (i * tPB);
             int subTickTime = noteTimeMs % 100;
             int redClockTime = noteTimeMs - subTickTime;
@@ -90,11 +90,12 @@ public class ComposersNote extends Item {
 
             if(i == beat){
                current_subtick = subtick;
-               pre_delay = ((redClockTime - lastTime) / 100);
+            }else{
+                post_delay = ((redClockTime - lastTime) / 100);
             }
             lastTime = redClockTime;
         }
-        return new Tuple<>(current_subtick, pre_delay);
+        return new Tuple<>(current_subtick, post_delay);
     }
 
     @Override
