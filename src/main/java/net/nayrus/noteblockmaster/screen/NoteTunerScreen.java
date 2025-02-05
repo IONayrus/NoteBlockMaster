@@ -90,7 +90,7 @@ public class NoteTunerScreen extends BaseTunerScreen implements Button.OnPress{
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if(this.slider.isMouseOver(mouseX, mouseY) || this.input.isMouseOver(mouseX, mouseY))
-            changeValue((int)(this.value + scrollY * (hasShiftDown() ? 2 : 1)));
+            changeValue((int)(this.value + scrollY * getScrollFactor(false).floatValue()));
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 

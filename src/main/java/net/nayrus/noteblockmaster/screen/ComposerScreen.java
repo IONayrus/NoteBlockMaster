@@ -58,7 +58,6 @@ public class ComposerScreen extends BaseComposerScreen {
                 || op.keyDown.matches(keyCode, scanCode)
                 || op.keyRight.matches(keyCode, scanCode)
                 || op.keyLeft.matches(keyCode, scanCode)
-                || op.keyShift.matches(keyCode, scanCode)
                 || op.keyJump.matches(keyCode, scanCode)
                 || keyCode == 257)
             this.onClose();

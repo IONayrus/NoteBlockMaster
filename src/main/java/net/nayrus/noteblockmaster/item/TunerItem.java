@@ -90,12 +90,14 @@ public class TunerItem extends Item {
             else{
                 if(composer.is(Registry.COMPOSER)){
                     ComposeData cData = ComposeData.getComposeData(composer);
-                    level.setBlockAndUpdate(pos.above(), block.setInstrument(level, pos.above(), block.defaultBlockState())
-                            .setValue(AdvancedNoteBlock.SUBTICK, cData.subtick()));
                     if(!player.isShiftKeyDown()){
                         Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
-                        composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
+                        ComposeData new_ = new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm());
+                        composer.set(Registry.COMPOSE_DATA, new_);
+                        cData = new_;
                     }
+                    level.setBlockAndUpdate(pos.above(), block.setInstrument(level, pos.above(), block.defaultBlockState())
+                            .setValue(AdvancedNoteBlock.SUBTICK, cData.subtick()));
                 }
                 else{
                     BlockState state = block.defaultBlockState().setValue(AdvancedNoteBlock.SUBTICK, data.value());

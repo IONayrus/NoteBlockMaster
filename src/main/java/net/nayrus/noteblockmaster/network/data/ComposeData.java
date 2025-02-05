@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.setup.Registry;
 
-public record ComposeData(int beat, int subtick, int preDelay, float bpm) implements CustomPacketPayload {
+public record ComposeData(int beat, int subtick, int postDelay, float bpm) implements CustomPacketPayload {
 
     public static final Type<ComposeData> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "composedata"));
 
@@ -19,7 +19,7 @@ public record ComposeData(int beat, int subtick, int preDelay, float bpm) implem
             instance.group(
                     Codec.INT.fieldOf("beat").forGetter(ComposeData::beat),
                     Codec.INT.fieldOf("subtick").forGetter(ComposeData::subtick),
-                    Codec.INT.fieldOf("delay").forGetter(ComposeData::preDelay),
+                    Codec.INT.fieldOf("delay").forGetter(ComposeData::postDelay),
                     Codec.FLOAT.fieldOf("bpm").forGetter(ComposeData::bpm)
             ).apply(instance, ComposeData::new)
 
@@ -28,7 +28,7 @@ public record ComposeData(int beat, int subtick, int preDelay, float bpm) implem
     public static final StreamCodec<FriendlyByteBuf, ComposeData> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, ComposeData::beat,
             ByteBufCodecs.INT, ComposeData::subtick,
-            ByteBufCodecs.INT, ComposeData::preDelay,
+            ByteBufCodecs.INT, ComposeData::postDelay,
             ByteBufCodecs.FLOAT, ComposeData::bpm,
             ComposeData::new
     );

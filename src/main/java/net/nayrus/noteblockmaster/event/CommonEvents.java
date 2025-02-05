@@ -72,7 +72,7 @@ public class CommonEvents {
             if(state.getBlock() instanceof RepeaterBlock && items.contains(Registry.COMPOSER.get())){
                 ItemStack composer = items.getFirst(Registry.COMPOSER.get());
                 ComposeData cData = ComposeData.getComposeData(composer);
-                int target = cData.preDelay();
+                int target = cData.postDelay();
                 int set = Math.min(target, 4);
                 if(target>0){
                     target -= set;
