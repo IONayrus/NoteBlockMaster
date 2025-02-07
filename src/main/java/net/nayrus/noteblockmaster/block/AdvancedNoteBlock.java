@@ -120,7 +120,7 @@ public class AdvancedNoteBlock extends Block
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(!stack.is(NBMTags.Items.TUNERS) && !stack.is(Registry.COMPOSER) && !stack.is(NBMTags.Items.CORES))
+        if(!stack.is(NBMTags.Items.TUNERS) && !stack.is(Registry.COMPOSITION) && !stack.is(NBMTags.Items.CORES))
             return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         return InteractionResult.PASS;
     }

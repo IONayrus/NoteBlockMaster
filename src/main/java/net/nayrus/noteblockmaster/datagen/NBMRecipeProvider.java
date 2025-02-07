@@ -69,7 +69,7 @@ public class NBMRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('C', Registry.CORE).define('W', Items.WHITE_WOOL).define('F', Items.FEATHER)
                 .unlockedBy("has_core", has(Registry.CORE)).save(this.output);
 
-        shapeless(RecipeCategory.MISC, Registry.COMPOSER)
+        shapeless(RecipeCategory.MISC, Registry.COMPOSITION)
                 .requires(NBMTags.Items.TUNERS)
                 .requires(Items.PAPER)
                 .requires(Items.LAPIS_LAZULI)

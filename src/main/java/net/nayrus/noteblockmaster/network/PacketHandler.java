@@ -109,8 +109,8 @@ public class PacketHandler {
     private static void handleComposeData(final ComposeData data, final IPayloadContext context) {
         Player player = context.player();
         FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
-        if(!(items.contains(Registry.COMPOSER.get()))) return;
-        ItemStack stack = items.getFirst(Registry.COMPOSER.get());
+        if(!(items.contains(Registry.COMPOSITION.get()))) return;
+        ItemStack stack = items.getFirst(Registry.COMPOSITION.get());
         stack.set(Registry.COMPOSE_DATA, data);
     }
 

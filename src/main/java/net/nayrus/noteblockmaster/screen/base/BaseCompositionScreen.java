@@ -16,7 +16,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class BaseComposerScreen extends BaseScreen implements Button.OnPress{
+public class BaseCompositionScreen extends BaseScreen implements Button.OnPress{
 
     protected IntegerEditBox beat;
     protected FloatEditBox bpm;
@@ -27,7 +27,7 @@ public class BaseComposerScreen extends BaseScreen implements Button.OnPress{
     private final float init_bpm;
     private final int init_beat;
 
-    protected BaseComposerScreen(ItemStack composer) {
+    protected BaseCompositionScreen(ItemStack composer) {
         super(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "textures/gui/tunerscreen.png"), 176, 53, 256, 256);
         this.composer = composer;
         ComposeData data = ComposeData.getComposeData(composer);

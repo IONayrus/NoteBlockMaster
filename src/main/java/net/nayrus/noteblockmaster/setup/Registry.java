@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
+import net.nayrus.noteblockmaster.block.composer.ComposerBlock;
 import net.nayrus.noteblockmaster.item.ComposersNote;
 import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
@@ -51,11 +52,12 @@ public class Registry
 
     public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock", AdvancedNoteBlock::new);
     public static final DeferredBlock<Block> TUNINGCORE = Registry.BLOCKS.register("tuningcore", TuningCore::new);
+    public static final DeferredBlock<Block> COMPOSER = Registry.BLOCKS.register("composer", ComposerBlock::new);
     public static final Map<DeferredBlock<Block>, DeferredItem<Item>> BLOCK_ITEMS;
 
     public static final DeferredItem<Item> TEMPOTUNER = ITEMS.register("tempotuner", TunerItem::new);
     public static final DeferredItem<Item> NOTETUNER = ITEMS.register("notetuner", TunerItem::new);
-    public static final DeferredItem<Item> COMPOSER = ITEMS.register("composer", ComposersNote::new);
+    public static final DeferredItem<Item> COMPOSITION = ITEMS.register("composition", ComposersNote::new);
     public static final DeferredItem<Item> CORE = ITEMS.register("core", () -> new Item(new Item.Properties()
             .setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "core")))));
     public static final DeferredItem<Item> SUSTAIN = ITEMS.register("sustain", SpinningCore::new);
@@ -80,6 +82,7 @@ public class Registry
     static{
         Map<DeferredBlock<Block>,DeferredItem<Item>> block_items = new HashMap<>();
         block_items.put(ADVANCED_NOTEBLOCK, createBlockItem(ADVANCED_NOTEBLOCK));
+        block_items.put(COMPOSER, createBlockItem(COMPOSER));
         BLOCK_ITEMS = block_items;
 
         CREATIVE_MODE_TABS.register("noteblockmaster", ()-> CreativeModeTab.builder()
@@ -92,7 +95,7 @@ public class Registry
 
     public static DeferredItem<Item> createBlockItem(DeferredBlock<Block> block){
         return Registry.ITEMS.register(block.getId().getPath(),
-                ()-> new BlockItem(Registry.ADVANCED_NOTEBLOCK.get(), new Item.Properties()
+                ()-> new BlockItem(block.get(), new Item.Properties()
                         .setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, block.getId().getPath())))));
     }
 

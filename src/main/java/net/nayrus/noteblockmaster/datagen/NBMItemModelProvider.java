@@ -20,7 +20,7 @@ public class NBMItemModelProvider extends ItemModelProvider {
         handheldItem(Registry.TEMPOTUNER);
         handheldItem(Registry.NOTETUNER);
 
-        basicItem(Registry.COMPOSER.get());
+        basicItem(Registry.COMPOSITION.get());
 
         customRendered(Registry.SUSTAIN);
         customRendered(Registry.VOLUME);

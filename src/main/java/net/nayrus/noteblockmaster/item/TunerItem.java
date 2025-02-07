@@ -64,7 +64,7 @@ public class TunerItem extends Item {
         }
         TunerData data = getTunerData(tuner);
         if(!(state.getBlock() instanceof AdvancedNoteBlock block)){
-            if(!data.isSetmode() && !composer.is(Registry.COMPOSER)) return InteractionResult.PASS;
+            if(!data.isSetmode() && !composer.is(Registry.COMPOSITION)) return InteractionResult.PASS;
             Inventory inv = player.getInventory();
             if(inv.contains(item -> item.is(Registry.ADVANCED_NOTEBLOCK.asItem())) && !doOffHandSwing){
                 placeAdvancedNoteBlock(level, tuner, pos, data, composer, player, inv);
@@ -88,7 +88,7 @@ public class TunerItem extends Item {
                 level.setBlockAndUpdate(pos.above(), block.setInstrument(level, pos.above(), state));
             }
             else{
-                if(composer.is(Registry.COMPOSER)){
+                if(composer.is(Registry.COMPOSITION)){
                     ComposeData cData = ComposeData.getComposeData(composer);
                     if(!player.isShiftKeyDown()){
                         Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
@@ -121,7 +121,7 @@ public class TunerItem extends Item {
     private static InteractionResult changeSubtickOn(Level level, AdvancedNoteBlock block, ItemStack composer, TunerData data, BlockState state, Player player, BlockPos pos, boolean doOffHandSwing) {
         if(!level.isClientSide()) {
             int new_val;
-            if (!composer.is(Registry.COMPOSER))
+            if (!composer.is(Registry.COMPOSITION))
                 new_val = (data.isSetmode() ? data.value() : state.getValue(AdvancedNoteBlock.SUBTICK) + data.value()) % AdvancedNoteBlock.SUBTICKS;
             else {
                 ComposeData cData = ComposeData.getComposeData(composer);

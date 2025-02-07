@@ -17,10 +17,11 @@ public class NBMLangProvider extends LanguageProvider {
     @Override
     protected void addTranslations() {
         addBlockWithItem(Registry.ADVANCED_NOTEBLOCK, "Advanced Note Block");
+        addBlockWithItem(Registry.COMPOSER, "Composer");
         add(Registry.TUNINGCORE.get(), "Tuning Core");
         add(Registry.TEMPOTUNER.get(), "Tempo Tuner");
         add(Registry.NOTETUNER.get(), "Note Tuner");
-        add(Registry.COMPOSER.get(), "Composers Note");
+        add(Registry.COMPOSITION.get(), "Composers Note");
         add(Registry.CORE.get(), "Core Base");
         add(Registry.SUSTAIN.get(), "Sustaining Core");
         add(Registry.VOLUME.get(), "Mixing Core");

@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
-import net.nayrus.noteblockmaster.screen.ComposerScreen;
+import net.nayrus.noteblockmaster.screen.CompositionScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.api.distmarker.Dist;
@@ -107,6 +107,6 @@ public class ComposersNote extends Item {
 
     @OnlyIn(Dist.CLIENT)
     public static void openComposer(ItemStack item){
-        Minecraft.getInstance().setScreen(new ComposerScreen(item));
+        Minecraft.getInstance().setScreen(new CompositionScreen(item));
     }
 }

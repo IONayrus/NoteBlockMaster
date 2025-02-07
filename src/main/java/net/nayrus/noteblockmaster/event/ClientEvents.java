@@ -10,7 +10,7 @@ import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.render.CoreRender;
 import net.nayrus.noteblockmaster.render.utils.RenderUtils;
-import net.nayrus.noteblockmaster.screen.ComposerScreen;
+import net.nayrus.noteblockmaster.screen.CompositionScreen;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.CoreSound;
@@ -34,7 +34,7 @@ public class ClientEvents {
             if(!(Minecraft.getInstance().player instanceof Player player)) return;
             ItemStack off = player.getOffhandItem();
             if(off.is(NBMTags.Items.TUNERS)) TunerItem.openTunerGUI(off, player.getMainHandItem(), true);
-            if(off.is(Registry.COMPOSER)) Minecraft.getInstance().setScreen(new ComposerScreen(off));
+            if(off.is(Registry.COMPOSITION)) Minecraft.getInstance().setScreen(new CompositionScreen(off));
         }
         if(ticks%200==0) CoreRender.clearMaps();
         ticks++;
@@ -57,8 +57,8 @@ public class ClientEvents {
             else if (items.getB().is(NBMTags.Items.TUNERS))
                 ANBInfoRender.renderNoteBlockInfo(e, level, items.getB().is(Registry.NOTETUNER) ? Utils.PROPERTY.NOTE : Utils.PROPERTY.TEMPO);
 
-            if (items.contains(Registry.COMPOSER.get())) {
-                ItemStack composer = items.getFirst(Registry.COMPOSER.get());
+            if (items.contains(Registry.COMPOSITION.get())) {
+                ItemStack composer = items.getFirst(Registry.COMPOSITION.get());
                 ComposeData cData = ComposeData.getComposeData(composer);
                 player.displayClientMessage(Component.literal("Next repeater delay: " + cData.postDelay()).withColor(Color.RED.darker().getRGB()), true);
             }

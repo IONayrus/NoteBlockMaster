@@ -69,8 +69,8 @@ public class CommonEvents {
                 }
             }
             //Repeater quick set
-            if(state.getBlock() instanceof RepeaterBlock && items.contains(Registry.COMPOSER.get())){
-                ItemStack composer = items.getFirst(Registry.COMPOSER.get());
+            if(state.getBlock() instanceof RepeaterBlock && items.contains(Registry.COMPOSITION.get())){
+                ItemStack composer = items.getFirst(Registry.COMPOSITION.get());
                 ComposeData cData = ComposeData.getComposeData(composer);
                 int target = cData.postDelay();
                 int set = Math.min(target, 4);
@@ -80,7 +80,7 @@ public class CommonEvents {
                         level.setBlock(pos, state.setValue(RepeaterBlock.DELAY, set), NoteBlock.UPDATE_ALL);
                         composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat(), cData.subtick(), target, cData.bpm()));
                     }
-                    if(items.getA().is(Registry.COMPOSER)) event.cancelWithResult(InteractionResult.SUCCESS);
+                    if(items.getA().is(Registry.COMPOSITION)) event.cancelWithResult(InteractionResult.SUCCESS);
                     else{
                         event.cancelWithResult(InteractionResult.CONSUME);
                         player.swing(InteractionHand.OFF_HAND);
