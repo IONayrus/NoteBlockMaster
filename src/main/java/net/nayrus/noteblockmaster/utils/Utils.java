@@ -94,4 +94,11 @@ public class Utils {
     public static float normalizeAngle(float angle) {
         return (angle % (2 * (float) Math.PI) + (2 * (float) Math.PI)) % (2 * (float) Math.PI);
     }
+
+    public static float getAngleToBlock(BlockPos pos, Player player) {
+        double dx = pos.getX() + 0.5 - player.getX();
+        double dz = pos.getZ() + 0.5 - player.getZ();
+        return (float) Math.toDegrees(Math.atan2(dz, dx));
+    }
+
 }

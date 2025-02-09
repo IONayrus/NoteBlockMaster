@@ -1,6 +1,7 @@
 package net.nayrus.noteblockmaster.block.composer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -17,7 +18,11 @@ public class ComposerRenderer implements BlockEntityRenderer<ComposerBlockEntity
         if(item.isEmpty()) return;
 
         poseStack.pushPose();
-        poseStack.translate(0,1.0,0);
+
+        poseStack.mulPose(Axis.XP.rotationDegrees(-90));
+        poseStack.rotateAround(Axis.ZP.rotationDegrees(-blockEntity.getRotation() - 45), 0.5F,-0.5F,0);
+        poseStack.translate(0.48,-0.7,0.966);
+        poseStack.scale(1.5F,1.5F,1.5F);
 
         renderer.renderStatic(
                 item,
