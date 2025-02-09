@@ -18,10 +18,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
-import net.nayrus.noteblockmaster.block.composer.ComposerBlock;
-import net.nayrus.noteblockmaster.block.composer.ComposerBlockEntity;
-import net.nayrus.noteblockmaster.block.composer.ComposerContainer;
-import net.nayrus.noteblockmaster.block.composer.ComposerRenderer;
+import net.nayrus.noteblockmaster.block.composer.*;
 import net.nayrus.noteblockmaster.item.ComposersNote;
 import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
@@ -34,7 +31,10 @@ import net.nayrus.noteblockmaster.render.particle.SustainedNoteType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -48,6 +48,7 @@ import java.util.function.Supplier;
 
 import static net.nayrus.noteblockmaster.NoteBlockMaster.MOD_ID;
 
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = MOD_ID, value = Dist.CLIENT)
 public class Registry
 {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MOD_ID);
@@ -86,7 +87,7 @@ public class Registry
     //Particle
     public static final DeferredHolder<ParticleType<?>, SustainedNoteType> SUSTAINED_NOTE = PARTICLE_TYPES.register("sustained_note", () -> new SustainedNoteType(false));
     //Menu
-    public static final Supplier<MenuType<ComposerContainer>> COMPOSER_MENU = MENU_TYPES.register("my_menu", () -> new MenuType<>(ComposerContainer::new, FeatureFlags.DEFAULT_FLAGS));
+    public static final Supplier<MenuType<ComposerContainer>> COMPOSER_MENU = MENU_TYPES.register("composer_menu", () -> new MenuType<>(ComposerContainer::new, FeatureFlags.DEFAULT_FLAGS));
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
@@ -96,6 +97,7 @@ public class Registry
         DATA_COMPONENT_TYPES.register(eventBus);
         //DATA_ATTACHMENT_TYPES.register(eventBus);
         PARTICLE_TYPES.register(eventBus);
+        MENU_TYPES.register(eventBus);
     }
 
     static{
@@ -119,17 +121,26 @@ public class Registry
     }
 
     @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerItem(new SpinningCoreRender.Extension(), VOLUME, SUSTAIN);
         event.registerItem(new CoreBaseRender.Extension(), CORE);
     }
 
     @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(COMPOSER_BE.get(), context -> new ComposerRenderer());
     }
 
     @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public static void registerMenuScreens(RegisterMenuScreensEvent event){
+        event.register(COMPOSER_MENU.get(), ComposerScreen::new);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent event) {
         if(!(Minecraft.getInstance().particleEngine instanceof ISpriteAccessor vanillaSprites)) return;
 

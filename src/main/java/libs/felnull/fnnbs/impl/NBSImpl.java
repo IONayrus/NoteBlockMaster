@@ -134,7 +134,7 @@ public class NBSImpl implements NBS {
     }
 
     private static int readSignedShort(InputStream stream) throws IOException {
-        return stream.read() + (stream.read() << 8);
+        return (short) (stream.read() | (stream.read() << 8));
     }
 
     private static boolean readBoolean(InputStream stream) throws IOException {

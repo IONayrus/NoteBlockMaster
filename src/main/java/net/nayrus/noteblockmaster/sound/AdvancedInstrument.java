@@ -7,13 +7,13 @@ import net.minecraft.util.StringRepresentable;
 
 public enum AdvancedInstrument implements StringRepresentable {
     HARP("harp", SoundEvents.NOTE_BLOCK_HARP),
+    BASS("bass", SoundEvents.NOTE_BLOCK_BASS),
     BASEDRUM("basedrum", SoundEvents.NOTE_BLOCK_BASEDRUM),
     SNARE("snare", SoundEvents.NOTE_BLOCK_SNARE),
     HAT("hat", SoundEvents.NOTE_BLOCK_HAT),
-    BASS("bass", SoundEvents.NOTE_BLOCK_BASS),
+    GUITAR("guitar", SoundEvents.NOTE_BLOCK_GUITAR),
     FLUTE("flute", SoundEvents.NOTE_BLOCK_FLUTE),
     BELL("bell", SoundEvents.NOTE_BLOCK_BELL),
-    GUITAR("guitar", SoundEvents.NOTE_BLOCK_GUITAR),
     CHIME("chime", SoundEvents.NOTE_BLOCK_CHIME),
     XYLOPHONE("xylophone", SoundEvents.NOTE_BLOCK_XYLOPHONE),
     IRON_XYLOPHONE("iron_xylophone", SoundEvents.NOTE_BLOCK_IRON_XYLOPHONE),

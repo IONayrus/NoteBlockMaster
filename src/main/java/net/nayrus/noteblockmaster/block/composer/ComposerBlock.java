@@ -1,14 +1,19 @@
 package net.nayrus.noteblockmaster.block.composer;
 
+import libs.felnull.fnnbs.Layer;
 import libs.felnull.fnnbs.NBS;
+import libs.felnull.fnnbs.Note;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -78,7 +83,7 @@ public class ComposerBlock extends Block implements EntityBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(!(level.getBlockEntity(pos) instanceof ComposerBlockEntity BE)) return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         if(!level.isClientSide()){
-            if(!stack.is(Registry.COMPOSITION)) return InteractionResult.SUCCESS; //Open Menu
+            if(!stack.is(Registry.COMPOSITION)) return InteractionResult.TRY_WITH_EMPTY_HAND;
             ItemStack item = BE.getItem();
             float rotation = Utils.getAngleToBlock(pos, player);
             if(item.isEmpty()){
@@ -94,10 +99,24 @@ public class ComposerBlock extends Block implements EntityBlock {
             }
             return InteractionResult.SUCCESS;
         }
-        if(stack.is(Registry.COMPOSITION)){
-            return InteractionResult.SUCCESS;
-        }
+        if(stack.is(Registry.COMPOSITION)) return InteractionResult.SUCCESS;
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if(!level.isClientSide() && player instanceof ServerPlayer serverPlayer){
+            //serverPlayer.openMenu(state.getMenuProvider(level, pos));
+            NBS nbs = loadNBSFile("Test");
+            if(nbs!= null){
+                for(Layer layer : nbs.getLayers())
+                    for(Note note : layer.getNotes().values()){
+                        NoteBlockMaster.LOGGER.debug(note.toString());
+                        NoteBlockMaster.LOGGER.debug(net.nayrus.noteblockmaster.block.composer.Note.of(note).toString());
+                    }
+            }
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -126,5 +145,11 @@ public class ComposerBlock extends Block implements EntityBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState().setValue(BlockStateProperties.FACING, context.getHorizontalDirection().getOpposite());
+    }
+
+    @Override
+    protected @Nullable MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+        return new SimpleMenuProvider((containerId, playerInventory, player) -> new ComposerContainer(containerId, playerInventory),
+                Component.translatable("menu.title.noteblockmaster.composer"));
     }
 }

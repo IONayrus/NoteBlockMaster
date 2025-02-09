@@ -51,9 +51,6 @@ public class NoteBlockMaster
         if(FMLEnvironment.dist == Dist.CLIENT){
             NeoForge.EVENT_BUS.register(ClientEvents.class);
             modEventBus.addListener(this::onFMLClientSetup);
-            modEventBus.addListener(Registry::registerClientExtensions);
-            modEventBus.addListener(Registry::registerEntityRenderers);
-            modEventBus.addListener(Registry::registerParticles);
             modEventBus.addListener(KeyBindings::registerBindings);
         }else{
             NeoForge.EVENT_BUS.register(ServerEvents.class);
