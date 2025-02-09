@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "noteblockmaster:block/composer"
+    },
+    "facing=down": {
+      "model": "noteblockmaster:block/composer"
+    },
+    "facing=north": {
+      "model": "noteblockmaster:block/composer"
+    },
+    "facing=south": {
+      "model": "noteblockmaster:block/composer",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "noteblockmaster:block/composer",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "noteblockmaster:block/composer",
+      "y": 270
+    }
+  }
+}

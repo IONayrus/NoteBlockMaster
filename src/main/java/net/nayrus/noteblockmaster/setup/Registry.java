@@ -8,6 +8,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -17,6 +19,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
 import net.nayrus.noteblockmaster.block.composer.ComposerBlock;
+import net.nayrus.noteblockmaster.block.composer.ComposerBlockEntity;
+import net.nayrus.noteblockmaster.block.composer.ComposerContainer;
+import net.nayrus.noteblockmaster.block.composer.ComposerRenderer;
 import net.nayrus.noteblockmaster.item.ComposersNote;
 import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
@@ -29,6 +34,7 @@ import net.nayrus.noteblockmaster.render.particle.SustainedNoteType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -38,6 +44,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static net.nayrus.noteblockmaster.NoteBlockMaster.MOD_ID;
 
@@ -48,13 +55,20 @@ public class Registry
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
     public static final DeferredRegister.DataComponents DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MOD_ID);
+    //public static final DeferredRegister<AttachmentType<?>> DATA_ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MOD_ID);
     public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES = DeferredRegister.create(Registries.PARTICLE_TYPE, MOD_ID);
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, MOD_ID);
 
-    public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = Registry.BLOCKS.register("advanced_noteblock", AdvancedNoteBlock::new);
-    public static final DeferredBlock<Block> TUNINGCORE = Registry.BLOCKS.register("tuningcore", TuningCore::new);
-    public static final DeferredBlock<Block> COMPOSER = Registry.BLOCKS.register("composer", ComposerBlock::new);
+    //Blocks
+    public static final DeferredBlock<Block> ADVANCED_NOTEBLOCK = BLOCKS.register("advanced_noteblock", AdvancedNoteBlock::new);
+    public static final DeferredBlock<Block> TUNINGCORE = BLOCKS.register("tuningcore", TuningCore::new);
+    public static final DeferredBlock<Block> COMPOSER = BLOCKS.register("composer", ComposerBlock::new);
     public static final Map<DeferredBlock<Block>, DeferredItem<Item>> BLOCK_ITEMS;
 
+    public static final Supplier<BlockEntityType<ComposerBlockEntity>> COMPOSER_BE = BLOCK_ENTITIES.register("composer_be",
+            () -> new BlockEntityType<>(ComposerBlockEntity::new, COMPOSER.get()));
+
+    //Items
     public static final DeferredItem<Item> TEMPOTUNER = ITEMS.register("tempotuner", TunerItem::new);
     public static final DeferredItem<Item> NOTETUNER = ITEMS.register("notetuner", TunerItem::new);
     public static final DeferredItem<Item> COMPOSITION = ITEMS.register("composition", ComposersNote::new);
@@ -63,12 +77,16 @@ public class Registry
     public static final DeferredItem<Item> SUSTAIN = ITEMS.register("sustain", SpinningCore::new);
     public static final DeferredItem<Item> VOLUME = ITEMS.register("volume", SpinningCore::new);
 
+    //Data
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<TunerData>> TUNER_DATA = DATA_COMPONENT_TYPES.registerComponentType("tuner_data",
             builder -> builder.persistent(TunerData.TUNER_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ComposeData>> COMPOSE_DATA = DATA_COMPONENT_TYPES.registerComponentType("compose_data",
             builder -> builder.persistent(ComposeData.CODEC));
-    public static final DeferredHolder<ParticleType<?>, SustainedNoteType> SUSTAINED_NOTE = PARTICLE_TYPES.register("sustained_note", () -> new SustainedNoteType(false));
 
+    //Particle
+    public static final DeferredHolder<ParticleType<?>, SustainedNoteType> SUSTAINED_NOTE = PARTICLE_TYPES.register("sustained_note", () -> new SustainedNoteType(false));
+    //Menu
+    public static final Supplier<MenuType<ComposerContainer>> COMPOSER_MENU = MENU_TYPES.register("my_menu", () -> new MenuType<>(ComposerContainer::new, FeatureFlags.DEFAULT_FLAGS));
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
@@ -76,6 +94,7 @@ public class Registry
         ITEMS.register(eventBus);
         CREATIVE_MODE_TABS.register(eventBus);
         DATA_COMPONENT_TYPES.register(eventBus);
+        //DATA_ATTACHMENT_TYPES.register(eventBus);
         PARTICLE_TYPES.register(eventBus);
     }
 
@@ -103,6 +122,11 @@ public class Registry
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerItem(new SpinningCoreRender.Extension(), VOLUME, SUSTAIN);
         event.registerItem(new CoreBaseRender.Extension(), CORE);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(COMPOSER_BE.get(), context -> new ComposerRenderer());
     }
 
     @OnlyIn(Dist.CLIENT)
