@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.setup.Registry;
 
-public record ComposeData(int beat, int subtick, int postDelay, float bpm) implements CustomPacketPayload {
+public record ComposeData(int beat, int subtick, int postDelay, float bpm, int placed) implements CustomPacketPayload {
 
     public static final Type<ComposeData> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(NoteBlockMaster.MOD_ID, "composedata"));
 
@@ -20,7 +20,8 @@ public record ComposeData(int beat, int subtick, int postDelay, float bpm) imple
                     Codec.INT.fieldOf("beat").forGetter(ComposeData::beat),
                     Codec.INT.fieldOf("subtick").forGetter(ComposeData::subtick),
                     Codec.INT.fieldOf("delay").forGetter(ComposeData::postDelay),
-                    Codec.FLOAT.fieldOf("bpm").forGetter(ComposeData::bpm)
+                    Codec.FLOAT.fieldOf("bpm").forGetter(ComposeData::bpm),
+                    Codec.INT.fieldOf("placed").forGetter(ComposeData::placed)
             ).apply(instance, ComposeData::new)
 
     );
@@ -30,6 +31,7 @@ public record ComposeData(int beat, int subtick, int postDelay, float bpm) imple
             ByteBufCodecs.INT, ComposeData::subtick,
             ByteBufCodecs.INT, ComposeData::postDelay,
             ByteBufCodecs.FLOAT, ComposeData::bpm,
+            ByteBufCodecs.INT, ComposeData::placed,
             ComposeData::new
     );
 
@@ -41,9 +43,14 @@ public record ComposeData(int beat, int subtick, int postDelay, float bpm) imple
     public static ComposeData getComposeData(ItemStack stack){
         ComposeData data = stack.get(Registry.COMPOSE_DATA);
         if(data == null) {
-            data = new ComposeData(0, 0,1,600);
+            data = new ComposeData(0, 0,1,600, 0);
             stack.set(Registry.COMPOSE_DATA, data);
         }
         return data;
+    }
+
+    public boolean hasPlaced(int index){
+        if(index > 31 || index < 0) throw new IllegalArgumentException("Note index "+index+" for beat ["+ this.beat() + "] is not allowed");
+        return ((this.placed >> index) & 1) == 1;
     }
 }

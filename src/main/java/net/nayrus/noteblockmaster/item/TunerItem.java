@@ -92,7 +92,7 @@ public class TunerItem extends Item {
                     ComposeData cData = ComposeData.getComposeData(composer);
                     if(!player.isShiftKeyDown()){
                         Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
-                        ComposeData new_ = new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm());
+                        ComposeData new_ = new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm(),0);
                         composer.set(Registry.COMPOSE_DATA, new_);
                         cData = new_;
                     }
@@ -128,7 +128,7 @@ public class TunerItem extends Item {
                 new_val = cData.subtick();
 
                 Tuple<Integer, Integer> next = ComposersNote.subtickAndPauseOnBeat(cData.beat() + 1, cData.bpm());
-                composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm()));
+                composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat() + 1, next.getA(), next.getB(), cData.bpm(), 0));
             }
             if (!doOffHandSwing) return block.onSubtickChange(level, player, state, pos, new_val, true);
             else {

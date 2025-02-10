@@ -65,7 +65,7 @@ public class ComposersNote extends Item {
             if(!level.isClientSide()){
                 level.setBlock(pos.above(), Blocks.REPEATER.defaultBlockState()
                         .setValue(RepeaterBlock.DELAY, set).setValue(RepeaterBlock.FACING, context.getHorizontalDirection().getOpposite()), Block.UPDATE_ALL);
-                composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat(), cData.subtick(), target, cData.bpm()));
+                composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat(), cData.subtick(), target, cData.bpm(), cData.placed()));
 
                 level.playSound(null, pos, SoundType.STONE.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 0.8F);
                 if (!player.isCreative()) Utils.removeItemsFromInventory(inv, Items.REPEATER, 1);

@@ -78,7 +78,7 @@ public class CommonEvents {
                     target -= set;
                     if(!level.isClientSide()){
                         level.setBlock(pos, state.setValue(RepeaterBlock.DELAY, set), NoteBlock.UPDATE_ALL);
-                        composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat(), cData.subtick(), target, cData.bpm()));
+                        composer.set(Registry.COMPOSE_DATA, new ComposeData(cData.beat(), cData.subtick(), target, cData.bpm(), cData.placed()));
                     }
                     if(items.getA().is(Registry.COMPOSITION)) event.cancelWithResult(InteractionResult.SUCCESS);
                     else{

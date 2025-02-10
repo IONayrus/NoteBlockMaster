@@ -44,7 +44,7 @@ public class BaseCompositionScreen extends BaseScreen implements Button.OnPress{
     public void onClose() {
         if(init_bpm != bpm_val || init_beat != beat_val){
             Tuple<Integer, Integer> calc = ComposersNote.subtickAndPauseOnBeat(this.beat_val, this.bpm_val);
-            ComposeData _new = new ComposeData(this.beat_val, calc.getA(), calc.getB(), this.bpm_val);
+            ComposeData _new = new ComposeData(this.beat_val, calc.getA(), calc.getB(), this.bpm_val, 0);
             composer.set(Registry.COMPOSE_DATA, _new);
             PacketDistributor.sendToServer(_new);
         }

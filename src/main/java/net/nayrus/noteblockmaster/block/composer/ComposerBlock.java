@@ -1,8 +1,6 @@
 package net.nayrus.noteblockmaster.block.composer;
 
-import libs.felnull.fnnbs.Layer;
 import libs.felnull.fnnbs.NBS;
-import libs.felnull.fnnbs.Note;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -28,6 +26,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
+import net.nayrus.noteblockmaster.network.data.SongData;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -107,13 +106,10 @@ public class ComposerBlock extends Block implements EntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if(!level.isClientSide() && player instanceof ServerPlayer serverPlayer){
             //serverPlayer.openMenu(state.getMenuProvider(level, pos));
-            NBS nbs = loadNBSFile("Test");
+            NBS nbs = loadNBSFile("Bad Apple!");
             if(nbs!= null){
-                for(Layer layer : nbs.getLayers())
-                    for(Note note : layer.getNotes().values()){
-                        NoteBlockMaster.LOGGER.debug(note.toString());
-                        NoteBlockMaster.LOGGER.debug(net.nayrus.noteblockmaster.block.composer.Note.of(note).toString());
-                    }
+                NoteBlockMaster.LOGGER.debug(nbs.getSongLength()+"");
+                NoteBlockMaster.LOGGER.debug(SongData.of(nbs)+"");
             }
         }
         return InteractionResult.SUCCESS;
