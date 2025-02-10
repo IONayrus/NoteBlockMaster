@@ -1,8 +1,10 @@
 package net.nayrus.noteblockmaster.item;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
@@ -14,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,11 +26,14 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
+import net.nayrus.noteblockmaster.network.data.SongData;
 import net.nayrus.noteblockmaster.screen.CompositionScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+
+import java.util.List;
 
 public class ComposersNote extends Item {
 
@@ -103,6 +109,15 @@ public class ComposersNote extends Item {
         ItemStack item = player.getItemInHand(usedHand);
         if(level.isClientSide()) openComposer(item);
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        if(stack.has(Registry.SONG_DATA)){
+            if(!(stack.get(Registry.SONG_DATA) instanceof SongData data)) return;
+            tooltipComponents.add(Component.literal(data.title()).withStyle(ChatFormatting.ITALIC));
+        }
     }
 
     @OnlyIn(Dist.CLIENT)

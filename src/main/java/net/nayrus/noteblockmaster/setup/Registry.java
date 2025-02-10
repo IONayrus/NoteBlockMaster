@@ -23,6 +23,7 @@ import net.nayrus.noteblockmaster.item.ComposersNote;
 import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
+import net.nayrus.noteblockmaster.network.data.SongData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.item.CoreBaseRender;
 import net.nayrus.noteblockmaster.render.item.SpinningCoreRender;
@@ -83,6 +84,8 @@ public class Registry
             builder -> builder.persistent(TunerData.TUNER_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ComposeData>> COMPOSE_DATA = DATA_COMPONENT_TYPES.registerComponentType("compose_data",
             builder -> builder.persistent(ComposeData.CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SongData>> SONG_DATA = DATA_COMPONENT_TYPES.registerComponentType("song_data",
+            builder -> builder.persistent(SongData.CODEC));
 
     //Particle
     public static final DeferredHolder<ParticleType<?>, SustainedNoteType> SUSTAINED_NOTE = PARTICLE_TYPES.register("sustained_note", () -> new SustainedNoteType(false));

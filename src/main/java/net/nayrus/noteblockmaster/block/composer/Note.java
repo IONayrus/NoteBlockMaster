@@ -2,6 +2,9 @@ package net.nayrus.noteblockmaster.block.composer;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.sound.AdvancedInstrument;
 import net.nayrus.noteblockmaster.utils.Utils;
@@ -27,6 +30,8 @@ public record Note(byte instrument, byte key, byte volume, byte pitch) {
                 Codec.INT.fieldOf("data").forGetter(Note::packNote)
         ).apply(instance, Note::new)
     );
+
+    public static final StreamCodec<FriendlyByteBuf, Note> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.INT, Note::packNote, Note::new);
 
     @Override
     public String toString() {

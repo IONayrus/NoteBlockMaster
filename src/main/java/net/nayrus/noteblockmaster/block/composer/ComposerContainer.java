@@ -6,10 +6,23 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.setup.Registry;
 
+import javax.annotation.Nullable;
+
 public class ComposerContainer extends AbstractContainerMenu {
+
+    private ComposerBlockEntity entity;
 
     public ComposerContainer(int containerId, Inventory playerInventory) {
         super(Registry.COMPOSER_MENU.get(), containerId);
+    }
+
+    public ComposerContainer(int containerId, Inventory playerInventory, ComposerBlockEntity entity){
+        this(containerId, playerInventory);
+        this.entity = entity;
+    }
+
+    public @Nullable ComposerBlockEntity getEntity() {
+        return this.entity;
     }
 
     @Override
@@ -21,4 +34,5 @@ public class ComposerContainer extends AbstractContainerMenu {
     public boolean stillValid(Player player) {
         return true;
     }
+
 }

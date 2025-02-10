@@ -64,7 +64,7 @@ public class NoteBlockMaster
     }
 
     public void onFMLClientSetup(FMLClientSetupEvent event){
-        Path customDir = Paths.get(System.getProperty("user.dir"), "nbm\\nbs_songs");
+        Path customDir = Paths.get(System.getProperty("user.dir"), "mods\\noteblockmaster\\songs");
         if (!Files.exists(customDir)) {
             try {
                 Files.createDirectories(customDir);

@@ -64,7 +64,7 @@ public class ComposerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
-        return new ComposerContainer(containerId, inventory);
+        return new ComposerContainer(containerId, inventory, this);
     }
 
     @Override
