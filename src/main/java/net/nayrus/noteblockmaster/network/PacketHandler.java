@@ -10,11 +10,12 @@ import net.minecraft.world.level.Level;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
-import net.nayrus.noteblockmaster.block.composer.ComposerBlockEntity;
-import net.nayrus.noteblockmaster.block.composer.ComposerContainer;
+import net.nayrus.noteblockmaster.composer.ComposerBlockEntity;
+import net.nayrus.noteblockmaster.composer.ComposerContainer;
+import net.nayrus.noteblockmaster.composer.ComposerNetwork;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
-import net.nayrus.noteblockmaster.network.data.SongData;
+import net.nayrus.noteblockmaster.network.data.SongID;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.network.payload.*;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
@@ -42,13 +43,14 @@ public class PacketHandler {
         reg.playToClient(ConfigCheck.TYPE, ConfigCheck.STREAM_CODEC, PacketHandler::handleStartUpSync);
         reg.playToClient(ActionPing.TYPE, ActionPing.STREAM_CODEC, PacketHandler::handleActionPing);
         reg.playToClient(ScheduleCoreSound.TYPE, ScheduleCoreSound.STREAM_CODEC, PacketHandler::handleScheduleCoreSound);
-        reg.playToClient(ComposerBlockEntity.ClientItemUpdate.TYPE, ComposerBlockEntity.ClientItemUpdate.STREAM_CODEC, ComposerBlockEntity::handleClientItemUpdate);
 
         reg.playToServer(TunerData.TYPE, TunerData.TUNER_STREAM_CODEC, PacketHandler::handleTunerData);
         reg.playToServer(ComposeData.TYPE, ComposeData.STREAM_CODEC, PacketHandler::handleComposeData);
-        reg.playToServer(SongData.TYPE, SongData.STREAM_CODEC, PacketHandler::handleSongData);
+        reg.playToServer(SongID.TYPE, SongID.STREAM_CODEC, PacketHandler::handleSongID);
         reg.playToServer(TickSchedule.TYPE, TickSchedule.STREAM_CODEC, PacketHandler::handleTickSchedule);
         reg.playToServer(CoreUpdate.TYPE, CoreUpdate.STREAM_CODEC, PacketHandler::handleCoreUpdate);
+
+        ComposerNetwork.register(reg);
     }
 
     private static void handleStartUpSync(final ConfigCheck packet, final IPayloadContext context) {
@@ -122,18 +124,18 @@ public class PacketHandler {
         stack.set(Registry.COMPOSE_DATA, data);
     }
 
-    private static void handleSongData(final SongData data, final IPayloadContext context) {
+    private static void handleSongID(final SongID data, final IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
         if(!(player.containerMenu instanceof ComposerContainer container && container.getEntity() instanceof ComposerBlockEntity BE)){
-            NoteBlockMaster.LOGGER.warn("Unable to determine ItemStack to save Song Data on"); return;
+            NoteBlockMaster.LOGGER.warn("Unable to determine ItemStack to save Song ID on"); return;
         }
         ItemStack composition = BE.getItem();
 
         if(composition.isEmpty() || !composition.is(Registry.COMPOSITION)){
-            NoteBlockMaster.LOGGER.warn("Unable to write Song Data onto invalid ItemStack"); return;
+            NoteBlockMaster.LOGGER.warn("Unable to write Song ID onto invalid ItemStack"); return;
         }
 
-        composition.set(Registry.SONG_DATA, data);
+        composition.set(Registry.SONG_ID, data);
         PacketDistributor.sendToPlayer(player, new ComposerBlockEntity.ClientItemUpdate(BE.getBlockPos(), Optional.of(composition), Optional.empty()));
     }
 

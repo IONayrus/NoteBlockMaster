@@ -1,8 +1,10 @@
-package net.nayrus.noteblockmaster.block.composer;
+package net.nayrus.noteblockmaster.composer;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -73,11 +75,38 @@ public class ComposerBlockEntity extends BaseContainerBlockEntity {
     }
 
     public float getRotation() {
-        return rotation;
+        return this.rotation;
     }
 
     public void setRotation(float rotation) {
         this.rotation = rotation;
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        CompoundTag item = tag.getCompound("Item");
+        this.setRotation(tag.getFloat("ItemRotation"));
+        this.setItem(ItemStack.parseOptional(registries, item));
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.put("Item", this.getItem().saveOptional(registries));
+        tag.putFloat("ItemRotation", this.getRotation());
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        saveAdditional(tag, registries);
+        return tag;
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        super.handleUpdateTag(tag, registries);
     }
 
     public static void handleClientItemUpdate(final ClientItemUpdate packet, final IPayloadContext context){
@@ -89,8 +118,8 @@ public class ComposerBlockEntity extends BaseContainerBlockEntity {
             player.level().playSound(player, packet.pos(), SoundEvents.BOOK_PAGE_TURN, SoundSource.BLOCKS);
         }
         else {
-            BE.setItem(packet.item().get());
             if(packet.rotation().isPresent()) BE.setRotation(packet.rotation().get());
+            BE.setItem(packet.item().get());
             player.level().playSound(player, packet.pos(), SoundEvents.BOOK_PAGE_TURN, SoundSource.BLOCKS);
         }
     }

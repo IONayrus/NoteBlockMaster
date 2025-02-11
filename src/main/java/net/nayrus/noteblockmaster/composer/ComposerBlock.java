@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.block.composer;
+package net.nayrus.noteblockmaster.composer;
 
 import libs.felnull.fnnbs.NBS;
 import net.minecraft.core.BlockPos;
@@ -85,6 +85,7 @@ public class ComposerBlock extends Block implements EntityBlock {
             ItemStack item = BE.getItem();
             float rotation = Utils.getAngleToBlock(pos, player);
             if(item.isEmpty()){
+                BE.setRotation(rotation);
                 BE.setItem(stack);
                 player.setItemInHand(hand, ItemStack.EMPTY);
                 PacketDistributor.sendToPlayer((ServerPlayer) player, new ComposerBlockEntity.ClientItemUpdate(pos, Optional.of(stack), Optional.of(rotation)));
@@ -92,6 +93,7 @@ public class ComposerBlock extends Block implements EntityBlock {
                 int slot = player.getInventory().getFreeSlot();
                 player.setItemInHand(hand, ItemStack.EMPTY);
                 player.getInventory().add(slot, item);
+                BE.setRotation(rotation);
                 BE.setItem(stack);
                 PacketDistributor.sendToPlayer((ServerPlayer) player, new ComposerBlockEntity.ClientItemUpdate(pos, Optional.of(stack), Optional.of(rotation)));
             }

@@ -18,12 +18,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
-import net.nayrus.noteblockmaster.block.composer.*;
+import net.nayrus.noteblockmaster.composer.*;
 import net.nayrus.noteblockmaster.item.ComposersNote;
 import net.nayrus.noteblockmaster.item.SpinningCore;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
-import net.nayrus.noteblockmaster.network.data.SongData;
+import net.nayrus.noteblockmaster.network.data.SongID;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.item.CoreBaseRender;
 import net.nayrus.noteblockmaster.render.item.SpinningCoreRender;
@@ -84,8 +84,8 @@ public class Registry
             builder -> builder.persistent(TunerData.TUNER_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ComposeData>> COMPOSE_DATA = DATA_COMPONENT_TYPES.registerComponentType("compose_data",
             builder -> builder.persistent(ComposeData.CODEC));
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SongData>> SONG_DATA = DATA_COMPONENT_TYPES.registerComponentType("song_data",
-            builder -> builder.persistent(SongData.CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SongID>> SONG_ID = DATA_COMPONENT_TYPES.registerComponentType("song_id",
+            builder -> builder.persistent(SongID.CODEC));
 
     //Particle
     public static final DeferredHolder<ParticleType<?>, SustainedNoteType> SUSTAINED_NOTE = PARTICLE_TYPES.register("sustained_note", () -> new SustainedNoteType(false));

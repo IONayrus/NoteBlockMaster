@@ -25,15 +25,19 @@ import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.composer.SongCache;
+import net.nayrus.noteblockmaster.composer.SongData;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
-import net.nayrus.noteblockmaster.network.data.SongData;
+import net.nayrus.noteblockmaster.network.data.SongID;
 import net.nayrus.noteblockmaster.screen.CompositionScreen;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import java.awt.*;
 import java.util.List;
+import java.util.UUID;
 
 public class ComposersNote extends Item {
 
@@ -114,9 +118,12 @@ public class ComposersNote extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-        if(stack.has(Registry.SONG_DATA)){
-            if(!(stack.get(Registry.SONG_DATA) instanceof SongData data)) return;
-            tooltipComponents.add(Component.literal(data.title()).withStyle(ChatFormatting.ITALIC));
+        if(stack.has(Registry.SONG_ID)){
+            if(!(stack.get(Registry.SONG_ID) instanceof SongID(UUID songID))) return;
+
+            SongData data = SongCache.getSong(songID, stack);
+            Component unknown = Component.literal("Unkown Song").withColor(Color.RED.getRGB());
+            tooltipComponents.add(data!= null ? Component.literal(data.title()).withStyle(ChatFormatting.ITALIC) : unknown);
         }
     }
 

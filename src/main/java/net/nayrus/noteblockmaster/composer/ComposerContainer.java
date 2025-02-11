@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.block.composer;
+package net.nayrus.noteblockmaster.composer;
 
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;

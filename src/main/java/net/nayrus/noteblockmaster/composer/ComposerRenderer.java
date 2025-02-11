@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.block.composer;
+package net.nayrus.noteblockmaster.composer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;

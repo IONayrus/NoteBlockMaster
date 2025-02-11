@@ -1,4 +1,4 @@
-package net.nayrus.noteblockmaster.block.composer;
+package net.nayrus.noteblockmaster.composer;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

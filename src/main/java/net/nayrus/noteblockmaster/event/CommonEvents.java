@@ -1,6 +1,7 @@
 package net.nayrus.noteblockmaster.event;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -15,9 +16,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.command.BPMInfoCommand;
 import net.nayrus.noteblockmaster.command.MainCommand;
+import net.nayrus.noteblockmaster.composer.SongCache;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -27,6 +30,7 @@ import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.server.command.ConfigCommand;
 
 public class CommonEvents {
@@ -36,6 +40,13 @@ public class CommonEvents {
         new BPMInfoCommand(event.getDispatcher());
         MainCommand.mainCommand(event.getDispatcher());
         ConfigCommand.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void onServerStart(ServerStartedEvent event) {
+        MinecraftServer server = event.getServer();
+        NoteBlockMaster.LOGGER.info("Loading saved songs");
+        SongCache.SERVER_CACHE = new SongCache(false).loadFromWorld(server.overworld());
     }
 
     @SubscribeEvent

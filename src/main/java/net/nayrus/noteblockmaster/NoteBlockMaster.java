@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.composer.SongCache;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipe;
 import net.nayrus.noteblockmaster.event.ClientEvents;
 import net.nayrus.noteblockmaster.event.CommonEvents;
@@ -52,6 +53,7 @@ public class NoteBlockMaster
             NeoForge.EVENT_BUS.register(ClientEvents.class);
             modEventBus.addListener(this::onFMLClientSetup);
             modEventBus.addListener(KeyBindings::registerBindings);
+            SongCache.CLIENT_CACHE = new SongCache(true);
         }else{
             NeoForge.EVENT_BUS.register(ServerEvents.class);
         }
