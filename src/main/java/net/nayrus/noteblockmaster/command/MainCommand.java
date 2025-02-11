@@ -8,6 +8,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.nayrus.noteblockmaster.NoteBlockMaster;
+import net.nayrus.noteblockmaster.composer.SongCache;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.setup.config.StartupConfig;
@@ -15,6 +17,8 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.awt.*;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class MainCommand {
 
@@ -24,6 +28,11 @@ public class MainCommand {
                 .then(lowResolutionCommand())
                 .then(Commands.literal("debug")
                         .executes(context -> {
+                            try {
+                                SongCache.saveCacheToFile(SongCache.CLIENT_CACHE);
+                            } catch (IOException e) {
+                                NoteBlockMaster.LOGGER.error(Arrays.toString(e.getStackTrace()));
+                            }
                             return Command.SINGLE_SUCCESS;
                         })
                 ).executes(context -> -1));

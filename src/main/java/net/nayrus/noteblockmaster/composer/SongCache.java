@@ -4,6 +4,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -22,6 +23,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,9 +68,13 @@ public class SongCache extends SavedData {
     }
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        return saveCacheOnTag(tag);
+    }
+
+    public CompoundTag saveCacheOnTag(CompoundTag tag){
         ListTag songList = new ListTag();
 
-        for (Map.Entry<UUID, SongData> entry : cache.entrySet()) {
+        for (Map.Entry<UUID, SongData> entry : this.cache.entrySet()) {
             CompoundTag songTag = new CompoundTag();
             songTag.putUUID("ID", entry.getKey());
             songTag.put("Data", entry.getValue().save(new CompoundTag()));
@@ -75,6 +83,14 @@ public class SongCache extends SavedData {
 
         tag.put("SongCache", songList);
         return tag;
+    }
+
+    public static void saveCacheToFile(SongCache cache) throws IOException {
+        Path cachePath = NoteBlockMaster.SONG_DIR.resolve(cache.isLocal ? "saved_songs.snbt" : "cached_songs.snbt");
+        if(Files.notExists(cachePath)) Files.createFile(cachePath);
+        CompoundTag tag = new CompoundTag();
+        cache.saveCacheOnTag(tag);
+        NbtIo.write(tag, cachePath);
     }
 
     private void cache(UUID id, SongData data){
@@ -103,6 +119,11 @@ public class SongCache extends SavedData {
         if(!instance.cache.containsKey(id)) instance.cache(id, data);
         else NoteBlockMaster.LOGGER.info("Song ID {} is already cached", id);
         instance.setDirty();
+    }
+
+    //In single player save song on world data
+    public static void cacheSongOnWorld(UUID id, SongData data){
+        if(!SERVER_CACHE.cache.containsKey(id)) SERVER_CACHE.cache(id, data);
     }
 
     public static @Nullable SongData getSong(UUID id, ItemStack IDHolder){

@@ -24,7 +24,7 @@ public class ComposerNetwork {
     }
 
     private static void handleSongPush(final SongData data, final IPayloadContext context){
-
+        SongCache.cacheSong(data.getID(), data);
     }
 
     public static final ConcurrentHashMap<UUID, CompletableFuture<SongData>> pullRequests = new ConcurrentHashMap<>();

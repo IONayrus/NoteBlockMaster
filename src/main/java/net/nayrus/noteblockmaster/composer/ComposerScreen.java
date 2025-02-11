@@ -23,7 +23,7 @@ public class ComposerScreen extends AbstractContainerScreen<ComposerContainer> {
 
     @Override
     public void onClose() {
-        NBS nbs = ComposerBlock.loadNBSFile("FDSpaced");
+        NBS nbs = ComposerBlock.loadNBSFile("FreedomDive");
         if(nbs!= null){
             SongData data = SongData.of(nbs);
             UUID ID = data.getID();

@@ -85,7 +85,8 @@ public record SongData(String title, String author, Map<String, List<Note>> note
         for (Map.Entry<String, List<Note>> entry : this.notes.entrySet()) {
             List<Integer> packedNoteList = new ArrayList<>();
             entry.getValue().forEach(note -> packedNoteList.add(note.packNote()));
-            notesTag.put(entry.getKey(), new IntArrayTag(packedNoteList));
+
+            if(!packedNoteList.isEmpty()) notesTag.put(entry.getKey(), new IntArrayTag(packedNoteList));
         }
 
         tag.putString("Title", this.title());
@@ -96,5 +97,9 @@ public record SongData(String title, String author, Map<String, List<Note>> note
 
     public UUID getID(){
         return Utils.generateUUIDFromString(this.toString());
+    }
+
+    public List<Note> getNotesAt(int index){
+        return notes().getOrDefault(index+"", List.of());
     }
 }
