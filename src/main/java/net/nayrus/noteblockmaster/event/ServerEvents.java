@@ -32,7 +32,7 @@ public class ServerEvents {
     private static long ticks = 0L;
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event){
-        if(ticks%6000==0) SongCache.SERVER_CACHE.saveAndClear();
+        if(ticks%6000==0) SongCache.SERVER_CACHE.saveAndClearCache();
         ticks++;
     }
 }

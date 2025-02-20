@@ -178,7 +178,7 @@ public class PacketHandler {
     }
 
     private static void handleLoadSong(final LoadSong packet, final IPayloadContext context){
-        NBS nbs = ComposerBlock.loadNBSFile(packet.name());
+        NBS nbs = SongFileManager.loadNBSFile(packet.name());
         if(nbs!= null) {
             SongData data = SongData.of(nbs);
             UUID ID = data.getID();

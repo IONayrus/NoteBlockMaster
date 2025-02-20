@@ -21,6 +21,7 @@ import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.command.BPMInfoCommand;
 import net.nayrus.noteblockmaster.command.MainCommand;
 import net.nayrus.noteblockmaster.composer.SongCache;
+import net.nayrus.noteblockmaster.composer.SongFileManager;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -32,8 +33,6 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.server.command.ConfigCommand;
-
-import java.io.IOException;
 
 public class CommonEvents {
 
@@ -49,11 +48,7 @@ public class CommonEvents {
         MinecraftServer server = event.getServer();
         NoteBlockMaster.LOGGER.info("Loading saved songs");
         SongCache.SERVER_CACHE = new SongCache(false).loadFromWorld(server.overworld());
-        try {
-            SongCache.SERVER_CACHE.loadIndiciesFromFile();
-        } catch (IOException e) {
-            NoteBlockMaster.LOGGER.warn("No additional songs have been loaded as cache file could not be opened");
-        }
+        SongFileManager.validateAndLoadCache();
     }
 
     @SubscribeEvent

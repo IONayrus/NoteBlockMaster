@@ -1,6 +1,5 @@
 package net.nayrus.noteblockmaster.composer;
 
-import libs.felnull.fnnbs.NBS;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -25,15 +24,11 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
 public class ComposerBlock extends Block implements EntityBlock {
@@ -45,21 +40,6 @@ public class ComposerBlock extends Block implements EntityBlock {
                 .strength(1.0F)
                 .noOcclusion());
         this.registerDefaultState(this.getStateDefinition().any());
-    }
-
-    @Nullable
-    public static NBS loadNBSFile(String name){
-        Path filePath = NoteBlockMaster.SONG_DIR.resolve(name+ ".nbs");
-        if (Files.exists(filePath)) {
-            try {
-                return NBS.load(Files.newInputStream(filePath));
-            } catch (IOException e) {
-                NoteBlockMaster.LOGGER.error(e.getLocalizedMessage());
-            }
-        } else {
-            NoteBlockMaster.LOGGER.warn("File not found: {}", filePath.toAbsolutePath());
-        }
-        return null;
     }
 
     @Override

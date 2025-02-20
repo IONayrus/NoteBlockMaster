@@ -1,10 +1,10 @@
 package net.nayrus.noteblockmaster.composer;
 
+import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -20,14 +20,13 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +37,6 @@ public class SongCache extends SavedData {
     public static SongCache CLIENT_CACHE;
 
     private final ConcurrentHashMap<UUID, SongData> cache = new ConcurrentHashMap<>();
-    private final List<UUID> registeredSongs = new ArrayList<>();
     private final boolean isLocal;
 
     public SongCache(boolean local){
@@ -59,7 +57,7 @@ public class SongCache extends SavedData {
             for (int i = 0; i < songList.size(); i++) {
                 CompoundTag songTag = songList.getCompound(i);
                 UUID key = songTag.getUUID("ID");
-                data.registeredSongs.add(key);
+                SongFileManager.registeredSongs.add(key);
                 SongData songData = SongData.load(songTag.getCompound("Data"));
                 data.cache.put(key, songData);
             }
@@ -86,63 +84,48 @@ public class SongCache extends SavedData {
         return tag;
     }
 
-    public static void saveCacheToFile(SongCache cache) throws IOException {
-        Path cachePath = NoteBlockMaster.SONG_DIR.resolve(cache.isLocal ? "saved_songs.snbt" : "cached_songs.snbt");
-        if(Files.notExists(cachePath)) Files.createFile(cachePath);
-        CompoundTag tag = new CompoundTag();
-        cache.saveCacheOnTag(tag);
-        NbtIo.write(tag, cachePath);
-    }
-
-    public void loadSongFromFile(UUID id) throws IOException {
-        if(!(getSavedCache() instanceof CompoundTag tag)) {
-            NoteBlockMaster.LOGGER.error("Could not load song {} from local cache - cache is invalid", id);
-            return;
-        }
-
-        if (!tag.contains("SongCache", Tag.TAG_LIST)) return;
-        ListTag songList = tag.getList("SongCache", Tag.TAG_COMPOUND);
-        for (int i = 0; i < songList.size(); i++) {
-            UUID key = songList.getCompound(i).getUUID("ID");
-            if(key.compareTo(id) != 0) continue;
-            if(!this.registeredSongs.contains(key)) this.registeredSongs.add(key); //Should be redundant
-            SongData songData = SongData.load(songList.getCompound(i).getCompound("Data"));
-            this.cache.put(key, songData);
+    public void saveCachedSongs() throws IOException {
+        for(SongData song : this.cache.values()){
+            SongFileManager.safeCachedSong(song);
         }
     }
 
-    public void loadIndiciesFromFile() throws IOException {
-        if(!(getSavedCache() instanceof CompoundTag tag)) {
-            NoteBlockMaster.LOGGER.error("Could not load song indicies");
-            return;
-        }
-        if (!tag.contains("SongCache", Tag.TAG_LIST)) return;
-        ListTag songList = tag.getList("SongCache", Tag.TAG_COMPOUND);
-        for (int i = 0; i < songList.size(); i++) {
-            UUID key = songList.getCompound(i).getUUID("ID");
-            if(!this.registeredSongs.contains(key)) this.registeredSongs.add(key);
-        }
-    }
-
-    public @Nullable CompoundTag getSavedCache() throws IOException {
-        Path cachePath = NoteBlockMaster.SONG_DIR.resolve(this.isLocal ? "saved_songs.snbt" : "cached_songs.snbt");
-        if(Files.notExists(cachePath)) return null;
-        return NbtIo.read(cachePath);
-    }
-
-    public void flushCache(){
+    public boolean saveIfPresent(UUID id){
+        if(!this.cache.containsKey(id)) return false;
         try{
-            if(this.isLocal) saveCacheToFile(CLIENT_CACHE);
-            else saveCacheToFile(SERVER_CACHE);
-        } catch (IOException e) {
-            NoteBlockMaster.LOGGER.error(e.getLocalizedMessage());
+            SongFileManager.safeCachedSong(this.cache.get(id));
+        }catch (IOException e){
+            NoteBlockMaster.LOGGER.error("Error saving song {} - {}", id, e.getLocalizedMessage());
         }
+        return true;
     }
 
-    public void saveAndClear(){
+    public boolean loadSongFromFile(UUID id){
+        SongData songData = SongFileManager.loadCachedSong(id);
+        if(songData == null){
+            SongFileManager.registeredSongs.remove(id);
+            NoteBlockMaster.LOGGER.debug("Tried to load not-existing cached song file of {}", id);
+            return false;
+        }
+        if(!SongFileManager.registeredSongs.contains(id)) SongFileManager.registeredSongs.add(id);
+        this.cache.put(id, songData);
+        return true;
+    }
+
+    public void flushCache() throws IOException {
+        if(this.isLocal) CLIENT_CACHE.saveCachedSongs();
+        else SERVER_CACHE.saveCachedSongs();
+    }
+
+    public void saveAndClearCache(){
         NoteBlockMaster.LOGGER.debug("Saving & clearing song cache");
-        this.flushCache();
-        this.cache.clear();
+        try{
+            this.flushCache();
+            this.cache.clear();
+            this.setDirty();
+        } catch (IOException e) {
+            NoteBlockMaster.LOGGER.error("Error druring cache safe - {}", e.getLocalizedMessage());
+        }
     }
 
     private void cache(UUID id, SongData data){
@@ -174,12 +157,13 @@ public class SongCache extends SavedData {
     public static void cacheSong(UUID id, SongData data, SongCache instance){
         if(!instance.cache.containsKey(id)){
             instance.cache(id, data);
-            if(!instance.isLocal) instance.registeredSongs.add(id);
+            if(!instance.isLocal && !SongFileManager.registeredSongs.contains(id)) SongFileManager.registeredSongs.add(id);
         }
         else NoteBlockMaster.LOGGER.info("Song ID {} is already cached", id);
         instance.setDirty();
     }
 
+    @OnlyIn(Dist.CLIENT) private static final HashMap<UUID, Long> pendingSongRequest = new HashMap<>();
     public static @Nullable SongData getSong(UUID id, ItemStack IDHolder){
         SongCache cache;
         if(FMLEnvironment.dist == Dist.CLIENT){
@@ -187,16 +171,24 @@ public class SongCache extends SavedData {
 
             SongData data = cache.getFromCache(id);
             if(data == null){
-                cache.hasServerKey(id).thenAccept(hasKey -> {
-                    if(!hasKey) IDHolder.remove(Registry.SONG_ID);
-                    else{
-                        cache.getSongFromServer(id).thenAccept(songData -> {
-                            if(songData != null){
-                                cache.cache(id, songData);
-                            }
-                        });
-                    }
-                });
+                pendingSongRequest.computeIfPresent(id, (uuid, time) -> { if(time + 1000 > Util.getMillis()) return time; return null; });
+                if(!pendingSongRequest.containsKey(id)){
+                    cache.hasServerKey(id).thenAccept(hasKey -> {
+                        if(!hasKey){
+                            IDHolder.remove(Registry.SONG_ID);
+                            pendingSongRequest.remove(id);
+                        }
+                        else{
+                            cache.getSongFromServer(id).thenAccept(songData -> {
+                                if(songData != null){
+                                    cache.cache(id, songData);
+                                }
+                                pendingSongRequest.remove(id);
+                            });
+                        }
+                    });
+                    pendingSongRequest.put(id, Util.getMillis());
+                }
             }
             return data;
         }else{
@@ -205,11 +197,15 @@ public class SongCache extends SavedData {
         }
     }
 
-    public void dropSong(UUID id){
+    public void dropSong(UUID id) {
         this.cache.remove(id);
         if(!this.isLocal){
-            this.registeredSongs.removeIf(currentID -> currentID.compareTo(id) == 0);
-            //TODO remove Song from file cache
+            try {
+                SongFileManager.deleteCachedSong(id);
+                SongFileManager.registeredSongs.removeIf(currentID -> currentID.compareTo(id) == 0);
+            } catch (IOException e) {
+                NoteBlockMaster.LOGGER.error("Could not delete cached song {} - {}", id, e.getLocalizedMessage());
+            }
         }
         this.setDirty();
     }
@@ -224,7 +220,7 @@ public class SongCache extends SavedData {
 
     public List<String> getRegisteredSongIDs(){
         List<String> asString = new ArrayList<>();
-        this.registeredSongs.forEach(uuid -> asString.add(uuid.toString()));
+        SongFileManager.registeredSongs.forEach(uuid -> asString.add(uuid.toString()));
         return asString;
     }
 
@@ -278,14 +274,9 @@ public class SongCache extends SavedData {
     public CompletableFuture<Boolean> hasServerKey(UUID id){
         if(!this.isLocal) {
             if(this.cache.containsKey(id)) return CompletableFuture.completedFuture(true);
-            if(!this.registeredSongs.contains(id)) return CompletableFuture.completedFuture(false);
-            try {
-                this.loadSongFromFile(id);
-                return CompletableFuture.completedFuture(true);
-            } catch (IOException e) {
-                NoteBlockMaster.LOGGER.warn("Could not load {} - cache file is not accessable", id);
-                return CompletableFuture.completedFuture(false);
-            }
+            if(!SongFileManager.registeredSongs.contains(id)) return CompletableFuture.completedFuture(false);
+
+            return CompletableFuture.completedFuture(this.loadSongFromFile(id));
         }
 
         if(!pendingKeyChecks.containsKey(id)) {

@@ -38,11 +38,7 @@ public class MainCommand {
                 .then(songCommands())
                 .then(Commands.literal("debug")
                         .executes(context -> {
-//                            try {
-//                                SongCache.saveCacheToFile(SongCache.CLIENT_CACHE);
-//                            } catch (IOException e) {
-//                                NoteBlockMaster.LOGGER.error(Arrays.toString(e.getStackTrace()));
-//                            }
+                            SongCache.SERVER_CACHE.saveAndClearCache();
 
                             return Command.SINGLE_SUCCESS;
                         })

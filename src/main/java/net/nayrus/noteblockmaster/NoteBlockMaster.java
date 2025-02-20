@@ -5,6 +5,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.composer.SongCache;
+import net.nayrus.noteblockmaster.composer.SongFileManager;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipe;
 import net.nayrus.noteblockmaster.event.ClientEvents;
 import net.nayrus.noteblockmaster.event.CommonEvents;
@@ -38,7 +39,6 @@ public class NoteBlockMaster
     public static final String MOD_ID = "noteblockmaster";
     @SuppressWarnings("unused")
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static Path SONG_DIR;
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, MOD_ID);
     public static final DeferredHolder<RecipeSerializer<?>, TunerRecipe.Serializer> TUNER_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("tunerrecipe", TunerRecipe.Serializer::new);
@@ -66,14 +66,16 @@ public class NoteBlockMaster
     }
 
     public void onFMLClientSetup(FMLClientSetupEvent event){
-        Path customDir = Paths.get(System.getProperty("user.dir"), "mods\\noteblockmaster\\songs");
-        if (!Files.exists(customDir)) {
-            try {
-                Files.createDirectories(customDir);
-            } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
-            }
+        Path songDir = Paths.get(System.getProperty("user.dir"), "mods\\noteblockmaster\\songs");
+        Path cacheDir = Paths.get(System.getProperty("user.dir"), "mods\\noteblockmaster\\song_cache");
+        try {
+            if (!Files.exists(songDir)) Files.createDirectories(songDir);
+            if (!Files.exists(cacheDir)) Files.createDirectories(cacheDir);
+        }catch (IOException e) {
+            LOGGER.error(e.getLocalizedMessage());
         }
-        NoteBlockMaster.SONG_DIR = customDir;
+
+        SongFileManager.SONG_DIR = songDir;
+        SongFileManager.CACHE_DIR = cacheDir;
     }
 }
