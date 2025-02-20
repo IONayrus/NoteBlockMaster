@@ -15,6 +15,10 @@ public class ComposerNetwork {
         reg.playToClient(ComposerBlockEntity.ClientItemUpdate.TYPE, ComposerBlockEntity.ClientItemUpdate.STREAM_CODEC, ComposerBlockEntity::handleClientItemUpdate);
 
         reg.executesOn(HandlerThread.NETWORK);
+
+        reg.playToClient(SongCache.PushRequest.TYPE, SongCache.PushRequest.STREAM_CODEC, SongCache::handlePushRequest);
+        reg.playToClient(SongCache.DropRequest.TYPE, SongCache.DropRequest.STREAM_CODEC, SongCache::handleDropRequest);
+
         reg.playBidirectional(SongData.TYPE, SongData.STREAM_CODEC,
                 new DirectionalPayloadHandler<>(ComposerNetwork::handleSongPull, ComposerNetwork::handleSongPush));
         reg.playBidirectional(SongCache.KeyCheck.TYPE, SongCache.KeyCheck.STREAM_CODEC,
@@ -24,7 +28,7 @@ public class ComposerNetwork {
     }
 
     private static void handleSongPush(final SongData data, final IPayloadContext context){
-        SongCache.cacheSong(data.getID(), data);
+        SongCache.cacheSong(data.getID(), data, SongCache.SERVER_CACHE);
     }
 
     public static final ConcurrentHashMap<UUID, CompletableFuture<SongData>> pullRequests = new ConcurrentHashMap<>();

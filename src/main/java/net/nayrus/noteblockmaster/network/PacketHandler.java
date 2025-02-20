@@ -1,7 +1,12 @@
 package net.nayrus.noteblockmaster.network;
 
+import libs.felnull.fnnbs.NBS;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -10,9 +15,7 @@ import net.minecraft.world.level.Level;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
-import net.nayrus.noteblockmaster.composer.ComposerBlockEntity;
-import net.nayrus.noteblockmaster.composer.ComposerContainer;
-import net.nayrus.noteblockmaster.composer.ComposerNetwork;
+import net.nayrus.noteblockmaster.composer.*;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.SongID;
@@ -29,11 +32,13 @@ import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.awt.*;
 import java.util.Optional;
+import java.util.UUID;
 
 public class PacketHandler {
     @SubscribeEvent
@@ -43,12 +48,14 @@ public class PacketHandler {
         reg.playToClient(ConfigCheck.TYPE, ConfigCheck.STREAM_CODEC, PacketHandler::handleStartUpSync);
         reg.playToClient(ActionPing.TYPE, ActionPing.STREAM_CODEC, PacketHandler::handleActionPing);
         reg.playToClient(ScheduleCoreSound.TYPE, ScheduleCoreSound.STREAM_CODEC, PacketHandler::handleScheduleCoreSound);
+        reg.playToClient(LoadSong.TYPE, LoadSong.STREAM_CODEC, PacketHandler::handleLoadSong);
 
         reg.playToServer(TunerData.TYPE, TunerData.TUNER_STREAM_CODEC, PacketHandler::handleTunerData);
         reg.playToServer(ComposeData.TYPE, ComposeData.STREAM_CODEC, PacketHandler::handleComposeData);
-        reg.playToServer(SongID.TYPE, SongID.STREAM_CODEC, PacketHandler::handleSongID);
         reg.playToServer(TickSchedule.TYPE, TickSchedule.STREAM_CODEC, PacketHandler::handleTickSchedule);
         reg.playToServer(CoreUpdate.TYPE, CoreUpdate.STREAM_CODEC, PacketHandler::handleCoreUpdate);
+
+        reg.playBidirectional(SongID.TYPE, SongID.STREAM_CODEC, new DirectionalPayloadHandler<>(PacketHandler::handleSongIDInHand, PacketHandler::handleSongIDOnComposer));
 
         ComposerNetwork.register(reg);
     }
@@ -93,6 +100,13 @@ public class PacketHandler {
                     ClientConfig.CLIENT.save();
                 }
             }
+            case LIST_CLIENT_CACHE -> {
+                for(String songInfo : SongCache.CLIENT_CACHE.getCachedSongInfo()){
+                    context.player().displayClientMessage(Component.literal("- "+songInfo.substring(40)).withStyle(Style.EMPTY
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, songInfo.substring(0, 36)))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to copy ID (" + songInfo.substring(0, 36) + ")")))), false);
+                }
+            }
         }
     }
 
@@ -124,7 +138,7 @@ public class PacketHandler {
         stack.set(Registry.COMPOSE_DATA, data);
     }
 
-    private static void handleSongID(final SongID data, final IPayloadContext context) {
+    private static void handleSongIDOnComposer(final SongID data, final IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
         if(!(player.containerMenu instanceof ComposerContainer container && container.getEntity() instanceof ComposerBlockEntity BE)){
             NoteBlockMaster.LOGGER.warn("Unable to determine ItemStack to save Song ID on"); return;
@@ -132,11 +146,21 @@ public class PacketHandler {
         ItemStack composition = BE.getItem();
 
         if(composition.isEmpty() || !composition.is(Registry.COMPOSITION)){
-            NoteBlockMaster.LOGGER.warn("Unable to write Song ID onto invalid ItemStack"); return;
+            NoteBlockMaster.LOGGER.warn("Unable to write Song ID onto invalid ItemStack at {}", BE.getBlockPos()); return;
         }
 
         composition.set(Registry.SONG_ID, data);
         PacketDistributor.sendToPlayer(player, new ComposerBlockEntity.ClientItemUpdate(BE.getBlockPos(), Optional.of(composition), Optional.empty()));
+    }
+
+    private static void handleSongIDInHand(final SongID data, final IPayloadContext context) {
+        LocalPlayer player = (LocalPlayer) context.player();
+        ItemStack composition = FinalTuple.getHeldItems(player).getFirst(Registry.COMPOSITION.get());
+        if(composition.isEmpty()){
+            NoteBlockMaster.LOGGER.warn("Unable to write Song ID onto invalid ItemStack"); return;
+        }
+
+        composition.set(Registry.SONG_ID, data);
     }
 
     private static void handleTickSchedule(final TickSchedule tickSchedule, final IPayloadContext context) {
@@ -151,5 +175,17 @@ public class PacketHandler {
         level.setBlockAndUpdate(pos, level.getBlockState(pos)
                 .setValue(TuningCore.VOLUME, coreUpdate.volume())
                 .setValue(TuningCore.SUSTAIN, coreUpdate.sustain()));
+    }
+
+    private static void handleLoadSong(final LoadSong packet, final IPayloadContext context){
+        NBS nbs = ComposerBlock.loadNBSFile(packet.name());
+        if(nbs!= null) {
+            SongData data = SongData.of(nbs);
+            UUID ID = data.getID();
+            context.player().displayClientMessage(Component.literal("Caching song " + data.title() +" by "+ data.author()+ " with ID " + ID), false);
+            SongCache.cacheSong(ID, data);
+            return;
+        }
+        context.player().displayClientMessage(Component.literal("Could not load song " + packet.name() + ".nbs"), false);
     }
 }

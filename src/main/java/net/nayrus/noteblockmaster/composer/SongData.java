@@ -4,14 +4,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import libs.felnull.fnnbs.Layer;
 import libs.felnull.fnnbs.NBS;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
-import net.nayrus.noteblockmaster.utils.Utils;
 
 import java.util.*;
 
@@ -47,7 +48,7 @@ public record SongData(String title, String author, Map<String, List<Note>> note
 
     public static SongData of(NBS nbs){
         List<Layer> layers = nbs.getLayers();
-        TreeMap<String, List<Note>> notes = new TreeMap<>();
+        Map<String, List<Note>> notes = new HashMap<>();
         for(int beat = 0; beat <= nbs.getSongLength(); beat++){
             List<Note> notesAtLayer = new ArrayList<>();
             int finalBeat = beat;
@@ -56,7 +57,7 @@ public record SongData(String title, String author, Map<String, List<Note>> note
                 if(current != null) notesAtLayer.add(Note.of(current));
             });
             if(notesAtLayer.size() > 32) throw new IllegalStateException("The song " + nbs.getName() + " by " + nbs.getAuthor() + " has more than 32 notes at tick " + finalBeat);
-            notes.put(finalBeat+"", notesAtLayer);
+            if(!notesAtLayer.isEmpty()) notes.put(finalBeat+"", notesAtLayer);
         }
         return new SongData(nbs.getName(), nbs.getAuthor(), notes);
     }
@@ -96,8 +97,19 @@ public record SongData(String title, String author, Map<String, List<Note>> note
     }
 
     public UUID getID(){
-        return Utils.generateUUIDFromString(this.toString());
+        return UUID.nameUUIDFromBytes(this.toString().getBytes());
     }
+
+//    @Override
+//    public String toString() {
+//        StringBuilder sb = new StringBuilder("Title: " + this.title() + " Author: " + this.author());
+//        TreeMap<Integer, List<Note>> sorted = new TreeMap<>();
+//        this.notes().forEach((beat, list) -> {
+//            sorted.put(Integer.parseInt(beat), list);
+//        });
+//        sb.append(sorted);
+//        return sb.toString();
+//    }
 
     public List<Note> getNotesAt(int index){
         return notes().getOrDefault(index+"", List.of());

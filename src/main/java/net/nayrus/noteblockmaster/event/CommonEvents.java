@@ -33,6 +33,8 @@ import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.server.command.ConfigCommand;
 
+import java.io.IOException;
+
 public class CommonEvents {
 
     @SubscribeEvent
@@ -47,6 +49,11 @@ public class CommonEvents {
         MinecraftServer server = event.getServer();
         NoteBlockMaster.LOGGER.info("Loading saved songs");
         SongCache.SERVER_CACHE = new SongCache(false).loadFromWorld(server.overworld());
+        try {
+            SongCache.SERVER_CACHE.loadIndiciesFromFile();
+        } catch (IOException e) {
+            NoteBlockMaster.LOGGER.warn("No additional songs have been loaded as cache file could not be opened");
+        }
     }
 
     @SubscribeEvent
