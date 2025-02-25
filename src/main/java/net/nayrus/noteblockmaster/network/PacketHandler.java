@@ -182,7 +182,9 @@ public class PacketHandler {
         if(nbs!= null) {
             SongData data = SongData.of(nbs);
             UUID ID = data.getID();
-            context.player().displayClientMessage(Component.literal("Caching song " + data.title() +" by "+ data.author()+ " with ID " + ID), false);
+            context.player().displayClientMessage(Component.literal("Caching song " + data.title() +" by "+ data.author()+ " with ID " + ID).withStyle(Style.EMPTY
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ID.toString()))
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to copy ID")))), false);
             SongCache.cacheSong(ID, data);
             return;
         }

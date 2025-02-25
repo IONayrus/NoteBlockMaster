@@ -72,11 +72,11 @@ public class ClientEvents {
         FinalTuple.ItemStackTuple items = FinalTuple.getHeldItems(player);
         if (!items.contains(Registry.COMPOSITION.get())) return;
 
-        ItemStack composer = items.getFirst(Registry.COMPOSITION.get());
-        ComposeData cData = ComposeData.getComposeData(composer);
+        ItemStack composer_note = items.getFirst(Registry.COMPOSITION.get());
+        ComposeData cData = ComposeData.getComposeData(composer_note);
         player.displayClientMessage(Component.literal("Next repeater delay: " + cData.postDelay()).withColor(Color.RED.darker().getRGB()), true);
-        if(composer.get(Registry.SONG_ID) instanceof SongID(UUID songID)){
-            SongData data = SongCache.getSong(songID, composer);
+        if(composer_note.get(Registry.SONG_ID) instanceof SongID(UUID songID)){
+            SongData data = SongCache.getSong(songID, composer_note);
             if(data!= null){
                 ComposerRenderer.renderScreenOverlay(event.getGuiGraphics(), data.getNotesAt(cData.beat()), cData);
             }

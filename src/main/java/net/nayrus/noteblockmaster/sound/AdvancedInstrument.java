@@ -4,6 +4,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public enum AdvancedInstrument implements StringRepresentable {
     HARP("harp", SoundEvents.NOTE_BLOCK_HARP),
@@ -25,6 +27,24 @@ public enum AdvancedInstrument implements StringRepresentable {
 
     private final String name;
     private final Holder<SoundEvent> soundEvent;
+
+    public static final ItemStack[] renderStack = {
+            new ItemStack(Items.DIRT),
+            new ItemStack(Items.OAK_PLANKS),
+            new ItemStack(Items.STONE),
+            new ItemStack(Items.SAND),
+            new ItemStack(Items.WHITE_WOOL),
+            new ItemStack(Items.CLAY),
+            new ItemStack(Items.GOLD_BLOCK),
+            new ItemStack(Items.ICE),
+            new ItemStack(Items.BONE_BLOCK),
+            new ItemStack(Items.IRON_BLOCK),
+            new ItemStack(Items.SOUL_SAND),
+            new ItemStack(Items.PUMPKIN),
+            new ItemStack(Items.EMERALD_BLOCK),
+            new ItemStack(Items.HAY_BLOCK),
+            new ItemStack(Items.GLOWSTONE)
+    };
 
     AdvancedInstrument(String name, Holder<SoundEvent> soundEvent) {
         this.name = name;
@@ -53,4 +73,5 @@ public enum AdvancedInstrument implements StringRepresentable {
     public int getSustains(){
         return SustainedInstrument.values()[this.ordinal()].getSize();
     }
+
 }
