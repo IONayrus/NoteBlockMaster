@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.datagen.DataGenerators;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipeSerializer;
 import net.nayrus.noteblockmaster.event.ClientEvents;
 import net.nayrus.noteblockmaster.event.CommonEvents;
@@ -46,6 +47,7 @@ public class NoteBlockMaster
             modEventBus.addListener(Registry::registerClientExtensions);
             modEventBus.addListener(Registry::registerParticles);
             modEventBus.addListener(KeyBindings::registerBindings);
+            modEventBus.addListener(DataGenerators::gatherData);
         }else{
             NeoForge.EVENT_BUS.register(ServerEvents.class);
         }

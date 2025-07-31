@@ -1,19 +1,24 @@
 package net.nayrus.noteblockmaster.render.utils;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.Util;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.nayrus.noteblockmaster.render.ANBInfoRender;
+import net.nayrus.noteblockmaster.render.CoreRender;
+import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
 import java.awt.*;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RenderUtils {
 
@@ -49,20 +54,41 @@ public class RenderUtils {
         return getStableEyeCenter(Minecraft.getInstance().gameRenderer.getMainCamera());
     }
 
-    public static Stream<BlockPos> getBlocksInRange(int renderRadius, Predicate<BlockPos> additionalPredicate){
+    public record RenderBlocks(List<BlockPos> blocks, List<BlockPos> cores) {}
+    private static RenderBlocks cachedBlocks = new RenderBlocks(new ArrayList<>(), new ArrayList<>());
+    private static long lastUpdate = 0L;
+
+    public static RenderBlocks getTargetBlocks(Level level){
+        if(Util.getMillis() - lastUpdate < 200) return cachedBlocks;
         Camera cam = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 lookVec = new Vec3(cam.getLookVector());
         Vec3 blockCenter = getStableEyeCenter(cam);
-        return BlockPos.betweenClosedStream(new AABB(blockCenter.add(Utils.sphereVec(-renderRadius)), blockCenter.add(Utils.sphereVec(renderRadius))))
-                .filter(pos -> isInRenderRange(pos, blockCenter, lookVec, cam.isDetached(), renderRadius) && additionalPredicate.test(pos));
+        int renderRadius = Math.max(ANBInfoRender.INFO_RENDER_RADIUS, CoreRender.CORE_RENDER_RANGE);
+        List<BlockPos> blocks = new ArrayList<>();
+        List<BlockPos> cores = new ArrayList<>();
+        BlockPos.betweenClosedStream(new AABB(blockCenter.add(Utils.sphereVec(-renderRadius)), blockCenter.add(Utils.sphereVec(renderRadius)))).forEach(pos->
+        {
+            BlockState state = level.getBlockState(pos);
+
+            if(state.is(Registry.ADVANCED_NOTEBLOCK)){
+                if(isNotInRenderRange(pos, blockCenter, lookVec, cam.isDetached(), ANBInfoRender.INFO_RENDER_RADIUS)) return;
+                blocks.add(pos.immutable());
+            } else if(state.is(Registry.TUNINGCORE)) {
+                if(isNotInRenderRange(pos, blockCenter, lookVec, cam.isDetached(), CoreRender.CORE_RENDER_RANGE)) return;
+                cores.add(pos.immutable());
+            }
+        });
+        lastUpdate = Util.getMillis();
+        cachedBlocks = new RenderBlocks(blocks, cores);
+        return cachedBlocks;
     }
 
     public static double distanceVecToBlock(Vec3 vPos, BlockPos pos){
         return vPos.distanceTo(pos.getCenter());
     }
 
-    public static boolean isInRenderRange(BlockPos pos, Vec3 center, Vec3 look, boolean fullCircle, int renderRadius){
-        return (fullCircle || pos.getCenter().subtract(center).dot(look) >= 0) && distanceVecToBlock(center, pos) <= renderRadius;
+    public static boolean isNotInRenderRange(BlockPos pos, Vec3 center, Vec3 look, boolean fullCircle, int renderRadius){
+        return distanceVecToBlock(center, pos) > renderRadius || (!fullCircle && !(pos.getCenter().subtract(center).dot(look) >= 0));
     }
 
     public static void pushAndTranslateRelativeToCam(PoseStack stack){
