@@ -53,8 +53,8 @@ public class RenderUtils {
         Camera cam = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 lookVec = new Vec3(cam.getLookVector());
         Vec3 blockCenter = getStableEyeCenter(cam);
-        return BlockPos.betweenClosedStream(new AABB(blockCenter.add(Utils.sphereVec(-renderRadius)), blockCenter.add(Utils.sphereVec(renderRadius))))
-                .filter(pos -> isInRenderRange(pos, blockCenter, lookVec, cam.isDetached(), renderRadius) && additionalPredicate.test(pos));
+        return BlockPos.betweenClosedStream(new AABB(blockCenter.add(Utils.sphereVec(-renderRadius)), blockCenter.add(Utils.sphereVec(renderRadius)))) //TODO Cache Blocks for 100ms or smth
+                .filter(pos -> isInRenderRange(pos, blockCenter, lookVec, cam.isDetached(), renderRadius) && additionalPredicate.test(pos)); //TODO Swap statements
     }
 
     public static double distanceVecToBlock(Vec3 vPos, BlockPos pos){
@@ -62,7 +62,7 @@ public class RenderUtils {
     }
 
     public static boolean isInRenderRange(BlockPos pos, Vec3 center, Vec3 look, boolean fullCircle, int renderRadius){
-        return (fullCircle || pos.getCenter().subtract(center).dot(look) >= 0) && distanceVecToBlock(center, pos) <= renderRadius;
+        return (fullCircle || pos.getCenter().subtract(center).dot(look) >= 0) && distanceVecToBlock(center, pos) <= renderRadius;  //TODO Inspect with spark
     }
 
     public static void pushAndTranslateRelativeToCam(PoseStack stack){

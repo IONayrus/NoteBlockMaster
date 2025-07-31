@@ -10,13 +10,11 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class SongFileManager {
 
-    public static final List<UUID> registeredSongs = new ArrayList<>();
+    public static final HashSet<UUID> registeredSongs = new HashSet<>();
     public static Path SONG_DIR;
     public static Path CACHE_DIR;
 
@@ -37,23 +35,21 @@ public class SongFileManager {
 
     public static void validateAndLoadCache(){
         try(DirectoryStream<Path> stream = Files.newDirectoryStream(CACHE_DIR)){
-            List<UUID> not_validated = new ArrayList<>(List.copyOf(SongFileManager.registeredSongs));
+            HashSet<UUID> notValidated = new HashSet<>(List.copyOf(SongFileManager.registeredSongs));
+
             for(Path file : stream){
                 String name = file.getFileName().toString();
                 try{
                     UUID id = UUID.fromString(name.substring(0,36));
-                    if(registeredSongs.contains(id)) not_validated.remove(id);
-                    else{
-                        registeredSongs.add(id);
-                        not_validated.removeIf(uuid -> uuid.compareTo(id) == 0);
-                    }
+                    notValidated.remove(id);
+                    registeredSongs.add(id);
                 }catch(IllegalArgumentException e){
                     NoteBlockMaster.LOGGER.warn("File {} is in the cache directory but is not a valid UUID", name);
                 }
             }
-            for(UUID id : not_validated){
-                if(!SongCache.SERVER_CACHE.saveIfPresent(id)) registeredSongs.remove(id);
-            }
+
+            notValidated.removeIf(id -> SongCache.SERVER_CACHE.saveIfPresent(id) || !registeredSongs.remove(id)); //Clean Up
+
         } catch (IOException e) {
             NoteBlockMaster.LOGGER.error("Could not validate the caching directory {}", e.getLocalizedMessage());
         }

@@ -18,6 +18,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
+import net.nayrus.noteblockmaster.composer.Note;
+import net.nayrus.noteblockmaster.composer.SongCache;
+import net.nayrus.noteblockmaster.composer.SongData;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.screen.NoteTunerScreen;
@@ -26,6 +29,8 @@ import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+
+import java.util.Objects;
 
 
 public class TunerItem extends Item {
@@ -63,6 +68,7 @@ public class TunerItem extends Item {
             composer = context.getItemInHand();
         }
         TunerData data = getTunerData(tuner);
+
         if(!(state.getBlock() instanceof AdvancedNoteBlock block)){
             if(!data.isSetmode() && !composer.is(Registry.COMPOSITION)) return InteractionResult.PASS;
             Inventory inv = player.getInventory();
@@ -74,7 +80,7 @@ public class TunerItem extends Item {
         }
         if(!player.isShiftKeyDown()) {
             if (tuner.is(Registry.TEMPOTUNER)) return changeSubtickOn(level, block, composer, data, state, player, pos, doOffHandSwing);
-            if (tuner.is(Registry.NOTETUNER)) return changeNoteOn(level, state, block, data, player, pos);
+            if (tuner.is(Registry.NOTETUNER)) return changeNoteOn(level, state, block, composer, data, player, pos);
         }
         return InteractionResult.PASS;
     }
@@ -110,12 +116,30 @@ public class TunerItem extends Item {
         }
     }
 
-    private static InteractionResult changeNoteOn(Level level, BlockState state, AdvancedNoteBlock block, TunerData data, Player player, BlockPos pos) {
+    private static InteractionResult changeNoteOn(Level level, BlockState state, AdvancedNoteBlock block, ItemStack composer, TunerData data, Player player, BlockPos pos) {
         if(!level.isClientSide()) {
-            int new_val = data.isSetmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
+            int new_val;
+            if(!composer.is(Registry.COMPOSITION) || !composer.has(Registry.SONG_ID)) new_val = getNewNoteValue(block, state, data);
+            else  {
+                ComposeData composeData = ComposeData.getComposeData(composer);
+                SongData songData = SongCache.getSong(Objects.requireNonNull(composer.get(Registry.SONG_ID)).songID(), composer);
+                if(songData == null) new_val = getNewNoteValue(block, state, data);
+                else{
+                    int note_index = composeData.nextNoteIndex();
+                    Note note = songData.getNotesAt(composeData.beat()).get(note_index);
+                    new_val = note.key();
+                    composer.set(Registry.COMPOSE_DATA, new ComposeData(composeData.beat(), composeData.subtick(), composeData.postDelay(), composeData.bpm(), composeData.placed() | (1 << note_index))); //TODO does this work?
+
+                    //TODO Set Tuning Core for pitch & volume
+                }
+            }
             return block.onNoteChange(level, player, state, pos, new_val);
         }
         return InteractionResult.SUCCESS;
+    }
+
+    private static int getNewNoteValue(AdvancedNoteBlock block, BlockState state, TunerData data){
+        return data.isSetmode() ? data.value() + AdvancedNoteBlock.MIN_NOTE_VAL : block.changeNoteValueBy(state, data.value());
     }
 
     private static InteractionResult changeSubtickOn(Level level, AdvancedNoteBlock block, ItemStack composer, TunerData data, BlockState state, Player player, BlockPos pos, boolean doOffHandSwing) {

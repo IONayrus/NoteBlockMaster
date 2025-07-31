@@ -3,6 +3,7 @@ package net.nayrus.noteblockmaster.event;
 import net.minecraft.server.level.ServerPlayer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.composer.SongCache;
+import net.nayrus.noteblockmaster.composer.SongFileManager;
 import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
 import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -32,7 +33,10 @@ public class ServerEvents {
     private static long ticks = 0L;
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event){
-        if(ticks%6000==0) SongCache.SERVER_CACHE.saveAndClearCache();
+        if(ticks%6000==0){
+            SongCache.SERVER_CACHE.saveAndClearCache();
+            SongFileManager.validateAndLoadCache();
+        }
         ticks++;
     }
 }

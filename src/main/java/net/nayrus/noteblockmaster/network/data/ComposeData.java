@@ -53,4 +53,10 @@ public record ComposeData(int beat, int subtick, int postDelay, float bpm, int p
         if(index > 31 || index < 0) throw new IllegalArgumentException("Note index "+index+" for beat ["+ this.beat() + "] is not allowed");
         return ((this.placed >> index) & 1) == 1;
     }
+
+    public int nextNoteIndex(){
+        int index = 0;
+        while(hasPlaced(index)) index++;
+        return index;
+    }
 }
