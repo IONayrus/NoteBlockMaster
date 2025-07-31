@@ -25,27 +25,27 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.*;
+import static net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS;
+import static net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_WEATHER;
 
 public class CoreRender {
 
     public static Map<BlockPos, Float> OFFSET_ON_POS = new HashMap<>();
     public static Map<BlockPos, Long> LAST_STAGE_TIME = new HashMap<>();
-    public static int RANGE = 20;
+    public static final int CORE_RENDER_RANGE = 20;
 
     public static void renderCoresInRange(RenderLevelStageEvent e, Level level){
         Vec3 camCenter = RenderUtils.getStableEyeCenter(Minecraft.getInstance().gameRenderer.getMainCamera());
         RenderLevelStageEvent.Stage stage = e.getStage();
         if(stage == AFTER_TRANSLUCENT_BLOCKS || (stage == AFTER_WEATHER && !ClientConfig.LOW_RESOLUTION_RENDER.get())) {
-            RenderUtils.getBlocksInRange(RANGE, pos -> level.getBlockState(pos).is(Registry.TUNINGCORE))
-                    .forEach(pos -> {
-                        long renderTime;
-                        if(stage == AFTER_TRANSLUCENT_BLOCKS){
-                            renderTime = Util.getMillis();
-                            LAST_STAGE_TIME.put(pos.immutable(), renderTime);
-                        }else renderTime = LAST_STAGE_TIME.getOrDefault(pos.immutable(), Util.getMillis());
-                        renderCore(level, pos, level.getBlockState(pos), e.getPoseStack(), stage, Utils.exponentialFloor(0.5F, RANGE, (float) RenderUtils.distanceVecToBlock(camCenter, pos), 2), renderTime);
-                    });
+            for(BlockPos pos : RenderUtils.getTargetBlocks(level).cores()){
+                long renderTime;
+                if(stage == AFTER_TRANSLUCENT_BLOCKS){
+                    renderTime = Util.getMillis();
+                    LAST_STAGE_TIME.put(pos.immutable(), renderTime);
+                }else renderTime = LAST_STAGE_TIME.getOrDefault(pos.immutable(), Util.getMillis());
+                renderCore(level, pos, level.getBlockState(pos), e.getPoseStack(), stage, Utils.exponentialFloor(0.5F, CORE_RENDER_RANGE, (float) RenderUtils.distanceVecToBlock(camCenter, pos), 2), renderTime);
+            }
         }
         if(stage == AFTER_WEATHER){
             OFFSET_ON_POS.entrySet().removeIf(entry -> {
@@ -60,6 +60,7 @@ public class CoreRender {
     }
 
     public static void renderCore(Level level, BlockPos pos, BlockState state, PoseStack stack, RenderLevelStageEvent.Stage stage, float alpha, long time){
+        if(!state.is(Registry.TUNINGCORE)) return; //Can happen if Block is destroyed right before rendering
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         RenderUtils.pushAndTranslateRelativeToCam(stack);
         BlockPos immutablePos = pos.immutable();
@@ -109,7 +110,7 @@ public class CoreRender {
 
     public static void clearMaps(){
         OFFSET_ON_POS.entrySet().removeIf(entry -> {
-            if(RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, entry.getKey()) > RANGE){
+            if(RenderUtils.distanceVecToBlock(RenderUtils.CURRENT_CAM_POS, entry.getKey()) > CORE_RENDER_RANGE){
                 LAST_STAGE_TIME.remove(entry.getKey());
                 return true;
             }

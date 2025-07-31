@@ -25,24 +25,24 @@ import java.awt.*;
 
 public class ANBInfoRender {
 
-    public static final int renderRadius = 18;
+    public static final int INFO_RENDER_RADIUS = 18;
     public static boolean NOTE_OFF_SYNC = false;
     public static boolean SUBTICK_OFF_SYNC = false;
 
     public static void renderNoteBlockInfo(RenderLevelStageEvent e, Level level, Utils.PROPERTY info){
         RenderSystem.disableDepthTest();
-        RenderUtils.getBlocksInRange(renderRadius, pos -> level.getBlockState(pos).is(Registry.ADVANCED_NOTEBLOCK))
-                .forEach(pos -> renderNoteBlockInfo(e, pos, level.getBlockState(pos), info));
+        for(BlockPos pos : RenderUtils.getTargetBlocks(level).blocks()) renderNoteBlockInfo(e, pos, level.getBlockState(pos), info);
     }
 
     public static void renderNoteBlockInfo(RenderLevelStageEvent e, BlockPos pos, BlockState state, Utils.PROPERTY info){
+        if(!state.is(Registry.ADVANCED_NOTEBLOCK)) return; //Can happen if Block is destroyed right before rendering
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         PoseStack matrix = e.getPoseStack();
         Color color = AdvancedNoteBlock.getColor(state, info);
 
         RenderUtils.pushAndTranslateRelativeToCam(matrix);
 
-        float alpha = Utils.exponentialFloor(1.0F, renderRadius, (float) RenderUtils.distanceVecToBlock(RenderUtils.getStableEyeCenter(), pos), 4);
+        float alpha = Utils.exponentialFloor(1.0F, INFO_RENDER_RADIUS, (float) RenderUtils.distanceVecToBlock(RenderUtils.getStableEyeCenter(), pos), 4);
         renderColoredCone(buffer, matrix, color, pos, 0.2F, 0.33F * alpha);
 
         String text = switch(info){
