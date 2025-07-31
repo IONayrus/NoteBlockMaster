@@ -6,6 +6,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.composer.SongCache;
 import net.nayrus.noteblockmaster.composer.SongFileManager;
+import net.nayrus.noteblockmaster.datagen.DataGenerators;
 import net.nayrus.noteblockmaster.datagen.recipes.TunerRecipe;
 import net.nayrus.noteblockmaster.event.ClientEvents;
 import net.nayrus.noteblockmaster.event.CommonEvents;
@@ -49,7 +50,15 @@ public class NoteBlockMaster
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT);
         modEventBus.addListener(PacketHandler::registerNetwork);
 
+
         if(FMLEnvironment.dist == Dist.CLIENT){
+            modEventBus.addListener(DataGenerators::gatherData);
+
+            modEventBus.addListener(Registry::registerEntityRenderers);
+            modEventBus.addListener(Registry::registerParticles);
+            modEventBus.addListener(Registry::registerClientExtensions);
+            modEventBus.addListener(Registry::registerMenuScreens);
+
             NeoForge.EVENT_BUS.register(ClientEvents.class);
             modEventBus.addListener(this::onFMLClientSetup);
             modEventBus.addListener(KeyBindings::registerBindings);
