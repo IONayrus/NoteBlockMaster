@@ -104,7 +104,7 @@ public class Registry
     static{
         Map<DeferredBlock<Block>,DeferredItem<Item>> block_items = new HashMap<>();
         block_items.put(ADVANCED_NOTEBLOCK, createBlockItem(ADVANCED_NOTEBLOCK));
-        block_items.put(COMPOSER, createBlockItem(COMPOSER));
+        //block_items.put(COMPOSER, createBlockItem(COMPOSER));
         BLOCK_ITEMS = block_items;
 
         CREATIVE_MODE_TABS.register("noteblockmaster", ()-> CreativeModeTab.builder()
