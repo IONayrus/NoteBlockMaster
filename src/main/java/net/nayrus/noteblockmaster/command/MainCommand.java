@@ -35,13 +35,13 @@ public class MainCommand {
         dispatcher.register(Commands.literal("nbm")
                 .then(saveConfigCommand())
                 .then(lowResolutionCommand())
-                //.then(songCommands())     TODO Disabled for release
-//                .then(Commands.literal("debug")
-//                        .executes(context -> {
-//                            SongCache.SERVER_CACHE.saveAndClearCache();
-//
-//                            return Command.SINGLE_SUCCESS;
-//                        }))
+                .then(songCommands())
+                .then(Commands.literal("debug")
+                        .executes(context -> {
+                            SongCache.SERVER_CACHE.saveAndClearCache();
+
+                            return Command.SINGLE_SUCCESS;
+                        }))
                 .executes(context -> -1));
     }
 

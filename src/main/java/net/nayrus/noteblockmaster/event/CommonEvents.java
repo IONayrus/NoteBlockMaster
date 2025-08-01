@@ -2,6 +2,7 @@ package net.nayrus.noteblockmaster.event;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -24,14 +25,20 @@ import net.nayrus.noteblockmaster.composer.SongCache;
 import net.nayrus.noteblockmaster.composer.SongFileManager;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
+import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
+import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.SoundRegistry;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.server.command.ConfigCommand;
 
 public class CommonEvents {
@@ -49,6 +56,17 @@ public class CommonEvents {
         NoteBlockMaster.LOGGER.info("Loading saved songs");
         SongCache.SERVER_CACHE = new SongCache(false).loadFromWorld(server.overworld());
         SongFileManager.validateAndLoadCache();
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event){
+        if(FMLEnvironment.dist == Dist.DEDICATED_SERVER)
+            PacketDistributor.sendToPlayer((ServerPlayer) event.getEntity(), new ConfigCheck(
+                    (byte) AdvancedNoteBlock.MIN_NOTE_VAL,
+                    (byte) AdvancedNoteBlock.MAX_NOTE_VAL,
+                    (byte) AdvancedNoteBlock.SUBTICK_LENGTH
+            ));
+        else if(ANBInfoRender.NOTE_OFF_SYNC || ANBInfoRender.SUBTICK_OFF_SYNC) AdvancedNoteBlock.resetPropertiesToLoadedValues();
     }
 
     @SubscribeEvent

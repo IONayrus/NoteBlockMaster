@@ -32,6 +32,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
+import net.nayrus.noteblockmaster.event.AdvancedNoteBlockEvent;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
@@ -76,7 +77,7 @@ public class AdvancedNoteBlock extends Block
 
     public static void loadPropertiesFromConfig(final NewRegistryEvent ignoredEvent){
         SUBTICK_LENGTH = StartupConfig.SUBTICK_LENGTH.get();
-        SUBTICKS = (int) (100.0F / SUBTICK_LENGTH);
+        SUBTICKS = 100 / SUBTICK_LENGTH;
         SUBTICK = IntegerProperty.create("subtick",0, SUBTICKS - 1);
         MIN_NOTE_VAL = StartupConfig.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) StartupConfig.LOWER_NOTE_LIMIT.get(), false) : (int) StartupConfig.LOWER_NOTE_LIMIT.get();
         MAX_NOTE_VAL = StartupConfig.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) StartupConfig.HIGHER_NOTE_LIMIT.get(), false) : (int) StartupConfig.HIGHER_NOTE_LIMIT.get();
@@ -85,6 +86,16 @@ public class AdvancedNoteBlock extends Block
         TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
 
         TuningCore.loadSustainProperty();
+    }
+
+    public static void resetPropertiesToLoadedValues(){
+        ANBInfoRender.NOTE_OFF_SYNC = false;
+        ANBInfoRender.SUBTICK_OFF_SYNC = false;
+        SUBTICKS = SUBTICK.getPossibleValues().size();
+        SUBTICK_LENGTH = 100 / SUBTICKS;
+        MIN_NOTE_VAL = NOTE.getPossibleValues().stream().toList().getFirst();
+        MAX_NOTE_VAL = NOTE.getPossibleValues().stream().toList().getLast();
+        TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
     }
 
     public BlockState setInstrument(LevelReader reader, BlockPos pos, BlockState state) {
@@ -225,9 +236,9 @@ public class AdvancedNoteBlock extends Block
 
     @Override
     protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
-        net.neoforged.neoforge.event.level.NoteBlockEvent.Play e = new net.neoforged.neoforge.event.level.NoteBlockEvent.Play(level, pos, state, getNoteValue(state), NoteBlockInstrument.values()[state.getValue(INSTRUMENT).ordinal()]);
+        AdvancedNoteBlockEvent.Play e = new AdvancedNoteBlockEvent.Play(level, pos, state, getNoteValue(state), state.getValue(INSTRUMENT));
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e).isCanceled()) return false;
-        AdvancedInstrument instrument = state.getValue(INSTRUMENT);
+        AdvancedInstrument instrument = e.getInstrument();
         if(id == 0) SubTickScheduler.delayedNoteBlockEvent(state, level, pos, instrument, 3.0F);
         if(id >= 1) SubTickScheduler.delayedCoredNoteBlockEvent(state, level.getBlockState(pos.above()), level, pos, instrument);
         return true;
@@ -303,7 +314,7 @@ public class AdvancedNoteBlock extends Block
 
     public InteractionResult onNoteChange(Level level, Player player, BlockState state, BlockPos pos, int new_val){
         int old_val = AdvancedNoteBlock.getNoteValue(state);
-        int _new = net.neoforged.neoforge.common.CommonHooks.onNoteChange(level, pos, state, old_val, new_val);
+        int _new = AdvancedNoteBlockEvent.onNoteChange(level, pos, state, old_val, new_val);
         if (_new == -1) return InteractionResult.FAIL;
         state = this.setNoteValue(state, _new);
         level.setBlockAndUpdate(pos, state);
