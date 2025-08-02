@@ -12,6 +12,8 @@ import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.render.particle.IInternalParticleAccessor;
 import net.nayrus.noteblockmaster.render.particle.SustainedNoteOptions;
 
+import javax.annotation.Nullable;
+
 public class CoreSound extends SimpleSoundInstance{
 
     private final BlockPos immutablePos;
@@ -51,7 +53,7 @@ public class CoreSound extends SimpleSoundInstance{
         return this.channel;
     }
 
-    public Particle getParticle() {
+    public @Nullable Particle getParticle() {
         return this.particle;
     }
 }

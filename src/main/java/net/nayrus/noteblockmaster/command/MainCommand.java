@@ -40,6 +40,7 @@ public class MainCommand {
                         .executes(context -> {
                             SongCache.SERVER_CACHE.saveAndClearCache();
 
+
                             return Command.SINGLE_SUCCESS;
                         }))
                 .executes(context -> -1));
