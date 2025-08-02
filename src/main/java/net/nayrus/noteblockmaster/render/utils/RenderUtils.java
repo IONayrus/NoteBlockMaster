@@ -108,12 +108,12 @@ public class RenderUtils {
         return CACHED_BLOCKS;
     }
 
-    public static void handleSyncPacket(final SyncBlockInfos payload, final IPayloadContext context) {
+    public static void handleSyncPacket(final SyncBlockInfos payload, final IPayloadContext ignoredContext) {
         CACHED_BLOCK_INFO.putAll(payload.states());
         getTargetBlocks(Minecraft.getInstance().level, true);
     }
 
-    public static void handleRemovePacket(final RemoveBlockInfo payload, final IPayloadContext context){
+    public static void handleRemovePacket(final RemoveBlockInfo payload, final IPayloadContext ignoredContext){
         CACHED_BLOCK_INFO.remove(payload.position());
     }
 

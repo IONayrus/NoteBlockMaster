@@ -239,4 +239,8 @@ public class TuningCore extends TransparentBlock{
         BREAK_DELAY.add(pos.immutable());
         level.scheduleTick(pos, state.getBlock(), 1);
     }
+
+    static{
+        loadSustainProperty();
+    }
 }

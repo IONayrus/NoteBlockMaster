@@ -16,6 +16,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.nayrus.noteblockmaster.composer.SongCache;
 import net.nayrus.noteblockmaster.network.data.SongID;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.network.payload.LoadSong;
 import net.nayrus.noteblockmaster.setup.Registry;
@@ -28,6 +30,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.awt.*;
 import java.util.UUID;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class MainCommand {
 
@@ -38,9 +42,17 @@ public class MainCommand {
                 .then(songCommands())
                 .then(Commands.literal("debug")
                         .executes(context -> {
-                            SongCache.SERVER_CACHE.saveAndClearCache();
-
-
+                            String fileName = context.getSource().isPlayer() ? "client_states.txt" : "server_states.txt";
+                            try (FileWriter writer = new FileWriter(fileName)) {
+                                for (BlockState state : Block.BLOCK_STATE_REGISTRY) {
+                                    int id = Block.BLOCK_STATE_REGISTRY.getId(state);
+                                    writer.write(id + ": " + state + "\n");
+                                }
+                                context.getSource().sendSuccess(() -> Component.literal("Successfully dumped " + Block.BLOCK_STATE_REGISTRY.size() + " states to " + fileName), true);
+                            } catch (IOException e) {
+                                context.getSource().sendFailure(Component.literal("Failed to dump states: " + e.getMessage()));
+                                e.printStackTrace();
+                            }
                             return Command.SINGLE_SUCCESS;
                         }))
                 .executes(context -> -1));
