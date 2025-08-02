@@ -58,7 +58,7 @@ public class CommonEvents {
                     (byte) AdvancedNoteBlock.MAX_NOTE_VAL,
                     (byte) AdvancedNoteBlock.SUBTICK_LENGTH
             ));
-        else if(ANBInfoRender.NOTE_OFF_SYNC || ANBInfoRender.SUBTICK_OFF_SYNC) AdvancedNoteBlock.resetPropertiesToLoadedValues();
+        else if(ANBInfoRender.NOTE_OFF_SYNC || ANBInfoRender.SUBTICK_OFF_SYNC) AdvancedNoteBlock.loadPropertiesFromConfig(null);
     }
 
     @SubscribeEvent

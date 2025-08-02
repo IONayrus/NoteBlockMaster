@@ -49,8 +49,8 @@ public class AdvancedNoteBlock extends Block
     public static int SUBTICKS;
     public static int SUBTICK_LENGTH;
     public static final EnumProperty<AdvancedInstrument> INSTRUMENT = EnumProperty.create("advanced_instrument", AdvancedInstrument.class);
-    public static IntegerProperty SUBTICK;
-    public static IntegerProperty NOTE;
+    public static final IntegerProperty SUBTICK = IntegerProperty.create("subtick",0, 19);
+    public static final IntegerProperty NOTE = IntegerProperty.create("note", 0, 82);
     public static int MIN_NOTE_VAL;
     public static int MAX_NOTE_VAL;
     public static int TOTAL_NOTES;
@@ -68,17 +68,15 @@ public class AdvancedNoteBlock extends Block
         );
     }
 
-    public static void loadPropertiesFromConfig(final NewRegistryEvent ignoredEvent){
+    public static void loadPropertiesFromConfig(@Nullable final NewRegistryEvent ignoredEvent){
         SUBTICK_LENGTH = StartupConfig.SUBTICK_LENGTH.get();
         SUBTICKS = 100 / SUBTICK_LENGTH;
-        SUBTICK = IntegerProperty.create("subtick",0, SUBTICKS - 1);
+        //SUBTICK = IntegerProperty.create("subtick",0, SUBTICKS - 1); Dynmaic Property Settings breaks on dedicated Servers
         MIN_NOTE_VAL = StartupConfig.LOWER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) StartupConfig.LOWER_NOTE_LIMIT.get(), false) : (int) StartupConfig.LOWER_NOTE_LIMIT.get();
         MAX_NOTE_VAL = StartupConfig.HIGHER_NOTE_LIMIT.get() instanceof String ? noteStringAsInt((String) StartupConfig.HIGHER_NOTE_LIMIT.get(), false) : (int) StartupConfig.HIGHER_NOTE_LIMIT.get();
-        NOTE = IntegerProperty.create("note", MIN_NOTE_VAL, MAX_NOTE_VAL);
+        //NOTE = IntegerProperty.create("note", MIN_NOTE_VAL, MAX_NOTE_VAL); We just have to load the maximum values everytime - we can keep the limtis
 
         TOTAL_NOTES = MAX_NOTE_VAL - MIN_NOTE_VAL;
-
-        TuningCore.loadSustainProperty();
     }
 
     public static void resetPropertiesToLoadedValues(){

@@ -8,6 +8,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.setup.config.StartupConfig;
@@ -15,6 +17,8 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.awt.*;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class MainCommand {
 
@@ -24,7 +28,17 @@ public class MainCommand {
                 .then(lowResolutionCommand())
                 .then(Commands.literal("debug")
                         .executes(context -> {
-
+                            String fileName = context.getSource().isPlayer() ? "client_states.txt" : "server_states.txt";
+                            try (FileWriter writer = new FileWriter(fileName)) {
+                                for (BlockState state : Block.BLOCK_STATE_REGISTRY) {
+                                    int id = Block.BLOCK_STATE_REGISTRY.getId(state);
+                                    writer.write(id + ": " + state + "\n");
+                                }
+                                context.getSource().sendSuccess(() -> Component.literal("Successfully dumped " + Block.BLOCK_STATE_REGISTRY.size() + " states to " + fileName), true);
+                            } catch (IOException e) {
+                                context.getSource().sendFailure(Component.literal("Failed to dump states: " + e.getMessage()));
+                                e.printStackTrace();
+                            }
                             return Command.SINGLE_SUCCESS;
                         })
                 ).executes(context -> -1));
