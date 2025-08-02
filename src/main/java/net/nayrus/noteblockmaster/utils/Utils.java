@@ -48,8 +48,8 @@ public class Utils {
     public enum PROPERTY {NOTE, TEMPO}
 
     public static void sendDesyncWarning(Player player){
-        player.sendSystemMessage(Component.translatable("text.config.desync_warning")
-                .withColor(Color.ORANGE.getRGB())
+        player.sendSystemMessage(Component.translatable("text.config.desync_info")
+                .withColor(Color.GREEN.getRGB())
                 .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nbm saveconfig"))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("text.config.sync_save_hovertext").withColor(Color.LIGHT_GRAY.getRGB())))));
     }

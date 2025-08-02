@@ -7,13 +7,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.render.utils.GeometryBuilder;
 import net.nayrus.noteblockmaster.render.utils.RenderUtils;
-import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -29,16 +30,32 @@ public class ANBInfoRender {
     public static boolean NOTE_OFF_SYNC = false;
     public static boolean SUBTICK_OFF_SYNC = false;
 
-    public static void renderNoteBlockInfo(RenderLevelStageEvent e, Level level, Utils.PROPERTY info){
-        RenderSystem.disableDepthTest();
-        for(BlockPos pos : RenderUtils.getTargetBlocks(level).blocks()) renderNoteBlockInfo(e, pos, level.getBlockState(pos), info);
+    public record BlockInfo(int noteVal, int tickVal){
+        public static final StreamCodec<RegistryFriendlyByteBuf, BlockInfo> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.INT, BlockInfo::noteVal,
+                ByteBufCodecs.INT, BlockInfo::tickVal,
+                BlockInfo::new
+        );
     }
 
-    public static void renderNoteBlockInfo(RenderLevelStageEvent e, BlockPos pos, BlockState state, Utils.PROPERTY info){
-        if(!state.is(Registry.ADVANCED_NOTEBLOCK)) return; //Can happen if Block is destroyed right before rendering
+    public static void renderNoteBlockInfo(RenderLevelStageEvent e, Level level, Utils.PROPERTY info){
+        RenderSystem.disableDepthTest();
+
+        for(BlockPos pos : RenderUtils.getTargetBlocks(level).blocks()) {
+            BlockInfo cachedInfo = RenderUtils.CACHED_BLOCK_INFO.get(pos);
+            if(cachedInfo != null)
+                renderNoteBlockInfo(
+                    e,
+                    pos,
+                    cachedInfo,
+                    info);
+        }
+    }
+
+    public static void renderNoteBlockInfo(RenderLevelStageEvent e, BlockPos pos, BlockInfo cachedInfo, Utils.PROPERTY info){
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         PoseStack matrix = e.getPoseStack();
-        Color color = AdvancedNoteBlock.getColor(state, info);
+        Color color = AdvancedNoteBlock.getColor(cachedInfo.noteVal(), cachedInfo.tickVal(), info);
 
         RenderUtils.pushAndTranslateRelativeToCam(matrix);
 
@@ -46,8 +63,8 @@ public class ANBInfoRender {
         renderColoredCone(buffer, matrix, color, pos, 0.2F, 0.33F * alpha);
 
         String text = switch(info){
-            case NOTE -> NOTE_OFF_SYNC ? "%" : Utils.NOTE_STRING[AdvancedNoteBlock.getNoteValue(state)];
-            case TEMPO -> SUBTICK_OFF_SYNC ? "%" : state.getValue(AdvancedNoteBlock.SUBTICK).toString();
+            case NOTE -> Utils.NOTE_STRING[cachedInfo.noteVal()];
+            case TEMPO -> Integer.toString(cachedInfo.tickVal());
         };
         renderInfoLabel(buffer, matrix, text, color, pos, 0.025F, alpha);
 

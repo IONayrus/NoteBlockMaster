@@ -3,9 +3,11 @@ package net.nayrus.noteblockmaster.network;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.block.AdvancedNoteBlock;
 import net.nayrus.noteblockmaster.block.TuningCore;
@@ -14,6 +16,7 @@ import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.network.payload.*;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
+import net.nayrus.noteblockmaster.render.utils.RenderUtils;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.setup.config.StartupConfig;
@@ -22,11 +25,14 @@ import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.FinalTuple;
 import net.nayrus.noteblockmaster.utils.Utils;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PacketHandler {
     @SubscribeEvent
@@ -36,11 +42,14 @@ public class PacketHandler {
         reg.playToClient(ConfigCheck.TYPE, ConfigCheck.STREAM_CODEC, PacketHandler::handleStartUpSync);
         reg.playToClient(ActionPing.TYPE, ActionPing.STREAM_CODEC, PacketHandler::handleActionPing);
         reg.playToClient(ScheduleCoreSound.TYPE, ScheduleCoreSound.STREAM_CODEC, PacketHandler::handleScheduleCoreSound);
+        reg.playToClient(SyncBlockInfos.TYPE, SyncBlockInfos.STREAM_CODEC, RenderUtils::handleSyncPacket);
+        reg.playToClient(RemoveBlockInfo.TYPE, RemoveBlockInfo.STREAM_CODEC, RenderUtils::handleRemovePacket);
 
         reg.playToServer(TunerData.TYPE, TunerData.TUNER_STREAM_CODEC, PacketHandler::handleTunerData);
         reg.playToServer(ComposeData.TYPE, ComposeData.STREAM_CODEC, PacketHandler::handleComposeData);
         reg.playToServer(TickSchedule.TYPE, TickSchedule.STREAM_CODEC, PacketHandler::handleTickSchedule);
         reg.playToServer(CoreUpdate.TYPE, CoreUpdate.STREAM_CODEC, PacketHandler::handleCoreUpdate);
+        reg.playToServer(RequestBlockInfo.TYPE, RequestBlockInfo.STREAM_CODEC, PacketHandler::handleRequestBlockStates);
     }
 
     private static void handleStartUpSync(final ConfigCheck packet, final IPayloadContext context) {
@@ -126,5 +135,28 @@ public class PacketHandler {
         level.setBlockAndUpdate(pos, level.getBlockState(pos)
                 .setValue(TuningCore.VOLUME, coreUpdate.volume())
                 .setValue(TuningCore.SUSTAIN, coreUpdate.sustain()));
+    }
+
+    private static void handleRequestBlockStates(final RequestBlockInfo request, final IPayloadContext context){
+        ServerPlayer player = (ServerPlayer) context.player();
+
+        context.enqueueWork(() -> {
+            Map<BlockPos, ANBInfoRender.BlockInfo> statesToSend = new HashMap<>();
+            ServerLevel level = (ServerLevel) player.level();
+
+            for (BlockPos pos : request.positions()) {
+                if (level.isLoaded(pos)) {
+                    BlockState state = level.getBlockState(pos);
+
+                    if (state.is(Registry.ADVANCED_NOTEBLOCK)) {
+                        statesToSend.put(pos, new ANBInfoRender.BlockInfo(AdvancedNoteBlock.getNoteValue(state), state.getValue(AdvancedNoteBlock.SUBTICK)));
+                    }
+                }
+            }
+
+            if (!statesToSend.isEmpty()) {
+                PacketDistributor.sendToPlayer(player, new SyncBlockInfos(statesToSend));
+            }
+        });
     }
 }

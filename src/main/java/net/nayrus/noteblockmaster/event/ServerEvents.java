@@ -10,5 +10,4 @@ public class ServerEvents {
     public static void onServerStopped(ServerStoppedEvent event){
         SubTickScheduler.executor.shutdown();
     }
-
 }

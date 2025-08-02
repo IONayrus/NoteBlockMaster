@@ -32,14 +32,12 @@ import net.nayrus.noteblockmaster.event.AdvancedNoteBlockEvent;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.TunerData;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
-import net.nayrus.noteblockmaster.setup.config.StartupConfig;
 import net.nayrus.noteblockmaster.setup.NBMTags;
 import net.nayrus.noteblockmaster.setup.Registry;
+import net.nayrus.noteblockmaster.setup.config.StartupConfig;
 import net.nayrus.noteblockmaster.sound.AdvancedInstrument;
 import net.nayrus.noteblockmaster.sound.SubTickScheduler;
 import net.nayrus.noteblockmaster.utils.Utils;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import javax.annotation.Nullable;
@@ -99,6 +97,18 @@ public class AdvancedNoteBlock extends Block
         BlockState above = level.getBlockState(pos.above());
         if(above.is(Registry.TUNINGCORE) && above.getValue(TuningCore.SUSTAIN) > instrument.getSustains()) level.setBlock(pos.above(), above.setValue(TuningCore.SUSTAIN, instrument.getSustains()), 3);
         return state.setValue(INSTRUMENT, instrument);
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if(!level.isClientSide()) net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new AdvancedNoteBlockEvent.Removed(level, pos, state));
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        if(!level.isClientSide()) net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new AdvancedNoteBlockEvent.Placed(level, pos, state));
+        super.onPlace(state, level, pos, oldState, movedByPiston);
     }
 
     @Override
@@ -271,21 +281,20 @@ public class AdvancedNoteBlock extends Block
         return (float)Math.pow(2.0, (double)(note - 42) / 12.0);
     }
 
-    public static Color getColor(BlockState state, Utils.PROPERTY info){
-        if(FMLEnvironment.dist != Dist.DEDICATED_SERVER)
-            switch (info){
-                case NOTE: if(ANBInfoRender.NOTE_OFF_SYNC) return Color.RED;
-                case TEMPO: if(ANBInfoRender.SUBTICK_OFF_SYNC) return Color.RED;
-            }
+    public static Color getColor(int noteVal, int tickVal, Utils.PROPERTY info){
         float rgbVal = switch (info){
-            case NOTE -> (getNoteValue(state) - 2) / 29.0F;
-            case TEMPO -> state.getValue(SUBTICK) / (SUBTICKS - 1.0F);
+            case NOTE -> (noteVal- 2) / 29.0F;
+            case TEMPO -> tickVal / (SUBTICKS - 1.0F);
         };
 
         float rCol = Math.max(0.0F, Mth.sin((rgbVal + 0.0F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
         float gCol = Math.max(0.0F, Mth.sin((rgbVal + 0.33333334F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
         float bCol = Math.max(0.0F, Mth.sin((rgbVal + 0.6666667F) * (float) (Math.PI * 2)) * 0.65F + 0.35F);
         return new Color(rCol, gCol, bCol);
+    }
+
+    public static Color getColor(BlockState state, Utils.PROPERTY info){
+        return getColor(getNoteValue(state), state.getValue(SUBTICK), info);
     }
 
     public int changeNoteValueBy(BlockState state, int value){
@@ -307,6 +316,9 @@ public class AdvancedNoteBlock extends Block
     }
 
     public InteractionResult onSubtickChange(Level level, Player player, BlockState state, BlockPos pos, int new_val, boolean add){
+        int old_val = state.getValue(AdvancedNoteBlock.SUBTICK);
+        int _new = AdvancedNoteBlockEvent.onSubtickChange(level, pos, state, old_val, new_val);
+        if (_new == -1) return InteractionResult.FAIL;
         state = state.setValue(AdvancedNoteBlock.SUBTICK, new_val);
         level.setBlockAndUpdate(pos, state);
         level.playSound(null,
