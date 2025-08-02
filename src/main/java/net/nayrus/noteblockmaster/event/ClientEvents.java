@@ -27,6 +27,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundSourceEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 import java.awt.*;
 import java.util.UUID;
@@ -89,6 +90,11 @@ public class ClientEvents {
         SubTickScheduler.SUSTAINED_SOUNDS.put(sound.getImmutablePos(), sound);
         sound.addNoteParticle();
         sound.setChannel(e.getChannel());
+    }
+
+    @SubscribeEvent
+    public static void onServerStopped(ServerStoppedEvent e){
+        RenderUtils.clearCache();
     }
 
 }

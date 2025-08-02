@@ -2,6 +2,7 @@ package net.nayrus.noteblockmaster.event;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -26,6 +27,8 @@ import net.nayrus.noteblockmaster.composer.SongFileManager;
 import net.nayrus.noteblockmaster.item.TunerItem;
 import net.nayrus.noteblockmaster.network.data.ComposeData;
 import net.nayrus.noteblockmaster.network.payload.ConfigCheck;
+import net.nayrus.noteblockmaster.network.payload.RemoveBlockInfo;
+import net.nayrus.noteblockmaster.network.payload.SyncBlockInfos;
 import net.nayrus.noteblockmaster.render.ANBInfoRender;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.nayrus.noteblockmaster.sound.SoundRegistry;
@@ -40,6 +43,8 @@ import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.server.command.ConfigCommand;
+
+import java.util.HashMap;
 
 public class CommonEvents {
 
@@ -67,6 +72,18 @@ public class CommonEvents {
                     (byte) AdvancedNoteBlock.SUBTICK_LENGTH
             ));
         else if(ANBInfoRender.NOTE_OFF_SYNC || ANBInfoRender.SUBTICK_OFF_SYNC) AdvancedNoteBlock.resetPropertiesToLoadedValues();
+    }
+
+    @SubscribeEvent
+    public static void onANBStateChange(AdvancedNoteBlockEvent.StateChange e){
+        if(!(e.getLevel() instanceof ServerLevel level)) return;
+        if(e instanceof  AdvancedNoteBlockEvent.Removed){
+            PacketDistributor.sendToPlayersInDimension(level, new RemoveBlockInfo(e.getPos()));
+            return;
+        }
+        HashMap<BlockPos, ANBInfoRender.BlockInfo> toSync = new HashMap<>();
+        toSync.put(e.getPos(), new ANBInfoRender.BlockInfo(AdvancedNoteBlock.getNoteValue(e.getState()), e.getState().getValue(AdvancedNoteBlock.SUBTICK)));
+        PacketDistributor.sendToPlayersInDimension(level, new SyncBlockInfos(toSync));
     }
 
     @SubscribeEvent

@@ -33,8 +33,8 @@ public class NBMLangProvider extends LanguageProvider {
         add("text.config.updated", "Updated local configs. Restart your client to apply");
         add("text.lowres.enable", "Activated low resolution render to save fps");
         add("text.lowres.disable", "Low resolution render deactivated");
-        add("text.config.desync_warning", "[WARNING] Advanced Note Block info render may be partially disabled. Click here to synchronize your local config with the server.");
-        add("text.config.save_sync_hovertext", "Synchronize & Safe conig");
+        add("text.config.desync_info", "[NBM] This Server uses a different configuration. Click here if you want to synchronize your local config with the server.");
+        add("text.config.sync_save_hovertext", "Synchronize & Save conig");
     }
 
     public void addBlockWithItem(DeferredBlock<Block> block, String name) {
