@@ -20,7 +20,6 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.nayrus.noteblockmaster.NoteBlockMaster;
 import net.nayrus.noteblockmaster.setup.Registry;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -107,7 +106,7 @@ public class SongCache extends SavedData {
             NoteBlockMaster.LOGGER.debug("Tried to load not-existing cached song file of {}", id);
             return false;
         }
-        if(!SongFileManager.registeredSongs.contains(id)) SongFileManager.registeredSongs.add(id);
+        SongFileManager.registeredSongs.add(id);
         this.cache.put(id, songData);
         return true;
     }
@@ -157,13 +156,13 @@ public class SongCache extends SavedData {
     public static void cacheSong(UUID id, SongData data, SongCache instance){
         if(!instance.cache.containsKey(id)){
             instance.cache(id, data);
-            if(!instance.isLocal && !SongFileManager.registeredSongs.contains(id)) SongFileManager.registeredSongs.add(id);
+            if(!instance.isLocal) SongFileManager.registeredSongs.add(id);
         }
         else NoteBlockMaster.LOGGER.info("Song ID {} is already cached", id);
         instance.setDirty();
     }
 
-    @OnlyIn(Dist.CLIENT) private static final HashMap<UUID, Long> pendingSongRequest = new HashMap<>();
+    private static final HashMap<UUID, Long> pendingSongRequest = new HashMap<>();
     public static @Nullable SongData getSong(UUID id, ItemStack IDHolder){
         SongCache cache;
         if(FMLEnvironment.dist == Dist.CLIENT){
@@ -298,7 +297,7 @@ public class SongCache extends SavedData {
         }
     }
 
-    public static void handleKeyCheckOnClient(final KeyCheck data, final IPayloadContext context){
+    public static void handleKeyCheckOnClient(final KeyCheck data, final IPayloadContext ignoredContext){
         if(!pendingKeyChecks.containsKey(data.key())){
             NoteBlockMaster.LOGGER.warn("Server tried to confirm existence of unknown song"); return;
         }

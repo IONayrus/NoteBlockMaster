@@ -1,7 +1,6 @@
 package net.nayrus.noteblockmaster.network;
 
 import libs.felnull.fnnbs.NBS;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -162,7 +161,7 @@ public class PacketHandler {
     }
 
     private static void handleSongIDInHand(final SongID data, final IPayloadContext context) {
-        LocalPlayer player = (LocalPlayer) context.player();
+        Player player = context.player();
         ItemStack composition = FinalTuple.getHeldItems(player).getFirst(Registry.COMPOSITION.get());
         if(composition.isEmpty()){
             NoteBlockMaster.LOGGER.warn("Unable to write Song ID onto invalid ItemStack"); return;

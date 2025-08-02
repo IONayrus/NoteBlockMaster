@@ -23,6 +23,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -49,7 +50,7 @@ public class NoteBlockMaster
         modContainer.registerConfig(ModConfig.Type.STARTUP, StartupConfig.START_UP);
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT);
         modEventBus.addListener(PacketHandler::registerNetwork);
-
+        modEventBus.addListener(this::onFMLCommonSetup);
 
         if(FMLEnvironment.dist == Dist.CLIENT){
             modEventBus.addListener(DataGenerators::gatherData);
@@ -76,15 +77,23 @@ public class NoteBlockMaster
 
     public void onFMLClientSetup(FMLClientSetupEvent event){
         Path songDir = Paths.get(System.getProperty("user.dir"), "mods\\noteblockmaster\\songs");
-        Path cacheDir = Paths.get(System.getProperty("user.dir"), "mods\\noteblockmaster\\song_cache");
+
         try {
             if (!Files.exists(songDir)) Files.createDirectories(songDir);
-            if (!Files.exists(cacheDir)) Files.createDirectories(cacheDir);
         }catch (IOException e) {
             LOGGER.error(e.getLocalizedMessage());
         }
 
         SongFileManager.SONG_DIR = songDir;
+    }
+
+    public void onFMLCommonSetup(FMLCommonSetupEvent event){
+        Path cacheDir = Paths.get(System.getProperty("user.dir"), "mods\\noteblockmaster\\song_cache");
+        try {
+            if (!Files.exists(cacheDir)) Files.createDirectories(cacheDir);
+        }catch (IOException e) {
+            LOGGER.error(e.getLocalizedMessage());
+        }
         SongFileManager.CACHE_DIR = cacheDir;
     }
 }
