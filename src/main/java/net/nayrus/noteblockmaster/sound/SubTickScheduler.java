@@ -18,15 +18,12 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class SubTickScheduler {
 
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new SubtickThread());
-    public static HashMap<BlockPos, CoreSound> SUSTAINED_SOUNDS = new HashMap<>();
+    public static final HashMap<BlockPos, CoreSound> SUSTAINED_SOUNDS = new HashMap<>();
     public static final RandomSource RANDOM = RandomSource.create();
 
     public static void delayedNoteBlockEvent(BlockState state, Level level, BlockPos pos, AdvancedInstrument instrument, float volume){
@@ -71,7 +68,7 @@ public class SubTickScheduler {
                 instrument.getSustainedEvent(sustainIndex), SoundSource.RECORDS, volume, noteVal,
                 RandomSource.create(RANDOM.nextLong()), pos, instrument.getSustainTime(sustainIndex), noDecay);
 
-        executor.schedule(()-> playSustainingSound(instance),
+        executor.schedule(() -> Minecraft.getInstance().execute(() -> playSustainingSound(instance)),
                 (long) delay * AdvancedNoteBlock.SUBTICK_LENGTH, TimeUnit.MILLISECONDS);
     }
 
@@ -85,7 +82,7 @@ public class SubTickScheduler {
     public static void playbackStop(BlockPos pos){
         SUSTAINED_SOUNDS.computeIfPresent(pos.immutable(), (p, sound) -> {
             if(!sound.getChannel().stopped()) Minecraft.getInstance().getSoundManager().stop(sound);
-            if(sound.getParticle().isAlive()) sound.getParticle().remove();
+            if(sound.getParticle() != null && sound.getParticle().isAlive()) sound.getParticle().remove();
             return null;
         });
     }

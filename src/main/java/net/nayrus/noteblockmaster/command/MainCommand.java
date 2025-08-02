@@ -8,9 +8,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.nayrus.noteblockmaster.setup.config.ClientConfig;
 import net.nayrus.noteblockmaster.setup.config.StartupConfig;
-import net.nayrus.noteblockmaster.network.payload.ActionPing;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 
@@ -24,7 +24,7 @@ public class MainCommand {
                 .then(lowResolutionCommand())
                 .then(Commands.literal("debug")
                         .executes(context -> {
-                            //ActionPing.sendActionPing(context.getSource().getPlayer(), ActionPing.Action.RENDER);
+
                             return Command.SINGLE_SUCCESS;
                         })
                 ).executes(context -> -1));

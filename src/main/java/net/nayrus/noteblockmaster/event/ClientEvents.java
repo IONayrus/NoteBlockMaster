@@ -70,9 +70,9 @@ public class ClientEvents {
     @SubscribeEvent
     public static void playSoundSourceEvent(PlaySoundSourceEvent e){
         if(!(e.getSound() instanceof CoreSound sound)) return;
-        SubTickScheduler.SUSTAINED_SOUNDS.put(sound.getImmutablePos(), sound);
         sound.addNoteParticle();
         sound.setChannel(e.getChannel());
+        SubTickScheduler.SUSTAINED_SOUNDS.put(sound.getImmutablePos(), sound);
     }
 
     @SubscribeEvent
