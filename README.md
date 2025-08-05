@@ -6,7 +6,7 @@ This mod provides you with a wider range of notes and timing possibilities for y
 Currently in Beta.
 
 Upcoming features:
-- Song item for song composing. Editing, saving and loading of composed songs
-- Note Block Studio integration (have not checked if possible)
-  - Not possible, maybe recode Note Block Studio ingame as that item/block :)
+- Block for song management. (Editing) Sharing, saving and loading of Note Block Studio songs
+- Sustaining Core may be replaced with Pitching Core as that is an actual feature of NBS
+
 
